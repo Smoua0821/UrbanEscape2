@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google Map Integration</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=<%= apiKey %>"></script>
+    <link rel="stylesheet" href="/css/style.css" />
+
+    <script>
+      let polyMarker = [
+        {
+          lng: 80.90610950660704,
+          lat: 26.845521783014455,
+        },
+        {
+          lng: 80.90569644641874,
+          lat: 26.844353924601922,
+        },
+        {
+          lng: 80.90571790409086,
+          lat: 26.844176830266072,
+        },
+        {
+          lng: 80.90752034854887,
+          lat: 26.843597681990193,
+        },
+        {
+          lng: 80.90774565410612,
+          lat: 26.843616827435074,
+        },
+        {
+          lng: 80.90789049339293,
+          lat: 26.843707768254166,
+        },
+        {
+          lng: 80.90805142593382,
+          lat: 26.84401888103013,
+        },
+        {
+          lng: 80.90827673149107,
+          lat: 26.84464589033456,
+        },
+      ];
+      let map, marker;
+      let pos = {};
+      let routeCoords = [];
+      const initMap = () => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((position) => {
+            pos.lat = position.coords.latitude;
+            pos.lng = position.coords.longitude;
+            map = new google.maps.Map(document.getElementById("map"), {
+              zoom: 18,
+              center: pos,
+            });
+            map.addListener("click", (event) => {
+              const clickedLocation = event.latLng;
+              routeCoords.push({
+                lng: clickedLocation.lng(),
+                lat: clickedLocation.lat(),
+              });
+              console.log(routeCoords);
+            });
+            document.getElementsByClassName("loadingScreen")[0].remove();
+            marker = new google.maps.Marker({
+              position: pos,
+              map: map,
+            });
+            createPolyAndMove(polyMarker);
+          });
+        }
+      };
+      const createPolyAndMove = (polygonCoordinates) => {
+        const totalCoords = polygonCoordinates.length;
+        if (polygonCoordinates[0] != polygonCoordinates[totalCoords - 1]) {
+          polygonCoordinates.push(polygonCoordinates[0]);
+        }
+        const loopPath = new google.maps.Polyline({
+          path: polygonCoordinates,
+          geodesic: true,
+          strokeColor: "#FF0000",
+          strokeOpacity: 1.0,
+          strokeWeight: 2,
+        });
+        loopPath.setMap(map);
+      };
+    </script>
+  </head>
+  <body onload="initMap()" style="margin: 0">
+    <div id="map" style="height: 100vh; width: 100vw"></div>
+    <div class="loadingScreen">
+      <div class="icon-container">
+        <img alt="Map Icon" src="/images/marker.png" width="100px" />
+      </div>
+      <div class="text-container">
+        <h2>Please Wait......</h2>
+        <p>Ensure You have enabled your location for a better experience</p>
+      </div>
+    </div>
+  </body>
+</html>

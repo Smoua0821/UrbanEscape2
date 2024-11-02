@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google Map Integration</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="https://maps.googleapis.com/maps/api/js?key=<%= apiKey %>"></script>
+    <script>
+      let loopPath; // To hold the polyline
+      let imageMarker; // To hold the moving image marker
+      let loopCoordinates = []; // To hold the route coordinates
+      let currentIndex = 0;
+      let map;
+      const routeCoords = [];
+      let tmpcoords = {};
+      let polyIndex = 0;
+
+      let pos = {
+        lat: -34.45006345312656,
+        lng: 150.47108677662047,
+      };
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 15,
+          center: { lat: -34.397, lng: 150.644 },
+        });
+
+        // Try to get the user's current position
+        if (navigator.geolocation) {
+          map.addListener("click", (event) => {
+            const clickedLocation = event.latLng;
+            tmpcoords = {};
+            tmpcoords.lat = clickedLocation.lat();
+            tmpcoords.lng = clickedLocation.lng();
+            routeCoords.push(tmpcoords);
+            console.log(routeCoords);
+          });
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              pos = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              };
+
+              // Set the map's center to the user's location
+              map.setCenter(pos);
+
+              imageMarker = new google.maps.Marker({
+                position: pos,
+                map: map,
+                icon: {
+                  url: "https://static.vecteezy.com/system/resources/thumbnails/018/982/684/small_2x/car-vehicles-transport-in-flat-style-png.png", // Replace with your image URL
+                  scaledSize: new google.maps.Size(40, 40), // Adjust size as needed
+                },
+              });
+              loopCoordinates = [
+                [
+                  {
+                    lat: 26.873944981713016,
+                    lng: 80.86450738884963,
+                  },
+                  {
+                    lat: 26.872873119173292,
+                    lng: 80.89162988640823,
+                  },
+                  {
+                    lat: 26.87123525645154,
+                    lng: 80.8996533731179,
+                  },
+                  {
+                    lat: 26.86694764258346,
+                    lng: 80.90789311921165,
+                  },
+                  {
+                    lat: 26.86449750453208,
+                    lng: 80.91304296052024,
+                  },
+                  {
+                    lat: 26.828351805051778,
+                    lng: 80.92214101349876,
+                  },
+                  {
+                    lat: 26.827279510628017,
+                    lng: 80.8999966958718,
+                  },
+                  {
+                    lat: 26.8085893210382,
+                    lng: 80.88883870636985,
+                  },
+                  {
+                    lat: 26.82360299555433,
+                    lng: 80.87373250519798,
+                  },
+                  {
+                    lat: 26.834938533834393,
+                    lng: 80.85467809235618,
+                  },
+                  {
+                    lat: 26.842290708856385,
+                    lng: 80.8516740182595,
+                  },
+                  {
+                    lat: 26.859616033395994,
+                    lng: 80.86238646742567,
+                  },
+                  {
+                    lat: 26.874316699977644,
+                    lng: 80.86478972670301,
+                  },
+                  {
+                    lat: 26.873944981713016,
+                    lng: 80.86450738884963,
+                  },
+                ],
+                [
+                  {
+                    lat: -34.45197772538809,
+                    lng: 150.4770364816059,
+                  },
+                  {
+                    lat: -34.45061527550795,
+                    lng: 150.47800207685125,
+                  },
+                  {
+                    lat: -34.45089838380591,
+                    lng: 150.47886038373602,
+                  },
+                  {
+                    lat: -34.449535916318275,
+                    lng: 150.4797401482929,
+                  },
+                  {
+                    lat: -34.44914031806577,
+                    lng: 150.47887418008628,
+                  },
+                  {
+                    lat: -34.447813211691475,
+                    lng: 150.47975394464316,
+                  },
+                  {
+                    lat: -34.44768934735405,
+                    lng: 150.4786274168569,
+                  },
+                  {
+                    lat: -34.4486802569105,
+                    lng: 150.47793004251304,
+                  },
+                  {
+                    lat: -34.44790168610576,
+                    lng: 150.4761061403829,
+                  },
+                  {
+                    lat: -34.44853869912217,
+                    lng: 150.47548386789146,
+                  },
+                  {
+                    lat: -34.44915801267498,
+                    lng: 150.47468993402305,
+                  },
+                  {
+                    lat: -34.45057356926642,
+                    lng: 150.47370288110557,
+                  },
+                  {
+                    lat: -34.45197772538809,
+                    lng: 150.4770364816059,
+                  },
+                ],
+                [
+                  {
+                    lat: -34.4554479976169,
+                    lng: 150.46125916278987,
+                  },
+                  {
+                    lat: -34.45520029140366,
+                    lng: 150.45941380298763,
+                  },
+                  {
+                    lat: -34.451201503721805,
+                    lng: 150.46031502521663,
+                  },
+                  {
+                    lat: -34.44929051102289,
+                    lng: 150.46078709400325,
+                  },
+                  {
+                    lat: -34.44663628196153,
+                    lng: 150.46327618396907,
+                  },
+                  {
+                    lat: -34.44730869463392,
+                    lng: 150.46404866016536,
+                  },
+                  {
+                    lat: -34.45084761948378,
+                    lng: 150.46580818927913,
+                  },
+                  {
+                    lat: -34.455164904741785,
+                    lng: 150.4649927977386,
+                  },
+                  {
+                    lat: -34.4554479976169,
+                    lng: 150.46125916278987,
+                  },
+                ],
+              ];
+              if (polyIndex != findNearestPolygonIndex(pos, loopCoordinates)) {
+                imageMarker.setMap(null);
+                polyIndex = findNearestPolygonIndex(pos, loopCoordinates);
+              }
+              boundArea(loopCoordinates);
+            },
+            (error) => {
+              console.error("Error getting location: ", error);
+            }
+          );
+        } else {
+          // Browser doesn't support Geolocation
+          handleLocationError(false, map.getCenter());
+        }
+      }
+
+      function handleLocationError(browserHasGeolocation, pos) {
+        console.error(
+          browserHasGeolocation
+            ? "Error: The Geolocation service failed."
+            : "Error: Your browser doesn't support geolocation."
+        );
+        // Optionally, you can set the map's center to a default location or display an error message
+      }
+      let radiusCircle;
+      function boundArea(loopCoordinates) {
+        loopCoordinates.forEach((element) => {
+          const loopPath = new google.maps.Polyline({
+            path: element,
+            geodesic: true,
+            strokeColor: "#FF0000",
+            strokeOpacity: 1.0,
+            strokeWeight: 2,
+          });
+          loopPath.setMap(map);
+          moveImage(polyIndex);
+          console.log(polyIndex);
+        });
+      }
+      function moveImage(index) {
+        if (loopCoordinates.length === 0) return;
+
+        // Get the current and next coordinates
+        const currentCoord = loopCoordinates[index][currentIndex];
+        const nextIndex = (currentIndex + 1) % loopCoordinates[index].length; // Wrap around to the start
+        const nextCoord = loopCoordinates[index][nextIndex];
+
+        // Calculate the number of steps for smoother movement
+        const steps = 10; // Adjust this for smoother/faster movement
+        let stepCount = 0;
+
+        // Move the car smoothly using setInterval
+        const interval = setInterval(() => {
+          if (stepCount < steps) {
+            const lat =
+              currentCoord.lat +
+              (nextCoord.lat - currentCoord.lat) * (stepCount / steps);
+            const lng =
+              currentCoord.lng +
+              (nextCoord.lng - currentCoord.lng) * (stepCount / steps);
+            imageMarker.setPosition(new google.maps.LatLng(lat, lng));
+            stepCount++;
+          } else {
+            currentIndex = nextIndex;
+            clearInterval(interval);
+            moveImage(index); // Start moving to the next segment
+          }
+        }, 50);
+      }
+
+      function haversineDistance(coord1, coord2) {
+        const R = 6371; // Radius of the Earth in kilometers
+        const dLat = (coord2.lat - coord1.lat) * (Math.PI / 180);
+        const dLng = (coord2.lng - coord1.lng) * (Math.PI / 180);
+
+        const a =
+          Math.sin(dLat / 2) ** 2 +
+          Math.cos(coord1.lat * (Math.PI / 180)) *
+            Math.cos(coord2.lat * (Math.PI / 180)) *
+            Math.sin(dLng / 2) ** 2;
+
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // Distance in kilometers
+      }
+
+      function findNearestPolygonIndex(point, loopCoordinates) {
+        let nearestIndex = -1;
+        let minDistance = Infinity;
+
+        for (let i = 0; i < loopCoordinates.length; i++) {
+          const polygon = loopCoordinates[i];
+          for (const vertex of polygon) {
+            const distance = haversineDistance(point, vertex);
+            if (distance < minDistance) {
+              minDistance = distance;
+              nearestIndex = i;
+            }
+          }
+        }
+        return nearestIndex;
+      }
+    </script>
+  </head>
+  <body onload="initMap()" style="margin: 0">
+    <div id="map" style="height: 100vh; width: 100vw"></div>
+  </body>
+</html>
