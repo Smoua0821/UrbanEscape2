@@ -6,76 +6,77 @@
     <title>Google Map Integration</title>
     <script src="https://maps.googleapis.com/maps/api/js?key=<%= apiKey %>"></script>
     <link rel="stylesheet" href="/css/style.css" />
-
     <script>
       let polyMarker = [
-        {
-          lng: 80.90610950660704,
-          lat: 26.845521783014455,
-        },
-        {
-          lng: 80.90569644641874,
-          lat: 26.844353924601922,
-        },
-        {
-          lng: 80.90571790409086,
-          lat: 26.844176830266072,
-        },
-        {
-          lng: 80.90752034854887,
-          lat: 26.843597681990193,
-        },
-        {
-          lng: 80.90774565410612,
-          lat: 26.843616827435074,
-        },
-        {
-          lng: 80.90789049339293,
-          lat: 26.843707768254166,
-        },
-        {
-          lng: 80.90805142593382,
-          lat: 26.84401888103013,
-        },
-        {
-          lng: 80.90827673149107,
-          lat: 26.84464589033456,
-        },
+        { lng: 79.17449714631042, lat: 26.23567752525881 },
+        { lng: 79.17469026535949, lat: 26.235884432184413 },
+        { lng: 79.17491020649871, lat: 26.236245315475717 },
+        { lng: 79.17582215756377, lat: 26.235961420713906 },
+        { lng: 79.17567195385894, lat: 26.23560534833768 },
+        { lng: 79.17576851338347, lat: 26.23543212354412 },
+        { lng: 79.17579533547362, lat: 26.235153038611568 },
+        { lng: 79.17506577462157, lat: 26.2352300276254 },
       ];
+
       let map, marker;
       let pos = {};
+      let latCrd = 0;
+      let lngCrd = 0;
       let routeCoords = [];
+      let currentIndex = 0;
+      const speed = 20; // Adjust speed as necessary
+      let animationInterval;
+
       const initMap = () => {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition((position) => {
             pos.lat = position.coords.latitude;
             pos.lng = position.coords.longitude;
+
             map = new google.maps.Map(document.getElementById("map"), {
               zoom: 18,
               center: pos,
+              mapId: "Main_Map",
             });
+
             map.addListener("click", (event) => {
               const clickedLocation = event.latLng;
-              routeCoords.push({
-                lng: clickedLocation.lng(),
-                lat: clickedLocation.lat(),
-              });
-              console.log(routeCoords);
+              const lng = clickedLocation.lng();
+              const lat = clickedLocation.lat();
+              const distance = Math.sqrt(
+                (latCrd - lat) * (latCrd - lat) +
+                  (lngCrd - lng) * (lngCrd - lng)
+              );
+              if (distance < 0.001) {
+                alert("Captured!");
+              } else {
+                console.log(distance);
+              }
             });
+
             document.getElementsByClassName("loadingScreen")[0].remove();
+
             marker = new google.maps.Marker({
               position: pos,
               map: map,
+              icon: {
+                url: "https://static.vecteezy.com/system/resources/thumbnails/018/982/684/small_2x/car-vehicles-transport-in-flat-style-png.png",
+                scaledSize: new google.maps.Size(40, 40),
+              },
             });
+
             createPolyAndMove(polyMarker);
+            startMarkerAnimation();
           });
         }
       };
+
       const createPolyAndMove = (polygonCoordinates) => {
         const totalCoords = polygonCoordinates.length;
-        if (polygonCoordinates[0] != polygonCoordinates[totalCoords - 1]) {
+        if (polygonCoordinates[0] !== polygonCoordinates[totalCoords - 1]) {
           polygonCoordinates.push(polygonCoordinates[0]);
         }
+
         const loopPath = new google.maps.Polyline({
           path: polygonCoordinates,
           geodesic: true,
@@ -83,8 +84,42 @@
           strokeOpacity: 1.0,
           strokeWeight: 2,
         });
+
         loopPath.setMap(map);
       };
+
+      const startMarkerAnimation = () => {
+        animationInterval = setInterval(() => {
+          if (currentIndex >= polyMarker.length) {
+            currentIndex = 0; // Reset to start
+          }
+
+          const nextIndex = (currentIndex + 1) % polyMarker.length;
+          const start = polyMarker[currentIndex];
+          const end = polyMarker[nextIndex];
+
+          const deltaLat = (end.lat - start.lat) / speed;
+          const deltaLng = (end.lng - start.lng) / speed;
+
+          const animateMarker = (step) => {
+            if (step < speed) {
+              latCrd = start.lat + deltaLat * step;
+              lngCrd = start.lng + deltaLng * step;
+              marker.setPosition({
+                lat: latCrd,
+                lng: lngCrd,
+              });
+              requestAnimationFrame(() => animateMarker(step + 1));
+            } else {
+              currentIndex = nextIndex;
+            }
+          };
+
+          animateMarker(0);
+        }, 1000); // Adjust the interval for smoother transitions
+      };
+
+      window.onload = initMap;
     </script>
   </head>
   <body onload="initMap()" style="margin: 0">
