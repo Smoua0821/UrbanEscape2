@@ -1,9 +1,11 @@
 const express = require("express");
 const router = express.Router();
-router.get("/", (req, res) => {
-  res.render("pages/admin", {
-    apiKey: "AIzaSyBaQ334LSpDNZXU8flkT1VjGpdj7f3_BZI",
-  });
-});
+const { adminPage } = require("../controllers/admin");
+const { fetchLoopRoutes, saveLoopRoutes } = require("../controllers/loopRoute");
+
+router.get("/", adminPage);
+
+router.get("/looproute", fetchLoopRoutes);
+router.post("/looproute", saveLoopRoutes);
 
 module.exports = router;
