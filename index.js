@@ -1,9 +1,11 @@
 const express = require("express");
-const app = express();
 const port = 8000;
 const bodyParser = require("body-parser");
 const connectDB = require("./config/db");
 const path = require("path");
+
+const app = express();
+connectDB();
 
 const staticRoutes = require("./routes/static");
 const adminRoutes = require("./routes/admin");
