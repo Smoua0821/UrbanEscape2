@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin</title>
+    <link href="/css/bs.css" rel="stylesheet" crossorigin="anonymous" />
+    <script src="/js/jquery.js"></script>
+  </head>
+  <body>
+    <div class="row m-0 p-0">
+      <div class="col-md-4 col-lg-3 vh-100 sidebar-container">
+        <div class="sidebar">
+          <div class="logo text-center p-2">
+            <h1>Mappy</h1>
+          </div>
+          <div class="menu">
+            <ul style="list-style: none">
+              <li data-link="home">Home</li>
+              <li data-link="users">Users</li>
+              <li data-link="routes">Routes</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-8 col-lg-9">
+        <div class="body-container">
+          <div class="dynamic-container">
+            <div class="vj_dynamic home">
+              <div
+                class="container d-flex justify-content-center align-items-center vh-100"
+              >
+                <div class="text-center">
+                  <h3>Welcome</h3>
+                  <img
+                    src="/images/dancer.gif"
+                    width="200px"
+                    alt="welcome dancer"
+                  />
+                  <p class="alert alert-warning">
+                    Hello, Welcome Admin! Here you can manage all the stuff of
+                    the Website!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="vj_dynamic users">User hai</div>
+            <div class="vj_dynamic routes">
+              <div class="map-container">
+                <div class="g-map vh-100"></div>
+                <div class="map-controller" style="display: none">
+                  <div class="d-flex bg-white p-2 rounded-2">
+                    <button class="btn btn-outline-warning undo">Undo</button>
+                    <button class="btn btn-outline-warning cpath">
+                      Close Path
+                    </button>
+                    <button class="btn btn-outline-success save">Save</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      let isNewMap = 0;
+      let isClosedPath = 0;
+      let map, marker, polygon;
+      let polyCoords = [];
+      let pos = {
+        lat: 26,
+        lng: 85,
+      };
+      $(".map-controller .undo").click(() => {
+        isClosedPath = 0;
+        polyCoords.pop();
+        polygon.setPath(polyCoords);
+        marker.position = polyCoords[polyCoords.length - 1];
+        if (polyCoords.length == 0) {
+          $(".map-controller").hide();
+          marker.setMap(null);
+        }
+      });
+      $(".map-controller .cpath").click(() => {
+        $("btn.undo").hide();
+        if (isClosedPath) return;
+        if (polyCoords[0] != polyCoords[polyCoords.length - 1]) {
+          polyCoords.push(polyCoords[0]);
+          isClosedPath = 1;
+          polygon.setPath(polyCoords);
+          marker.setMap(null);
+        }
+      });
+      $(document).ready(() => {
+        $(".vj_dynamic").hide();
+        $(".vj_dynamic.home").show();
+        $(".sidebar-container .sidebar .menu ul li").click(function () {
+          const linkId = $(this).data("link");
+          if (!linkId) return;
+          if (linkId == "routes") {
+            if (isNewMap) {
+              isNewMap = 1;
+            }
+          }
+          $(".vj_dynamic").hide();
+          $(`.vj_dynamic.${linkId}`).show();
+        });
+        map = new google.maps.Map(document.getElementsByClassName("g-map")[0], {
+          zoom: 10,
+          center: pos,
+          mapId: "Main_Map",
+        });
+        marker = new google.maps.marker.AdvancedMarkerElement({
+          position: pos,
+        });
+        marker.setMap(null);
+        polygon = new google.maps.Polyline({
+          map: map,
+        });
+        polygon.setMap(null);
+        google.maps.event.addListener(map, "click", (event) => {
+          if (isClosedPath) {
+            isClosedPath = 0;
+            polyCoords = [];
+            polygon.setMap(null);
+            $(".btn.undo").show();
+          }
+          const clickedLocation = event.latLng;
+          const lng = clickedLocation.lng();
+          const lat = clickedLocation.lat();
+          const tmp = {
+            lat: lat,
+            lng: lng,
+          };
+          polyCoords.push(tmp);
+          marker.position = tmp;
+          marker.setMap(map);
+          $(".map-controller").hide();
+          if (polyCoords.length > 1) {
+            $(".map-controller").show();
+            polygon.setPath(polyCoords);
+            polygon.setMap(map);
+          }
+        });
+      });
+    </script>
+    <style>
+      .sidebar-container {
+        background: #e5ffbd;
+        box-shadow: 2px 0px 11px 0px #00000091;
+      }
+
+      .sidebar-container .sidebar .logo {
+        color: #ffffff;
+        -webkit-text-stroke: 1px #000;
+        text-shadow: 2px 2px #000000;
+      }
+
+      .sidebar-container .sidebar .menu ul li {
+        padding: 5px 10px;
+        margin: 2px 0;
+        transition: 0.2s;
+        cursor: pointer;
+      }
+
+      .sidebar-container .sidebar .menu ul {
+        text-align: center;
+        font-weight: 500;
+        letter-spacing: 2px;
+        padding: 0;
+      }
+
+      .sidebar-container .sidebar .menu ul li:hover {
+        background: white;
+      }
+
+      .map-controller {
+        position: fixed;
+        z-index: 999;
+        bottom: 5px;
+      }
+
+      .map-controller .btn {
+        margin: 0 5px;
+      }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=marker&key=<%= apiKey %>"></script>
+  </body>
+</html>
