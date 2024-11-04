@@ -1,12 +1,15 @@
 const express = require("express");
 const app = express();
 const port = 8000;
+const bodyParser = require("body-parser");
+const connectDB = require("./config/db");
 const path = require("path");
 
 const staticRoutes = require("./routes/static");
 const adminRoutes = require("./routes/admin");
 
 app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 
