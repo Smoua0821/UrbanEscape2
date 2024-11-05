@@ -125,7 +125,7 @@
               class="btn btn-secondary"
               data-bs-dismiss="modal"
             >
-              Close
+              Preview
             </button>
             <button type="button" class="btn btn-primary">Save changes</button>
           </div>
@@ -147,7 +147,7 @@
         radius = Math.pow(event.value / 10, 1.5) * (1000 / map.getZoom());
         circle.setRadius(radius);
         circle.setMap(map);
-        payloadData.radius = radius;
+        payloadData.radius = parseInt(radius);
       };
       let payloadData = {
         polygonCoords: polyCoords,
