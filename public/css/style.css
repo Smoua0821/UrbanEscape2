@@ -30,6 +30,7 @@
   align-items: center;
   height: 100%;
   font-family: sans-serif;
+  background: white;
 }
 
 .loadingScreen div {

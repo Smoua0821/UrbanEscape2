@@ -4,125 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Google Map Integration</title>
-    <script src="https://maps.googleapis.com/maps/api/js?key=<%= apiKey %>"></script>
     <link rel="stylesheet" href="/css/style.css" />
-    <script>
-      let polyMarker = [
-        { lng: 79.17449714631042, lat: 26.23567752525881 },
-        { lng: 79.17469026535949, lat: 26.235884432184413 },
-        { lng: 79.17491020649871, lat: 26.236245315475717 },
-        { lng: 79.17582215756377, lat: 26.235961420713906 },
-        { lng: 79.17567195385894, lat: 26.23560534833768 },
-        { lng: 79.17576851338347, lat: 26.23543212354412 },
-        { lng: 79.17579533547362, lat: 26.235153038611568 },
-        { lng: 79.17506577462157, lat: 26.2352300276254 },
-      ];
-
-      let map, marker;
-      let pos = {};
-      let latCrd = 0;
-      let lngCrd = 0;
-      let routeCoords = [];
-      let currentIndex = 0;
-      const speed = 10; // Adjust speed as necessary
-      let animationInterval;
-
-      const initMap = () => {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition((position) => {
-            pos.lat = position.coords.latitude;
-            pos.lng = position.coords.longitude;
-
-            map = new google.maps.Map(document.getElementById("map"), {
-              zoom: 18,
-              center: pos,
-              mapId: "Main_Map",
-            });
-
-            map.addListener("click", (event) => {
-              const clickedLocation = event.latLng;
-              const lng = clickedLocation.lng();
-              const lat = clickedLocation.lat();
-              const distance = Math.sqrt(
-                (latCrd - lat) * (latCrd - lat) +
-                  (lngCrd - lng) * (lngCrd - lng)
-              );
-              if (distance < 0.001) {
-                alert("Captured!");
-              } else {
-                console.log(distance);
-              }
-            });
-
-            document.getElementsByClassName("loadingScreen")[0].remove();
-
-            marker = new google.maps.Marker({
-              position: pos,
-              map: map,
-              icon: {
-                url: "https://static.vecteezy.com/system/resources/thumbnails/018/982/684/small_2x/car-vehicles-transport-in-flat-style-png.png",
-                scaledSize: new google.maps.Size(40, 40),
-              },
-            });
-
-            createPolyAndMove(polyMarker);
-            startMarkerAnimation();
-          });
-        }
-      };
-
-      const createPolyAndMove = (polygonCoordinates) => {
-        const totalCoords = polygonCoordinates.length;
-        if (polygonCoordinates[0] !== polygonCoordinates[totalCoords - 1]) {
-          polygonCoordinates.push(polygonCoordinates[0]);
-        }
-
-        const loopPath = new google.maps.Polyline({
-          path: polygonCoordinates,
-          geodesic: true,
-          strokeColor: "#FF0000",
-          strokeOpacity: 1.0,
-          strokeWeight: 2,
-        });
-
-        loopPath.setMap(map);
-      };
-
-      const startMarkerAnimation = () => {
-        animationInterval = setInterval(() => {
-          if (currentIndex >= polyMarker.length) {
-            currentIndex = 0; // Reset to start
-          }
-
-          const nextIndex = (currentIndex + 1) % polyMarker.length;
-          const start = polyMarker[currentIndex];
-          const end = polyMarker[nextIndex];
-
-          const deltaLat = (end.lat - start.lat) / speed;
-          const deltaLng = (end.lng - start.lng) / speed;
-
-          const animateMarker = (step) => {
-            if (step < speed) {
-              latCrd = start.lat + deltaLat * step;
-              lngCrd = start.lng + deltaLng * step;
-              marker.setPosition({
-                lat: latCrd,
-                lng: lngCrd,
-              });
-              requestAnimationFrame(() => animateMarker(step + 1));
-            } else {
-              currentIndex = nextIndex;
-            }
-          };
-
-          animateMarker(0);
-        }, 1000); // Adjust the interval for smoother transitions
-      };
-
-      window.onload = initMap;
-    </script>
+    <script src="/js/jquery.js"></script>
   </head>
-  <body onload="initMap()" style="margin: 0">
+  <body style="margin: 0">
     <div id="map" style="height: 100vh; width: 100vw"></div>
     <div class="loadingScreen">
       <div class="icon-container">
@@ -133,5 +18,123 @@
         <p>Ensure You have enabled your location for a better experience</p>
       </div>
     </div>
+    <script>
+      let polygonCoordinates = [];
+      let map, markerElement;
+      let pos = { lat: 26, lng: 85 };
+      let iconMarker = document.createElement("img");
+      let currentSegment = 0;
+      let currentStep = 0;
+      let stepsPerSegment = 100;
+      let speed = 10;
+      iconMarker.width = 50;
+      function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 10,
+          center: pos,
+          mapId: "main_map",
+        });
+        markerElement = new google.maps.marker.AdvancedMarkerElement({
+          position: pos,
+          map: map,
+          content: iconMarker,
+        });
+        showAllPolygons();
+      }
+
+      function showAllPolygons() {
+        $.get("/admin/looproute", (data, success) => {
+          if (!success) return;
+          polygonCoordinates = data;
+          polygonCoordinates.forEach((element) => {
+            new google.maps.Polyline({
+              path: element.polygonCoords,
+              map: map,
+            });
+          });
+          stepsPerSegment = haversineDistance(
+            polygonCoordinates[0].polygonCoords[0],
+            polygonCoordinates[0].polygonCoords[1]
+          );
+          moveMarker(
+            polygonCoordinates[0].image,
+            polygonCoordinates[0].polygonCoords
+          );
+          animateMarker();
+        });
+      }
+
+      function moveMarker(imageSrc, coordinates) {
+        iconMarker.src = imageSrc;
+        markerElement.position = coordinates[0];
+      }
+
+      function interpolate(start, end, factor) {
+        return {
+          lat: start.lat + (end.lat - start.lat) * factor,
+          lng: start.lng + (end.lng - start.lng) * factor,
+        };
+      }
+
+      function animateMarker() {
+        const start = polygonCoordinates[0].polygonCoords[currentSegment];
+        const end = polygonCoordinates[0].polygonCoords[currentSegment + 1];
+
+        // Calculate the interpolation factor
+        const factor = currentStep / stepsPerSegment;
+        const newPos = interpolate(start, end, factor);
+        markerElement.position = newPos;
+        stepsPerSegment = haversineDistance(
+          polygonCoordinates[0].polygonCoords[currentSegment],
+          polygonCoordinates[0].polygonCoords[currentSegment + 1]
+        );
+        currentStep++;
+
+        // Move to next segment if current segment is done
+        if (currentStep > stepsPerSegment) {
+          currentStep = 0;
+          currentSegment++;
+          // Loop back to start if at the end of the polygon path
+          if (
+            currentSegment >=
+            polygonCoordinates[0].polygonCoords.length - 1
+          ) {
+            currentSegment = 0;
+          }
+        }
+        // Repeat animation
+        setTimeout(animateMarker, 1000 / speed);
+      }
+
+      function haversineDistance(coords1, coords2) {
+        const toRadians = (degrees) => degrees * (Math.PI / 180);
+
+        const lat1 = toRadians(coords1.lat);
+        const lng1 = toRadians(coords1.lng);
+        const lat2 = toRadians(coords2.lat);
+        const lng2 = toRadians(coords2.lng);
+
+        const dlat = lat2 - lat1;
+        const dlng = lng2 - lng1;
+
+        const a =
+          Math.sin(dlat / 2) ** 2 +
+          Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlng / 2) ** 2;
+
+        const c = 2 * Math.asin(Math.sqrt(a));
+
+        const R = 6371;
+        return R * c;
+      }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?callback=initMap&libraries=marker&key=<%= apiKey %>"></script>
+
+    <script>
+      setTimeout(function () {
+        $(".loadingScreen").fadeOut(() => {
+          $(".loadingScreen").remove();
+        });
+      }, 1000);
+    </script>
   </body>
 </html>
