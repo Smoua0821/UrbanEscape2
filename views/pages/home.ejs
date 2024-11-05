@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Google Map Integration</title>
     <link rel="stylesheet" href="/css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css"
+    />
     <script src="/js/jquery.js"></script>
   </head>
   <body style="margin: 0">
@@ -19,8 +23,12 @@
       </div>
     </div>
     <script>
+      let notyf;
+      $(document).ready(() => {
+        notyf = new Notyf();
+      });
       let polygonCoordinates = [];
-      let map, markerElement;
+      let map, markerElement, circle, marker;
       let pos = { lat: 26, lng: 85 };
       let iconMarker = document.createElement("img");
       let currentSegment = 0;
@@ -28,16 +36,49 @@
       let stepsPerSegment = 100;
       let speed = 10;
       iconMarker.width = 50;
+      let polyIndex = 2;
       function initMap() {
         map = new google.maps.Map(document.getElementById("map"), {
           zoom: 10,
           center: pos,
           mapId: "main_map",
         });
+        marker = new google.maps.marker.AdvancedMarkerElement({
+          map: map,
+          position: pos,
+        });
+        map.addListener("click", (event) => {
+          const clickedLocation = event.latLng;
+          const circleLocation = circle.getCenter();
+          marker.position = {
+            lat: clickedLocation.lat(),
+            lng: clickedLocation.lng(),
+          };
+          const clickDist = haversineDistance(
+            {
+              lat: clickedLocation.lat(),
+              lng: clickedLocation.lng(),
+            },
+            {
+              lat: circleLocation.lat(),
+              lng: circleLocation.lng(),
+            }
+          );
+          if (clickDist <= circle.getRadius() / 1000) {
+            notyf.success("Picture Added to Your Profile!");
+          }
+        });
         markerElement = new google.maps.marker.AdvancedMarkerElement({
           position: pos,
           map: map,
           content: iconMarker,
+        });
+
+        circle = new google.maps.Circle({
+          center: pos,
+          radius: 1000,
+          map: map,
+          clickable: false,
         });
         showAllPolygons();
       }
@@ -53,12 +94,12 @@
             });
           });
           stepsPerSegment = haversineDistance(
-            polygonCoordinates[0].polygonCoords[0],
-            polygonCoordinates[0].polygonCoords[1]
+            polygonCoordinates[polyIndex].polygonCoords[0],
+            polygonCoordinates[polyIndex].polygonCoords[1]
           );
           moveMarker(
-            polygonCoordinates[0].image,
-            polygonCoordinates[0].polygonCoords
+            polygonCoordinates[polyIndex].image,
+            polygonCoordinates[polyIndex].polygonCoords
           );
           animateMarker();
         });
@@ -66,7 +107,8 @@
 
       function moveMarker(imageSrc, coordinates) {
         iconMarker.src = imageSrc;
-        markerElement.position = coordinates[0];
+        markerElement.position = coordinates[polyIndex];
+        circle.setRadius(polygonCoordinates[polyIndex].radius);
       }
 
       function interpolate(start, end, factor) {
@@ -77,16 +119,23 @@
       }
 
       function animateMarker() {
-        const start = polygonCoordinates[0].polygonCoords[currentSegment];
-        const end = polygonCoordinates[0].polygonCoords[currentSegment + 1];
+        const urlParsed = new URL(iconMarker.src);
+        if ((urlParsed.pathname = polygonCoordinates[polyIndex].image)) {
+          iconMarker.src = polygonCoordinates[polyIndex].image;
+        }
+        const start =
+          polygonCoordinates[polyIndex].polygonCoords[currentSegment];
+        const end =
+          polygonCoordinates[polyIndex].polygonCoords[currentSegment + 1];
 
         // Calculate the interpolation factor
         const factor = currentStep / stepsPerSegment;
         const newPos = interpolate(start, end, factor);
         markerElement.position = newPos;
+        circle.setCenter(newPos);
         stepsPerSegment = haversineDistance(
-          polygonCoordinates[0].polygonCoords[currentSegment],
-          polygonCoordinates[0].polygonCoords[currentSegment + 1]
+          polygonCoordinates[polyIndex].polygonCoords[currentSegment],
+          polygonCoordinates[polyIndex].polygonCoords[currentSegment + 1]
         );
         currentStep++;
 
@@ -97,7 +146,7 @@
           // Loop back to start if at the end of the polygon path
           if (
             currentSegment >=
-            polygonCoordinates[0].polygonCoords.length - 1
+            polygonCoordinates[polyIndex].polygonCoords.length - 1
           ) {
             currentSegment = 0;
           }
@@ -136,5 +185,7 @@
         });
       }, 1000);
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
   </body>
 </html>
