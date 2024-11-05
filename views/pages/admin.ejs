@@ -179,6 +179,9 @@
               circle.setMap(null);
             }
           });
+          $(".icon-selector").removeClass("active");
+          polyCoords = [];
+          $(".map-controller").fadeOut();
         } else {
           notyf.error("Invalid Configuration!");
         }
@@ -222,7 +225,7 @@
       });
       $(document).ready(() => {
         $(".vj_dynamic").hide();
-        $(".vj_dynamic.home").show();
+        $(".vj_dynamic.home").fadeIn();
         $(".sidebar-container .sidebar .menu ul li").click(function () {
           const linkId = $(this).data("link");
           if (!linkId) return;
@@ -232,7 +235,7 @@
             }
           }
           $(".vj_dynamic").hide();
-          $(`.vj_dynamic.${linkId}`).show();
+          $(`.vj_dynamic.${linkId}`).fadeIn();
         });
         map = new google.maps.Map(document.getElementsByClassName("g-map")[0], {
           zoom: 10,
@@ -263,7 +266,7 @@
             polygon.setMap(null);
             circle.setMap(null);
             iconMarker.setMap(null);
-            $(".btn.undo").show();
+            $(".btn.undo").fadeIn();
           }
           const clickedLocation = event.latLng;
           const lng = clickedLocation.lng();
