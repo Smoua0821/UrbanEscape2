@@ -91,6 +91,7 @@
             new google.maps.Polyline({
               path: element.polygonCoords,
               map: map,
+              clickable: false,
             });
           });
           stepsPerSegment = haversineDistance(
