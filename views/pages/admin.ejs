@@ -33,6 +33,7 @@
                 <div class="text-center">
                   <h3>Welcome</h3>
                   <img
+                    loading="lazy"
                     src="/images/dancer.gif"
                     width="200px"
                     alt="welcome dancer"
@@ -63,23 +64,121 @@
         </div>
       </div>
     </div>
+    <div
+      class="modal fade"
+      id="savePolyModal"
+      tabindex="-1"
+      aria-labelledby="savePolyModal"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              <form class="m-0 p-0" method="POST">
+                <input type="hidden" name="polyCoords" />
+                <div class="form-group mb-2">
+                  <p class="m-0">Adjust Radius:</p>
+                  <input
+                    type="range"
+                    oninput="setMapRadius(this)"
+                    max="1000"
+                    step="1"
+                    value="50"
+                    class="form-control"
+                    placeholder="Radius of Image"
+                  />
+                </div>
+                <% if (icons) { %>
+                <p class="m-0">Select Image</p>
+                <div class="icon-container d-flex justify-content-center">
+                  <% icons.forEach(icon => { %>
+                  <div
+                    class="p-2 border-1 rounded-1 mx-1 icon-selector"
+                    data-src="/images/mapicons/<%= icon %>"
+                  >
+                    <img
+                      loading="lazy"
+                      alt="<%= icon %>"
+                      src="/images/mapicons/<%= icon %>"
+                      width="100px"
+                    />
+                  </div>
+                  <% }) %>
+                </div>
+                <% } %>
+              </form>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <script>
       let isNewMap = 0;
       let isClosedPath = 0;
-      let map, marker, polygon;
+      let map, marker, polygon, circle, iconMarker, radius;
       let polyCoords = [];
+      const beachFlagImg = document.createElement("img");
       let pos = {
         lat: 26,
         lng: 85,
       };
+      const setMapRadius = (event) => {
+        circle.setCenter(polyCoords[0]);
+        radius = Math.pow(event.value / 10, 1.5) * (1000 / map.getZoom());
+        circle.setRadius(radius);
+        circle.setMap(map);
+        payloadData.radius = radius;
+      };
+      let payloadData = {
+        polygonCoords: polyCoords,
+        image: beachFlagImg.src,
+        radius: radius,
+      };
+      $(".icon-selector").click(function () {
+        $(".icon-selector").removeClass("active");
+        $(this).addClass("active");
+        iconMarker.setMap(map);
+        iconMarker.position = polyCoords[0];
+        beachFlagImg.width = 50;
+        beachFlagImg.src = $(this).data("src");
+        payloadData.image = $(this).data("src");
+      });
       $(".map-controller .undo").click(() => {
         isClosedPath = 0;
         polyCoords.pop();
+        circle.setMap(null);
         polygon.setPath(polyCoords);
         marker.position = polyCoords[polyCoords.length - 1];
         if (polyCoords.length == 0) {
           $(".map-controller").hide();
           marker.setMap(null);
+        }
+      });
+      $(".map-controller .save").click(() => {
+        if (isClosedPath) {
+          $("#savePolyModal").modal("show");
+        } else {
+          alert("Please Close the path before saving...");
         }
       });
       $(".map-controller .cpath").click(() => {
@@ -118,12 +217,22 @@
         polygon = new google.maps.Polyline({
           map: map,
         });
+        circle = new google.maps.Circle({
+          center: pos,
+          radius: 5000,
+        });
+
+        iconMarker = new google.maps.marker.AdvancedMarkerElement({
+          position: pos,
+          content: beachFlagImg,
+        });
         polygon.setMap(null);
         google.maps.event.addListener(map, "click", (event) => {
           if (isClosedPath) {
             isClosedPath = 0;
             polyCoords = [];
             polygon.setMap(null);
+            circle.setMap(null);
             $(".btn.undo").show();
           }
           const clickedLocation = event.latLng;
@@ -184,7 +293,29 @@
       .map-controller .btn {
         margin: 0 5px;
       }
+
+      .icon-container div {
+        border: 1px solid lightgrey;
+        box-shadow: 0 2px 10px 0 lightgrey;
+        cursor: pointer;
+        transition: 0.1s;
+      }
+
+      .icon-container div:hover {
+        box-shadow: 0 0 0 0 lightgrey;
+      }
+
+      .icon-container div.active {
+        background: #ededed;
+        border: 2px dashed green;
+        box-shadow: 0 0 0 0 lightgrey;
+      }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?libraries=marker&key=<%= apiKey %>"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
   </body>
 </html>
