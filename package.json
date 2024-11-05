@@ -16,6 +16,8 @@
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.8.0",
-    "nodemon": "^3.1.7"
+    "nodemon": "^3.1.7",
+    "notyf": "^3.10.0",
+    "toastify-js": "^1.12.0"
   }
 }

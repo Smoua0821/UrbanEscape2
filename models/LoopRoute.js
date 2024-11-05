@@ -12,15 +12,6 @@ const loopRouteSchema = new mongoose.Schema(
         },
       ],
       required: true,
-      validate: {
-        validator: function (v) {
-          const coordsSet = new Set(
-            v.map((coord) => `${coord.lat},${coord.lng}`)
-          );
-          return coordsSet.size === v.length; // Unique check
-        },
-        message: "Coordinates must be unique.",
-      },
     },
     image: {
       type: String, // URL or file path for the image

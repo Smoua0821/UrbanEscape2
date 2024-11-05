@@ -6,6 +6,12 @@
     <title>Admin</title>
     <link href="/css/bs.css" rel="stylesheet" crossorigin="anonymous" />
     <script src="/js/jquery.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
   </head>
   <body>
     <div class="row m-0 p-0">
@@ -127,12 +133,15 @@
             >
               Preview
             </button>
-            <button type="button" class="btn btn-primary">Save changes</button>
+            <button type="button" class="btn btn-primary save_final">
+              Save changes
+            </button>
           </div>
         </div>
       </div>
     </div>
     <script>
+      const notyf = new Notyf();
       let isNewMap = 0;
       let isClosedPath = 0;
       let map, marker, polygon, circle, iconMarker, radius;
@@ -154,6 +163,26 @@
         image: beachFlagImg.src,
         radius: radius,
       };
+      $(".save_final").click(() => {
+        if (
+          payloadData.polygonCoords.length > 2 &&
+          payloadData.radius > 0 &&
+          payloadData.image
+        ) {
+          $.post("/admin/looproute", payloadData, (success, data) => {
+            if (success) {
+              notyf.success("New Route added successfully!");
+              $("#savePolyModal").modal("hide");
+              marker.setMap(null);
+              iconMarker.setMap(null);
+              polygon.setMap(null);
+              circle.setMap(null);
+            }
+          });
+        } else {
+          notyf.error("Invalid Configuration!");
+        }
+      });
       $(".icon-selector").click(function () {
         $(".icon-selector").removeClass("active");
         $(this).addClass("active");
@@ -178,7 +207,7 @@
         if (isClosedPath) {
           $("#savePolyModal").modal("show");
         } else {
-          alert("Please Close the path before saving...");
+          notyf.error("Please Close the path before saving...");
         }
       });
       $(".map-controller .cpath").click(() => {
