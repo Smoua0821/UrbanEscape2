@@ -51,7 +51,35 @@
                 </div>
               </div>
             </div>
-            <div class="vj_dynamic users">User hai</div>
+            <div class="vj_dynamic users">
+              <div class="user-container">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Sr no.</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Since</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% let index = 1; %> <% users.forEach(user => { %>
+                    <tr>
+                      <td><%= index++ %></td>
+                      <td><%= user.name %></td>
+                      <td><%= user.email %></td>
+                      <td>
+                        <%= new Date(user.createdAt).toLocaleDateString('en-US')
+                        %>
+                      </td>
+                      <td><button class="btn btn-danger">Delete</button></td>
+                    </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
             <div class="vj_dynamic routes">
               <div class="map-container">
                 <div class="g-map vh-100"></div>
