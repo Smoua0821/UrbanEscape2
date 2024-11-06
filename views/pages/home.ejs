@@ -36,7 +36,7 @@
       let stepsPerSegment = 100;
       let speed = 10;
       iconMarker.width = 50;
-      let polyIndex = 2;
+      let polyIndex = 0;
       function initMap() {
         map = new google.maps.Map(document.getElementById("map"), {
           zoom: 5,
@@ -78,7 +78,6 @@
         circle = new google.maps.Circle({
           center: pos,
           radius: 1000,
-          map: map,
           clickable: false,
         });
         showAllPolygons();
@@ -88,15 +87,6 @@
         $.get("/admin/looproute", (data, success) => {
           if (!success) return;
           polygonCoordinates = data;
-          stepsPerSegment = haversineDistance(
-            polygonCoordinates[polyIndex].polygonCoords[0],
-            polygonCoordinates[polyIndex].polygonCoords[1]
-          );
-          moveMarker(
-            polygonCoordinates[polyIndex].image,
-            polygonCoordinates[polyIndex].polygonCoords
-          );
-          animateMarker();
         });
       }
 
@@ -215,6 +205,23 @@
           map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
         }
         return tmpaihjhsg;
+      }
+      function startGaming() {
+        if (polygonCoordinates.length == 0) {
+          notyf.error("No Route Found!");
+          return false;
+        }
+        nearestPolygon();
+        circle.setMap(map);
+        stepsPerSegment = haversineDistance(
+          polygonCoordinates[polyIndex].polygonCoords[0],
+          polygonCoordinates[polyIndex].polygonCoords[1]
+        );
+        moveMarker(
+          polygonCoordinates[polyIndex].image,
+          polygonCoordinates[polyIndex].polygonCoords
+        );
+        animateMarker();
       }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?callback=initMap&libraries=marker&key=<%= apiKey %>"></script>
