@@ -29,7 +29,7 @@
       });
       let polygonCoordinates = [];
       let map, markerElement, circle, marker;
-      let pos = { lat: 26, lng: 85 };
+      let pos = { lat: 55.5, lng: 254.7 };
       let iconMarker = document.createElement("img");
       let currentSegment = 0;
       let currentStep = 0;
@@ -39,7 +39,7 @@
       let polyIndex = 2;
       function initMap() {
         map = new google.maps.Map(document.getElementById("map"), {
-          zoom: 10,
+          zoom: 5,
           center: pos,
           mapId: "main_map",
         });
@@ -67,6 +67,7 @@
           if (clickDist <= circle.getRadius() / 1000) {
             notyf.success("Picture Added to Your Profile!");
           }
+          nearestPolygon();
         });
         markerElement = new google.maps.marker.AdvancedMarkerElement({
           position: pos,
@@ -113,6 +114,17 @@
       }
 
       function interpolate(start, end, factor) {
+        if (
+          !start ||
+          !start.lat ||
+          !start.lng ||
+          !end ||
+          !end.lat ||
+          !end.lng
+        ) {
+          return polygonCoordinates[polyIndex].polygonCoords[0];
+        }
+
         return {
           lat: start.lat + (end.lat - start.lat) * factor,
           lng: start.lng + (end.lng - start.lng) * factor,
@@ -134,6 +146,12 @@
         const newPos = interpolate(start, end, factor);
         markerElement.position = newPos;
         circle.setCenter(newPos);
+        if (
+          polygonCoordinates[polyIndex].polygonCoords.length <
+          currentSegment + 1
+        ) {
+          currentSegment = 0;
+        }
         stepsPerSegment = haversineDistance(
           polygonCoordinates[polyIndex].polygonCoords[currentSegment],
           polygonCoordinates[polyIndex].polygonCoords[currentSegment + 1]
@@ -157,6 +175,7 @@
       }
 
       function haversineDistance(coords1, coords2) {
+        if (!coords1 || !coords2 || !coords1.lat || !coords2.lng) return;
         const toRadians = (degrees) => degrees * (Math.PI / 180);
 
         const lat1 = toRadians(coords1.lat);
@@ -175,6 +194,34 @@
 
         const R = 6371;
         return R * c;
+      }
+
+      function nearestPolygon() {
+        const tmpaihjhsg = {
+          distance: 0,
+          index: 0,
+        };
+        for (let index = 0; index < polygonCoordinates.length; index++) {
+          const element = polygonCoordinates[index];
+          const posa = {
+            lat: marker.position.Fg,
+            lng: marker.position.Hg,
+          };
+          element.polygonCoords.forEach((d) => {
+            if (
+              tmpaihjhsg.distance > haversineDistance(posa, d) ||
+              tmpaihjhsg.distance == 0
+            ) {
+              tmpaihjhsg.distance = haversineDistance(posa, d);
+              tmpaihjhsg.index = index;
+            }
+          });
+        }
+        if (polyIndex != tmpaihjhsg.index) {
+          polyIndex = tmpaihjhsg.index;
+          map.setCenter(polygonCoordinates[polyIndex].polygonCoords[0]);
+        }
+        return tmpaihjhsg;
       }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?callback=initMap&libraries=marker&key=<%= apiKey %>"></script>

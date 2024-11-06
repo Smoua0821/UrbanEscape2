@@ -147,10 +147,8 @@
       let map, marker, polygon, circle, iconMarker, radius;
       let polyCoords = [];
       const beachFlagImg = document.createElement("img");
-      let pos = {
-        lat: 26,
-        lng: 85,
-      };
+      let pos = { lat: 55.5, lng: 254.7 };
+
       const setMapRadius = (event) => {
         circle.setCenter(polyCoords[0]);
         radius = Math.pow(event.value / 10, 1.5) * (1000 / map.getZoom());
@@ -238,7 +236,7 @@
           $(`.vj_dynamic.${linkId}`).fadeIn();
         });
         map = new google.maps.Map(document.getElementsByClassName("g-map")[0], {
-          zoom: 10,
+          zoom: 5,
           center: pos,
           mapId: "Main_Map",
         });
