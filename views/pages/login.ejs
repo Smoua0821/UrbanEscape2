@@ -3,14 +3,62 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="google-signin-client_id"
+      content="YOUR_CLIENT_ID.apps.googleusercontent.com"
+    />
+
     <title>Login</title>
     <link rel="stylesheet" href="/css/bs.css" />
+    <style>
+      body {
+        background: url(/images/green_bg.jpeg);
+        background-size: cover;
+        background-position: center;
+      }
+
+      .form-control_v {
+        background-color: #ffffff66;
+        width: 100%;
+        border: 0;
+        outline: 0;
+        padding: 5px 20px;
+        border: 1px solid lightgrey;
+      }
+
+      .form-container form {
+        background: #ffffff52 !important;
+        backdrop-filter: blur(5px);
+        border: 1px solid #d3d3d363;
+        animation: 3s circularShadow infinite;
+      }
+
+      @keyframes circularShadow {
+        0%,
+        100% {
+          box-shadow: 2px 2px 20px 5px green;
+        }
+        25% {
+          box-shadow: 2px -2px 20px 5px green;
+        }
+        50% {
+          box-shadow: -2px -2px 20px 5px green;
+        }
+        75% {
+          box-shadow: -2px 2px 20px 5px green;
+        }
+      }
+    </style>
   </head>
   <body>
     <div class="body-container">
       <div class="d-flex justify-content-center align-items-center vh-100">
         <div class="form-container col-lg-4 col-md-6 col-12 col-sm-8">
-          <form method="POST" class="py-2 container rounded-2">
+          <form
+            action="/auth"
+            method="POST"
+            class="py-2 container login rounded-2"
+          >
             <h1
               class="m-0 text-center"
               style="
@@ -44,31 +92,82 @@
               </div>
               <button class="btn btn-success w-100">SUBMIT</button>
             </div>
+            <p class="m-0 mt-2">
+              New User? <a href="javascript:toggleForm()">Register</a>
+            </p>
+          </form>
+          <form
+            action="/auth/new"
+            method="POST"
+            class="py-2 container register rounded-2"
+            style="display: none"
+          >
+            <h1
+              class="m-0 text-center"
+              style="
+                color: transparent;
+                -webkit-text-stroke: 1px #19873d;
+                text-transform: uppercase;
+                text-shadow: 2px 2px 10px #19873d;
+              "
+            >
+              Register
+            </h1>
+            <hr />
+            <div class="form-components">
+              <div class="form-group mb-2">
+                <input
+                  required
+                  type="text"
+                  name="name"
+                  placeholder="John Doe"
+                  class="form-control_v"
+                />
+              </div>
+              <div class="form-group mb-2">
+                <input
+                  required
+                  type="email"
+                  name="email"
+                  placeholder="user@gmail.com"
+                  class="form-control_v"
+                />
+              </div>
+              <div class="form-group mb-2">
+                <input
+                  required
+                  type="password"
+                  name="password"
+                  placeholder="******"
+                  class="form-control_v"
+                />
+              </div>
+              <button class="btn btn-success w-100">SUBMIT</button>
+            </div>
+            <p class="m-0 mt-2">
+              Already Have an account?
+              <a href="javascript:toggleForm()">Login</a>
+            </p>
           </form>
         </div>
       </div>
     </div>
-    <style>
-      body {
-        background: url(/images/green_bg.jpeg);
-        background-size: cover;
-        background-position: center;
+    <script src="/js/jquery.js"></script>
+    <script>
+      let isLoginITF = 1;
+      function toggleForm() {
+        if (isLoginITF) {
+          isLoginITF = 0;
+          $("form.register").fadeIn();
+          $("form.login").hide();
+        } else {
+          isLoginITF = 1;
+          $("form.login").fadeIn();
+          $("form.register").hide();
+        }
       }
-
-      .form-control_v {
-        background-color: #ffffff66;
-        width: 100%;
-        border: 0;
-        outline: 0;
-        padding: 5px 20px;
-        border: 1px solid lightgrey;
-      }
-
-      .form-container form {
-        background: #ffffff52 !important;
-        backdrop-filter: blur(5px);
-        border: 1px solid #d3d3d363;
-      }
-    </style>
+      $(document).ready(() => {});
+    </script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
   </body>
 </html>
