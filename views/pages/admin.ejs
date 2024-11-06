@@ -64,7 +64,8 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <% let index = 1; %> <% users.forEach(user => { %>
+                    <% let index = 1; %> <% users.forEach(user => { %> <% if
+                    (user.role.current!="admin") { %>
                     <tr>
                       <td><%= index++ %></td>
                       <td><%= user.name %></td>
@@ -75,7 +76,7 @@
                       </td>
                       <td><button class="btn btn-danger">Delete</button></td>
                     </tr>
-                    <% }) %>
+                    <% } %> <% }) %>
                   </tbody>
                 </table>
               </div>
