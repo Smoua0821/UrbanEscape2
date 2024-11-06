@@ -1,4 +1,3 @@
-// models/loopRoute.js
 const mongoose = require("mongoose");
 
 const loopRouteSchema = new mongoose.Schema(
