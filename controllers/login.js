@@ -1,5 +1,8 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const loginPage = async (req, res) => {
   if (req.user) {
@@ -18,7 +21,14 @@ const loginValidate = async (req, res) => {
   if (!user) return res.end("Invalid Email");
   const isMatched = await bcrypt.compare(password, user.password);
   if (!isMatched) return res.end("Invalid Password");
-  return res.json(user);
+  const payload = user.toObject();
+  const token = await jwt.sign(payload, process.env.JWT_SECRET);
+  res.cookie("sessionId", token, {
+    maxAge: 1000 * 60 * 60 * 24, // Expire in 1 day
+    httpOnly: true, // Cannot be accessed by JavaScript
+    sameSite: "strict", // CSRF protection
+  });
+  return res.redirect("/");
 };
 
 const newUser = async (req, res) => {

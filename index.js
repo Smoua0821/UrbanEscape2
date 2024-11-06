@@ -2,6 +2,8 @@ const express = require("express");
 const port = 8000;
 const bodyParser = require("body-parser");
 const connectDB = require("./config/db");
+const cookieParser = require("cookie-parser");
+
 const path = require("path");
 
 const app = express();
@@ -12,6 +14,7 @@ const adminRoutes = require("./routes/admin");
 const loginRoutes = require("./routes/login");
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
