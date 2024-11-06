@@ -3,7 +3,7 @@ const path = require("path");
 
 async function adminPage(req, res) {
   const user = req.user;
-  if (user.role != "admin") return res.end("Unauthorised!");
+  if (user.role.current != "admin") return res.end("Unauthorised!");
   const dirPath = "./public/images/mapicons/";
   const icons = fs
     .readdirSync(dirPath)

@@ -21,9 +21,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use("/auth", loginRoutes);
 app.use("/", authMiddleware, staticRoutes);
 app.use("/admin", adminRoutes);
-app.use("/auth", loginRoutes);
 
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
