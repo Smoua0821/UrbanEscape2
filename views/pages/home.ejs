@@ -88,13 +88,6 @@
         $.get("/admin/looproute", (data, success) => {
           if (!success) return;
           polygonCoordinates = data;
-          polygonCoordinates.forEach((element) => {
-            new google.maps.Polyline({
-              path: element.polygonCoords,
-              map: map,
-              clickable: false,
-            });
-          });
           stepsPerSegment = haversineDistance(
             polygonCoordinates[polyIndex].polygonCoords[0],
             polygonCoordinates[polyIndex].polygonCoords[1]
@@ -219,7 +212,7 @@
         }
         if (polyIndex != tmpaihjhsg.index) {
           polyIndex = tmpaihjhsg.index;
-          map.setCenter(polygonCoordinates[polyIndex].polygonCoords[0]);
+          map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
         }
         return tmpaihjhsg;
       }
