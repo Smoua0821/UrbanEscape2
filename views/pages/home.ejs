@@ -78,6 +78,7 @@
           if (!gameStarted) {
             startGaming();
           }
+          map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
         });
         markerElement = new google.maps.marker.AdvancedMarkerElement({
           position: pos,
@@ -233,6 +234,7 @@
         );
         animateMarker();
         gameStarted = 1;
+        map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
       }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?callback=initMap&libraries=marker&key=<%= apiKey %>"></script>
