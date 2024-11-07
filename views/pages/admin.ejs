@@ -263,8 +263,11 @@
           if (!tarId) return;
           const cnf = confirm("Are you Sure?");
           if (cnf) {
-            $(`tr[data-id=${tarId}]`).fadeOut(function () {
-              $(this).remove();
+            $.post(`/admin/delete/${tarId}`, (data) => {
+              $(`tr[data-id=${tarId}]`).fadeOut(function () {
+                $(this).remove();
+              });
+              notyf.success(data.message);
             });
           }
         });

@@ -30,4 +30,9 @@ const authMiddleware = (req, res, next) => {
   });
 };
 
-module.exports = { authMiddleware };
+const adminMiddleware = async (req, res, next) => {
+  if (req.user.role.current == "admin") return next();
+  return res.status(404).json({ status: "error", message: "Invalid Request" });
+};
+
+module.exports = { authMiddleware, adminMiddleware };

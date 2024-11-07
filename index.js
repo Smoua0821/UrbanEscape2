@@ -14,7 +14,7 @@ const adminRoutes = require("./routes/admin");
 const loginRoutes = require("./routes/login");
 const userRoutes = require("./routes/user");
 
-const { authMiddleware } = require("./middlewares/auth");
+const { authMiddleware, adminMiddleware } = require("./middlewares/auth");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -25,7 +25,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/auth", loginRoutes);
 app.use("/", authMiddleware, staticRoutes);
 app.use("/user", userRoutes);
-app.use("/admin", adminRoutes);
+app.use("/admin", adminMiddleware, adminRoutes);
 
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
