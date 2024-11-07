@@ -130,15 +130,32 @@
                 <input type="hidden" name="polyCoords" />
                 <div class="form-group mb-2">
                   <p class="m-0">Adjust Radius:</p>
-                  <input
-                    type="range"
-                    oninput="setMapRadius(this)"
-                    max="1000"
-                    step="1"
-                    value="50"
-                    class="form-control"
-                    placeholder="Radius of Image"
-                  />
+                  <div class="row m-0 p-0">
+                    <div class="col-sm-8">
+                      <input
+                        type="range"
+                        oninput="setMapRadius(this)"
+                        max="1000"
+                        step="1"
+                        value="50"
+                        class="form-control"
+                        placeholder="Radius of Image"
+                        id="radiusRange"
+                      />
+                    </div>
+                    <div class="col-sm-4">
+                      <input
+                        type="number"
+                        oninput="setMapRadiusNum(this)"
+                        max="1000"
+                        step="1"
+                        value="50"
+                        class="form-control"
+                        placeholder="Radius of Image"
+                        id="radiusNum"
+                      />
+                    </div>
+                  </div>
                 </div>
                 <% if (icons) { %>
                 <p class="m-0">Select Image</p>
@@ -188,6 +205,18 @@
       const setMapRadius = (event) => {
         circle.setCenter(polyCoords[0]);
         radius = Math.pow(event.value / 10, 1.5) * (1000 / map.getZoom());
+        $("#radiusNum").val(event.value);
+        circle.setRadius(radius);
+        circle.setMap(map);
+        payloadData.radius = parseInt(radius);
+      };
+      const setMapRadiusNum = (event) => {
+        if (event.value > 1000) {
+          event.value = 1000;
+        }
+        circle.setCenter(polyCoords[0]);
+        radius = Math.pow(event.value / 10, 1.5) * (1000 / map.getZoom());
+        $("#radiusRange").val(event.value);
         circle.setRadius(radius);
         circle.setMap(map);
         payloadData.radius = parseInt(radius);
