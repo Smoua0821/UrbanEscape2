@@ -165,6 +165,8 @@
           }
         }
         // Repeat animation
+        if (speed > 100) speed = 100;
+        if (speed < 10) speed = 10;
         setTimeout(animateMarker, 1000 / speed);
       }
 
