@@ -66,7 +66,7 @@
                   <tbody>
                     <% let index = 1; %> <% users.forEach(user => { %> <% if
                     (user.role.current!="admin") { %>
-                    <tr>
+                    <tr data-id="<%= user._id %>">
                       <td><%= index++ %></td>
                       <td><%= user.name %></td>
                       <td><%= user.email %></td>
@@ -74,7 +74,14 @@
                         <%= new Date(user.createdAt).toLocaleDateString('en-US')
                         %>
                       </td>
-                      <td><button class="btn btn-danger">Delete</button></td>
+                      <td>
+                        <button
+                          class="btn btn-danger delete"
+                          data-id="<%= user._id %>"
+                        >
+                          Delete
+                        </button>
+                      </td>
                     </tr>
                     <% } %> <% }) %>
                   </tbody>
@@ -251,6 +258,16 @@
         }
       });
       $(document).ready(() => {
+        $(".user-container table tr button.delete").click(function () {
+          const tarId = $(this).data("id");
+          if (!tarId) return;
+          const cnf = confirm("Are you Sure?");
+          if (cnf) {
+            $(`tr[data-id=${tarId}]`).fadeOut(function () {
+              $(this).remove();
+            });
+          }
+        });
         $(".vj_dynamic").hide();
         $(".vj_dynamic.home").fadeIn();
         $(".sidebar-container .sidebar .menu ul li").click(function () {
