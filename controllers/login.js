@@ -10,15 +10,20 @@ const loginPage = async (req, res) => {
 
   try {
     const user = await jwt.verify(token, process.env.JWT_SECRET);
-    if (user) {
-      if (user.role.current == "admin") {
+    if (user && user.role && user.role.current) {
+      if (user.role.current === "admin") {
         return res.redirect("/admin");
       } else {
         return res.redirect("/");
       }
+    } else {
+      return res
+        .status(401)
+        .render("pages/login", { error: "Invalid user role" });
     }
   } catch (error) {
-    console.log("error");
+    console.error("Error verifying token:", error);
+    return res.status(401).render("pages/login", { error: "Invalid session" });
   }
 };
 
@@ -31,10 +36,11 @@ const loginValidate = async (req, res) => {
   const payload = user.toObject();
   const token = await jwt.sign(payload, process.env.JWT_SECRET);
   res.cookie("sessionId", token, {
-    maxAge: 1000 * 60 * 60 * 24, // Expire in 1 day
-    httpOnly: true, // Cannot be accessed by JavaScript
-    sameSite: "strict", // CSRF protection
+    maxAge: 1000 * 60 * 60 * 24,
+    httpOnly: true,
+    sameSite: "strict",
   });
+  if (user.role.current == "admin") return res.redirect("/admin");
   return res.redirect("/");
 };
 
