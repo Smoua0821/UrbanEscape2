@@ -13,6 +13,7 @@ const staticRoutes = require("./routes/static");
 const adminRoutes = require("./routes/admin");
 const loginRoutes = require("./routes/login");
 const userRoutes = require("./routes/user");
+const apiRoutes = require("./routes/api");
 
 const { authMiddleware, adminMiddleware } = require("./middlewares/auth");
 
@@ -23,6 +24,7 @@ app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/auth", loginRoutes);
+app.use("/api", apiRoutes);
 app.use("/", authMiddleware, staticRoutes);
 app.use("/user", userRoutes);
 app.use("/admin", adminMiddleware, adminRoutes);

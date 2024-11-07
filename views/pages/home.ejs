@@ -95,7 +95,7 @@
       }
 
       function showAllPolygons() {
-        $.get("/admin/looproute", (data, success) => {
+        $.get("/api/looproute", (data, success) => {
           if (!success) return;
           polygonCoordinates = data;
         });
