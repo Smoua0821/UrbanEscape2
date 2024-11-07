@@ -1,0 +1,51 @@
+<div class="user-navbar">
+  <div class="navbar-container">
+    <ul>
+      <% if (user) { %>
+      <li data-id="/user/profile">Profile</li>
+      <li data-id="/logout">Logout</li>
+      <% }else{ %>
+      <li data-id="/auth">Login</li>
+      <% } %>
+    </ul>
+  </div>
+</div>
+<style>
+  .user-navbar {
+    position: fixed;
+    bottom: 0;
+    justify-content: center;
+    width: 100%;
+    display: inline-flex;
+  }
+
+  .user-navbar .navbar-container {
+    background: #ffffff70;
+    border-radius: 5px;
+    padding: 5px;
+    backdrop-filter: blur(5px);
+    font-family: sans-serif;
+    text-align: center;
+  }
+
+  .user-navbar .navbar-container ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .user-navbar .navbar-container ul li {
+    display: inline-block;
+    border: 1px solid #ffabab;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.1s;
+    color: #3e3e3e;
+  }
+
+  .user-navbar .navbar-container ul li:hover {
+    background: #ff0000;
+    color: white;
+  }
+</style>

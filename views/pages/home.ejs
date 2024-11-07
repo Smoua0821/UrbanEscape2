@@ -22,10 +22,16 @@
         <p>Ensure You have enabled your location for a better experience</p>
       </div>
     </div>
+    <%- include('../components/navbar') %>
     <script>
       let notyf;
       $(document).ready(() => {
         notyf = new Notyf();
+        $(".user-navbar .navbar-container ul li").click(function () {
+          const target = $(this).data("id");
+          if (!target) return;
+          window.location.href = target;
+        });
       });
       let polygonCoordinates = [];
       let map, markerElement, circle, marker;

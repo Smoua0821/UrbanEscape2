@@ -12,6 +12,7 @@ connectDB();
 const staticRoutes = require("./routes/static");
 const adminRoutes = require("./routes/admin");
 const loginRoutes = require("./routes/login");
+const userRoutes = require("./routes/user");
 
 const { authMiddleware } = require("./middlewares/auth");
 
@@ -23,6 +24,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/auth", loginRoutes);
 app.use("/", authMiddleware, staticRoutes);
+app.use("/user", userRoutes);
 app.use("/admin", adminRoutes);
 
 app.listen(port, () => {

@@ -5,14 +5,21 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const loginPage = async (req, res) => {
-  if (req.user) {
-    if (req.user.role == "admin") {
-      return res.redirect("/admin");
-    } else {
-      return res.redirect("/");
+  const token = req.cookies.sessionId;
+  if (!token) return res.render("pages/login");
+
+  try {
+    const user = await jwt.verify(token, process.env.JWT_SECRET);
+    if (user) {
+      if (user.role.current == "admin") {
+        return res.redirect("/admin");
+      } else {
+        return res.redirect("/");
+      }
     }
+  } catch (error) {
+    console.log("error");
   }
-  return res.render("pages/login");
 };
 
 const loginValidate = async (req, res) => {
