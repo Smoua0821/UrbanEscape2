@@ -18,7 +18,7 @@
       <div class="col-md-4 col-lg-3 vh-100 sidebar-container">
         <div class="sidebar">
           <div class="logo text-center p-2">
-            <h1>Mappy</h1>
+            <h1 onclick="window.open('/', '_self')">Mappy</h1>
           </div>
           <div class="menu">
             <ul style="list-style: none">
@@ -324,6 +324,12 @@
         color: #ffffff;
         -webkit-text-stroke: 1px #000;
         text-shadow: 2px 2px #000000;
+        transition: 0.1s;
+        cursor: pointer;
+      }
+
+      .sidebar-container .sidebar .logo:hover {
+        text-shadow: 0 0 #000000;
       }
 
       .sidebar-container .sidebar .menu ul li {

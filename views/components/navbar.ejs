@@ -1,7 +1,9 @@
 <div class="user-navbar">
   <div class="navbar-container">
     <ul>
-      <% if (user) { %>
+      <% if (user) { %> <% if (user.role.current=="admin") { %>
+      <li data-id="/admin">Admin</li>
+      <%}%>
       <li data-id="/user/profile">Profile</li>
       <li data-id="/logout">Logout</li>
       <% }else{ %>
