@@ -67,8 +67,9 @@ const newUser = async (req, res) => {
       email: email,
       password: hashedPassword,
     });
-
-    return res.status(201).json(newuser);
+    return res
+      .status(200)
+      .send("Account Created Please <a href='/auth'>Login</a>");
   } catch (err) {
     console.error(err);
     if (err.code === 11000) {

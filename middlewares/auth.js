@@ -17,7 +17,7 @@ const authMiddleware = (req, res, next) => {
   const token = req.cookies.sessionId;
 
   if (!token) {
-    return res.status(401).json({ error: "No token provided, access denied" });
+    return res.status(301).redirect("/auth");
   }
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
