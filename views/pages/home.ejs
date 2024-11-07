@@ -35,6 +35,7 @@
       let currentStep = 0;
       let stepsPerSegment = 100;
       let speed = 10;
+      let gameStarted = 0;
       iconMarker.width = 50;
       let polyIndex = 0;
       function initMap() {
@@ -68,6 +69,9 @@
             notyf.success("Picture Added to Your Profile!");
           }
           nearestPolygon();
+          if (!gameStarted) {
+            startGaming();
+          }
         });
         markerElement = new google.maps.marker.AdvancedMarkerElement({
           position: pos,
@@ -222,6 +226,7 @@
           polygonCoordinates[polyIndex].polygonCoords
         );
         animateMarker();
+        gameStarted = 1;
       }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?callback=initMap&libraries=marker&key=<%= apiKey %>"></script>
