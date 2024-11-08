@@ -72,7 +72,16 @@
             }
           );
           if (clickDist <= circle.getRadius() / 1000) {
-            notyf.success("Picture Added to Your Profile!");
+            // $.post("/profile/capture", { image });
+            const ImgPath = iconMarker.src.split("/");
+            $.post(
+              "/user/profile/capture",
+              { image: ImgPath[ImgPath.length - 1] },
+              (data) => {
+                console.log(data);
+                notyf.success("Picture Added to Your Profile!");
+              }
+            );
           }
           nearestPolygon();
           if (!gameStarted) {
