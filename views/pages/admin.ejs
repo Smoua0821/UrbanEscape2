@@ -316,7 +316,8 @@
           const linkId = $(this).data("link");
           if (!linkId) return;
           if (linkId == "routes") {
-            if (isNewMap) {
+            if (!isNewMap) {
+              renderRoutes();
               isNewMap = 1;
             }
           }
@@ -378,6 +379,7 @@
         if (bulkCircle) bulkCircle.setMap(null);
         if (bulkMarker) {
           bulkMarker.setMap(null);
+          bulkMarker.remo;
         }
         $.get("/api/looproute", (data) => {
           data.forEach((path) => {
