@@ -137,7 +137,7 @@
                         oninput="setMapRadius(this)"
                         max="1000"
                         step="1"
-                        value="50"
+                        value="0"
                         class="form-control"
                         placeholder="Radius of Image"
                         id="radiusRange"
@@ -149,7 +149,7 @@
                         oninput="setMapRadiusNum(this)"
                         max="1000"
                         step="1"
-                        value="50"
+                        value="0"
                         class="form-control"
                         placeholder="Radius of Image"
                         id="radiusNum"
@@ -253,8 +253,10 @@
         if (
           payloadData.polygonCoords.length > 2 &&
           payloadData.radius > 0 &&
-          payloadData.image
+          payloadData.image &&
+          payloadData.speed
         ) {
+          payloadData.polygonCoords = polyCoords;
           $.post("/admin/looproute", payloadData, (success, data) => {
             if (success) {
               notyf.success("New Route added successfully!");
