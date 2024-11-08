@@ -85,6 +85,23 @@
               <a href="/logout" class="btn btn-danger">Logout</a>
               <a href="/" class="btn btn-success ms-2">Map</a>
             </div>
+            <hr />
+            <div class="captured-images">
+              <h3 class="text-center pb-2 border-bottom">Captured Images</h3>
+              <% if (locals.user && user.capturedImages.length>0) { %>
+              <div class="image-container row justify-content-center">
+                <% user.capturedImages.forEach(image => { %>
+                <div class="image-unit col-6 col-sm-4 col-lg-3">
+                  <img src="/images/mapicons/<%= image %>" width="100%" />
+                </div>
+                <% }) %>
+              </div>
+              <% }else{ %>
+              <div class="text-center alert alert-success opacity-50">
+                No Image Captured!
+              </div>
+              <%}%>
+            </div>
           </form>
         </div>
       </div>
