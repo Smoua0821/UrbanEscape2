@@ -71,6 +71,9 @@
               Login
             </h1>
             <hr />
+            <% if (locals.error) { %>
+            <div class="text-danger pb-2 text-center"><%= error %></div>
+            <% } %>
             <div class="form-components">
               <div class="form-group mb-2">
                 <input
