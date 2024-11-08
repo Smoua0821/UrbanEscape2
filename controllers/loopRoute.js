@@ -20,6 +20,26 @@ async function saveLoopRoutes(req, res) {
   }
 }
 
-module.exports = { saveLoopRoutes };
+const deleteRoute = async (req, res) => {
+  const { routeId } = req.body;
+  if (!routeId) return res.status(404).end("Invalid request");
 
-module.exports = { fetchLoopRoutes, saveLoopRoutes };
+  try {
+    const route = await LoopRoute.findOne({ _id: routeId });
+    if (!route) return res.status(404).end("No Route Found");
+
+    await LoopRoute.deleteOne({ _id: routeId });
+
+    return res.json({
+      status: "success",
+      message: "Route Deleted successfully",
+    });
+  } catch (error) {
+    return res.status(400).json({
+      status: "error",
+      error: error.message || error,
+    });
+  }
+};
+
+module.exports = { fetchLoopRoutes, saveLoopRoutes, deleteRoute };

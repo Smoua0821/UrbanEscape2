@@ -240,6 +240,16 @@
               iconMarker.setMap(null);
               polygon.setMap(null);
               circle.setMap(null);
+
+              new google.maps.Polyline({
+                path: payloadData.polygonCoords,
+                map: map,
+              });
+              new google.maps.Circle({
+                center: payloadData.polygonCoords[0],
+                map: map,
+                radius: payloadData.radius,
+              });
             }
           });
           $(".icon-selector").removeClass("active");
@@ -362,6 +372,44 @@
           }
         });
       });
+      let bulkPolyLine, bulkCircle, bulkMarker;
+      function renderRoutes() {
+        if (bulkPolyLine) bulkPolyLine.setMap(null);
+        if (bulkCircle) bulkCircle.setMap(null);
+        if (bulkMarker) {
+          bulkMarker.setMap(null);
+        }
+        $.get("/api/looproute", (data) => {
+          data.forEach((path) => {
+            bulkPolyLine = new google.maps.Polyline({
+              map: map,
+              path: path.polygonCoords,
+            });
+            const cco = path.polygonCoords[0];
+            bulkCircle = new google.maps.Circle({
+              map: map,
+              radius: path.radius,
+              center: cco,
+            });
+            bulkMarker = new google.maps.marker.AdvancedMarkerElement({
+              position: cco,
+              map: map,
+            });
+            bulkMarker.addListener("click", function () {
+              const cnf = confirm("Do you want to delete this Route?");
+              if (!cnf) return;
+              $.post(
+                "/admin/looproute/delete",
+                { routeId: path._id },
+                (data) => {
+                  if (!data) return;
+                  notyf.success(data.message);
+                }
+              );
+            });
+          });
+        });
+      }
     </script>
     <style>
       .sidebar-container {
