@@ -5,11 +5,12 @@ async function fetchLoopRoutes(req, res) {
 }
 
 async function saveLoopRoutes(req, res) {
-  const { polygonCoords, image, radius } = req.body;
+  const { polygonCoords, image, radius, speed } = req.body;
   const newLoopRoute = new LoopRoute({
     polygonCoords,
     image,
     radius,
+    speed,
   });
 
   try {

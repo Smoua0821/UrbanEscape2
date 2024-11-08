@@ -20,6 +20,11 @@ const loopRouteSchema = new mongoose.Schema(
       type: Number, // Radius in meters
       required: true,
     },
+    speed: {
+      type: Number,
+      required: true,
+      default: 1,
+    },
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt fields
