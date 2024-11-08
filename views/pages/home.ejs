@@ -88,6 +88,7 @@
             startGaming();
           }
           map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
+          speed = polygonCoordinates[polyIndex].speed * 10;
         });
         markerElement = new google.maps.marker.AdvancedMarkerElement({
           position: pos,
