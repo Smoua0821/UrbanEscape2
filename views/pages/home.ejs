@@ -152,11 +152,13 @@
               $(".simpleLoading").fadeOut();
               pos.lat = position.coords.latitude;
               pos.lng = position.coords.longitude;
+              nearestPolygon();
               marker.position = pos;
               marker.setMap(map);
               if (isFirstTime) {
                 isFirstTime = 0;
                 map.panTo(pos);
+                startGaming();
               }
               console.log(pos);
             },
@@ -283,16 +285,13 @@
         };
         for (let index = 0; index < polygonCoordinates.length; index++) {
           const element = polygonCoordinates[index];
-          const posa = {
-            lat: marker.position.Fg,
-            lng: marker.position.Hg,
-          };
+
           element.polygonCoords.forEach((d) => {
             if (
-              tmpaihjhsg.distance > haversineDistance(posa, d) ||
+              tmpaihjhsg.distance > haversineDistance(pos, d) ||
               tmpaihjhsg.distance == 0
             ) {
-              tmpaihjhsg.distance = haversineDistance(posa, d);
+              tmpaihjhsg.distance = haversineDistance(pos, d);
               tmpaihjhsg.index = index;
             }
           });
