@@ -20,7 +20,8 @@
   border-top: 8px solid #4285f4;
 }
 
-.loadingScreen {
+.loadingScreen,
+.errorScreen {
   position: fixed;
   top: 0;
   left: 0;
@@ -33,8 +34,20 @@
   background: white;
 }
 
-.loadingScreen div {
+.loadingScreen div,
+.errorScreen div {
   padding: 10px;
+}
+
+.errorScreen h2 {
+  color: red;
+}
+
+.errorScreen p {
+  padding: 5px 10px;
+  color: white;
+  text-transform: uppercase;
+  background-color: red;
 }
 
 .loadingScreen div img {
@@ -50,5 +63,53 @@
   50% {
     padding: 10px;
     width: 80px;
+  }
+}
+
+.simpleLoading {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  background: #000000ab;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.simpleLoading .loadingAnime {
+  width: 300px;
+  overflow: hidden;
+  height: 5px;
+  border-radius: 5px;
+  background: #0000001c;
+  border: 1px solid #ffffff33;
+}
+
+.simpleLoading .loadingAnime:before {
+  content: "";
+  position: relative;
+  display: block;
+  width: 30%;
+  background: white;
+  height: 100%;
+  border-radius: 5px;
+  animation: 5s leftright infinite;
+}
+
+@keyframes leftright {
+  0%,
+  100% {
+    left: -20%;
+  }
+  20% {
+    left: 30%;
+  }
+  45% {
+    left: 80%;
+  }
+  50% {
+    left: 100%;
   }
 }

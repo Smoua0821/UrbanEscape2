@@ -13,6 +13,9 @@
   </head>
   <body style="margin: 0">
     <div id="map" style="height: 100vh; width: 100vw"></div>
+    <div class="simpleLoading">
+      <div class="loadingAnime"></div>
+    </div>
     <div class="loadingScreen">
       <div class="icon-container">
         <img alt="Map Icon" src="/images/marker.png" width="100px" />
@@ -20,6 +23,17 @@
       <div class="text-container">
         <h2>Please Wait......</h2>
         <p>Ensure You have enabled your location for a better experience</p>
+      </div>
+    </div>
+    <div class="errorScreen" style="display: none">
+      <div class="icon-container">
+        <img alt="Map Icon" src="/images/marker.png" width="100px" />
+      </div>
+      <div class="text-container">
+        <h2>Location Error</h2>
+        <p class="locerrmsg">
+          Ensure You have enabled your location for a better experience
+        </p>
       </div>
     </div>
     <%- include('../components/navbar') %>
@@ -46,39 +60,38 @@
       let polyIndex = 0;
       function initMap() {
         map = new google.maps.Map(document.getElementById("map"), {
-          zoom: 5,
+          zoom: 15,
           center: pos,
           mapId: "main_map",
         });
         marker = new google.maps.marker.AdvancedMarkerElement({
-          map: map,
           position: pos,
         });
+
+        $(document).ready(() => {
+          $(".simpleLoading").show();
+          updateCurrentLocation();
+        });
+
         map.addListener("click", (event) => {
           const clickedLocation = event.latLng;
           const circleLocation = circle.getCenter();
-          marker.position = {
-            lat: clickedLocation.lat(),
-            lng: clickedLocation.lng(),
-          };
           const clickDist = haversineDistance(
             {
-              lat: clickedLocation.lat(),
-              lng: clickedLocation.lng(),
+              lat: pos.lat,
+              lng: pos.lng,
             },
-            {
-              lat: circleLocation.lat(),
-              lng: circleLocation.lng(),
-            }
+            polygonCoordinates[polyIndex].polygonCoords[0]
+          );
+          console.log(
+            `Clicked: ${clickDist}  Radii: ${circle.getRadius() / 1000}`
           );
           if (clickDist <= circle.getRadius() / 1000) {
-            // $.post("/profile/capture", { image });
             const ImgPath = iconMarker.src.split("/");
             $.post(
               "/user/profile/capture",
               { image: ImgPath[ImgPath.length - 1] },
               (data) => {
-                console.log(data);
                 notyf.success("Picture Added to Your Profile!");
               }
             );
@@ -87,7 +100,6 @@
           if (!gameStarted) {
             startGaming();
           }
-          map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
           speed = polygonCoordinates[polyIndex].speed * 10;
         });
         markerElement = new google.maps.marker.AdvancedMarkerElement({
@@ -115,6 +127,51 @@
         iconMarker.src = imageSrc;
         markerElement.position = coordinates[polyIndex];
         circle.setRadius(polygonCoordinates[polyIndex].radius);
+      }
+      let isFirstTime = 1;
+      function updateCurrentLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              $(".simpleLoading").fadeOut();
+              pos.lat = position.coords.latitude;
+              pos.lng = position.coords.longitude;
+              marker.position = pos;
+              marker.setMap(map);
+              if (isFirstTime) {
+                isFirstTime = 0;
+                map.panTo(pos);
+              }
+              console.log(pos);
+            },
+            (error) => {
+              $(".errorScreen").show();
+              $("#map").remove();
+              let locerrmsg = "";
+              switch (error.code) {
+                case error.PERMISSION_DENIED:
+                  locerrmsg = "User denied the request for Geolocation.";
+                  break;
+                case error.POSITION_UNAVAILABLE:
+                  locerrmsg = "Location information is unavailable.";
+                  break;
+                case error.TIMEOUT:
+                  locerrmsg = "The request to get user location timed out.";
+                  break;
+                case error.UNKNOWN_ERROR:
+                  locerrmsg = "An unknown error occurred.";
+                  break;
+                default:
+                  locerrmsg = "An error occurred while retrieving location.";
+              }
+              notyf.error(locerrmsg);
+              $(".locerrmsg").text(locerrmsg);
+            }
+          );
+          setTimeout(updateCurrentLocation, 10000);
+        } else {
+          notyf.error("Geolocation is not supported by this browser.");
+        }
       }
 
       function interpolate(start, end, factor) {
@@ -225,7 +282,6 @@
         }
         if (polyIndex != tmpaihjhsg.index) {
           polyIndex = tmpaihjhsg.index;
-          map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
         }
         return tmpaihjhsg;
       }
@@ -246,7 +302,6 @@
         );
         animateMarker();
         gameStarted = 1;
-        map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
       }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?callback=initMap&libraries=marker&key=<%= apiKey %>"></script>
