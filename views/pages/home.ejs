@@ -36,6 +36,7 @@
         </p>
       </div>
     </div>
+    <div class="WinScreen" style="display: none"></div>
     <%- include('../components/navbar') %>
     <script>
       let notyf;
@@ -99,6 +100,12 @@
                   data.message === "Image Captured successfully!"
                 ) {
                   notyf.success("Picture Added to Your Profile!");
+                  polygonCoordinates.pop();
+                  polyIndex -= 1;
+                  if (polyIndex < 0) {
+                    notyf.success("You have Captured All images!");
+                    //$(".WinScreen").fadeIn();
+                  }
                 } else {
                   const errorMessage =
                     data.message ||

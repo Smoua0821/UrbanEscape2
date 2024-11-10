@@ -10,7 +10,6 @@ async function adminPage(req, res) {
     .filter((file) => fs.statSync(path.join(dirPath, file)).isFile())
     .map((file) => path.join(file));
 
-  console.log(icons);
   const users = await User.find();
   res.render("pages/admin", {
     apiKey: "AIzaSyBaQ334LSpDNZXU8flkT1VjGpdj7f3_BZI",
