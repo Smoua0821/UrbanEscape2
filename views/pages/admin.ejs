@@ -170,10 +170,10 @@
                 </div>
                 <% if (icons) { %>
                 <p class="m-0">Select Image</p>
-                <div class="icon-container d-flex justify-content-center">
+                <div class="icon-container row justify-content-center">
                   <% icons.forEach(icon => { %>
                   <div
-                    class="p-2 border-1 rounded-1 mx-1 icon-selector"
+                    class="col-sm-4 p-2 border-1 rounded-1 text-center icon-selector"
                     data-src="/images/mapicons/<%= icon %>"
                   >
                     <img
@@ -184,6 +184,9 @@
                     />
                   </div>
                   <% }) %>
+                  <div class="col-sm-4 p-2 border-1 rounded-1 icon-selector">
+                    <div class="addImage"></div>
+                  </div>
                 </div>
                 <% } %>
               </form>
@@ -204,6 +207,13 @@
         </div>
       </div>
     </div>
+    <input
+      type="file"
+      id="image-upload"
+      accept="image/png, image/jpeg, image/gif"
+      style="display: none"
+    />
+
     <script>
       const notyf = new Notyf();
       let isNewMap = 0;
@@ -287,6 +297,10 @@
       $(".icon-selector").click(function () {
         $(".icon-selector").removeClass("active");
         $(this).addClass("active");
+        if (!$(this).data("src")) {
+          $("#image-upload").click();
+          return;
+        }
         iconMarker.setMap(map);
         iconMarker.position = polyCoords[0];
         beachFlagImg.width = 50;
@@ -322,6 +336,57 @@
         }
       });
       $(document).ready(() => {
+        $("#image-upload").on("change", function (e) {
+          const file = e.target.files[0];
+          if (!file) {
+            notyf.error("Upload Valid Image");
+            return;
+          }
+          const formData = new FormData();
+          formData.append("image", file);
+          $.ajax({
+            url: "/admin/looproute/image",
+            method: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+              if (response && response.imageName) {
+                $(this).data("src", response.imageName);
+                $(".icon-container")
+                  .prepend(`<div class="p-2 border-1 rounded-1 col-sm-4 icon-selector" data-src="/images/mapicons/${response.imageName}">
+                    <img loading="lazy" alt="${response.imageName}" src="/images/mapicons/${response.imageName}" width="100px">
+                  </div>`);
+                $(".icon-selector")
+                  .off("click")
+                  .click(function () {
+                    $(".icon-selector").removeClass("active");
+                    $(this).addClass("active");
+                    if (!$(this).data("src")) {
+                      $("#image-upload").click();
+                      return;
+                    }
+                    iconMarker.setMap(map);
+                    iconMarker.position = polyCoords[0];
+                    beachFlagImg.width = 50;
+                    beachFlagImg.src = $(this).data("src");
+                    payloadData.image = $(this).data("src");
+                  });
+                console.log("Image uploaded successfully:", response.imageName);
+                notyf.success(
+                  `Image uploaded successfully: ${response.imageName}`
+                );
+              } else {
+                notyf.error("Failed to upload image. Please try again.");
+              }
+            },
+            error: function (xhr, status, error) {
+              const errorMessage =
+                xhr.responseJSON?.message || "An error occurred during upload.";
+              notyf.error(errorMessage);
+            },
+          });
+        });
         $(".user-container table tr button.delete").click(function () {
           const tarId = $(this).data("id");
           if (!tarId) return;
@@ -473,6 +538,20 @@
       }
     </script>
     <style>
+      .icon-selector .addImage {
+        width: 100px;
+        height: 100px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .icon-selector .addImage:before {
+        content: "+";
+        font-size: 3rem;
+        height: 5rem;
+      }
+
       .sidebar-container {
         background: #e5ffbd;
         box-shadow: 2px 0px 11px 0px #00000091;

@@ -43,4 +43,11 @@ const deleteRoute = async (req, res) => {
   }
 };
 
-module.exports = { fetchLoopRoutes, saveLoopRoutes, deleteRoute };
+const uploadImage = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded." });
+  }
+
+  res.json({ imageName: req.file.filename });
+};
+module.exports = { fetchLoopRoutes, saveLoopRoutes, deleteRoute, uploadImage };
