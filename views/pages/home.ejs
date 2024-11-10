@@ -140,7 +140,9 @@
       }
 
       function moveMarker(imageSrc, coordinates) {
-        iconMarker.src = imageSrc;
+        if (!iconMarker.src.match(imageSrc)) {
+          iconMarker.src = imageSrc;
+        }
         markerElement.position = coordinates[polyIndex];
         circle.setRadius(polygonCoordinates[polyIndex].radius);
       }
@@ -212,7 +214,7 @@
 
       function animateMarker() {
         const urlParsed = new URL(iconMarker.src);
-        if ((urlParsed.pathname = polygonCoordinates[polyIndex].image)) {
+        if (urlParsed.pathname != polygonCoordinates[polyIndex].image) {
           iconMarker.src = polygonCoordinates[polyIndex].image;
         }
         const start =
