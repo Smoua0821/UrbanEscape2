@@ -74,6 +74,8 @@
         });
 
         map.addListener("click", (event) => {
+          if (polygonCoordinates.length == 0)
+            return notyf.error("No Route Available");
           const clickedLocation = event.latLng;
           const circleLocation = circle.getCenter();
           const clickDist = haversineDistance(
@@ -81,7 +83,7 @@
               lat: pos.lat,
               lng: pos.lng,
             },
-            polygonCoordinates[polyIndex].polygonCoords[0]
+            markerElement.position
           );
           console.log(
             `Clicked: ${clickDist}  Radii: ${circle.getRadius() / 1000}`
@@ -91,10 +93,24 @@
             $.post(
               "/user/profile/capture",
               { image: ImgPath[ImgPath.length - 1] },
-              (data) => {
-                notyf.success("Picture Added to Your Profile!");
+              (data, status, xhr) => {
+                if (
+                  status === "success" &&
+                  data.message === "Image Captured successfully!"
+                ) {
+                  notyf.success("Picture Added to Your Profile!");
+                } else {
+                  const errorMessage =
+                    data.message ||
+                    "An error occurred while capturing the image.";
+                  notyf.error(errorMessage);
+                }
               }
-            );
+            ).fail((xhr, status, error) => {
+              const errorMessage =
+                xhr.responseJSON?.message || "An unexpected error occurred.";
+              notyf.error(errorMessage);
+            });
           }
           nearestPolygon();
           if (!gameStarted) {
@@ -213,10 +229,11 @@
         ) {
           currentSegment = 0;
         }
-        stepsPerSegment = haversineDistance(
-          polygonCoordinates[polyIndex].polygonCoords[currentSegment],
-          polygonCoordinates[polyIndex].polygonCoords[currentSegment + 1]
-        );
+        stepsPerSegment =
+          haversineDistance(
+            polygonCoordinates[polyIndex].polygonCoords[currentSegment],
+            polygonCoordinates[polyIndex].polygonCoords[currentSegment + 1]
+          ) * 100;
         currentStep++;
 
         // Move to next segment if current segment is done
@@ -292,10 +309,11 @@
         }
         nearestPolygon();
         circle.setMap(map);
-        stepsPerSegment = haversineDistance(
-          polygonCoordinates[polyIndex].polygonCoords[0],
-          polygonCoordinates[polyIndex].polygonCoords[1]
-        );
+        stepsPerSegment =
+          haversineDistance(
+            polygonCoordinates[polyIndex].polygonCoords[0],
+            polygonCoordinates[polyIndex].polygonCoords[1]
+          ) * 100;
         moveMarker(
           polygonCoordinates[polyIndex].image,
           polygonCoordinates[polyIndex].polygonCoords

@@ -350,7 +350,7 @@
           $(`.vj_dynamic.${linkId}`).fadeIn();
         });
         map = new google.maps.Map(document.getElementsByClassName("g-map")[0], {
-          zoom: 5,
+          zoom: 15,
           center: pos,
           mapId: "Main_Map",
         });
@@ -397,6 +397,40 @@
             polygon.setMap(map);
           }
         });
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              pos.lat = position.coords.latitude;
+              pos.lng = position.coords.longitude;
+              map.panTo(pos);
+            },
+            (error) => {
+              $(".errorScreen").show();
+              $("#map").remove();
+              let locerrmsg = "";
+              switch (error.code) {
+                case error.PERMISSION_DENIED:
+                  locerrmsg = "User denied the request for Geolocation.";
+                  break;
+                case error.POSITION_UNAVAILABLE:
+                  locerrmsg = "Location information is unavailable.";
+                  break;
+                case error.TIMEOUT:
+                  locerrmsg = "The request to get user location timed out.";
+                  break;
+                case error.UNKNOWN_ERROR:
+                  locerrmsg = "An unknown error occurred.";
+                  break;
+                default:
+                  locerrmsg = "An error occurred while retrieving location.";
+              }
+              notyf.error(locerrmsg);
+              $(".locerrmsg").text(locerrmsg);
+            }
+          );
+        } else {
+          notyf.error("Geolocation is not supported by this browser.");
+        }
       });
       let bulkPolyLine, bulkCircle, bulkMarker;
       function renderRoutes() {
