@@ -116,7 +116,6 @@
           if (!gameStarted) {
             startGaming();
           }
-          speed = polygonCoordinates[polyIndex].speed * 10;
         });
         markerElement = new google.maps.marker.AdvancedMarkerElement({
           position: pos,
@@ -237,7 +236,7 @@
           haversineDistance(
             polygonCoordinates[polyIndex].polygonCoords[currentSegment],
             polygonCoordinates[polyIndex].polygonCoords[currentSegment + 1]
-          ) * 100;
+          ) * 500;
         currentStep++;
 
         // Move to next segment if current segment is done
@@ -308,13 +307,14 @@
           notyf.error("No Route Found!");
           return false;
         }
+        speed = polygonCoordinates[polyIndex].speed * 10;
         nearestPolygon();
         circle.setMap(map);
         stepsPerSegment =
           haversineDistance(
             polygonCoordinates[polyIndex].polygonCoords[0],
             polygonCoordinates[polyIndex].polygonCoords[1]
-          ) * 100;
+          ) * 500;
         moveMarker(
           polygonCoordinates[polyIndex].image,
           polygonCoordinates[polyIndex].polygonCoords
