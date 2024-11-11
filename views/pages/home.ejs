@@ -71,7 +71,6 @@
 
         $(document).ready(() => {
           $(".simpleLoading").show();
-          updateCurrentLocation();
         });
 
         map.addListener("click", (event) => {
@@ -142,6 +141,7 @@
         $.get("/api/looproute", (data, success) => {
           if (!success) return;
           polygonCoordinates = data;
+          updateCurrentLocation();
         });
       }
 
@@ -310,7 +310,7 @@
         return tmpaihjhsg;
       }
       function startGaming() {
-        if (polygonCoordinates.length == 0) {
+        if (polygonCoordinates && polygonCoordinates.length == 0) {
           notyf.error("No Route Found!");
           return false;
         }
