@@ -7,7 +7,11 @@ const authMiddleware = (req, res, next) => {
     if (token) {
       jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
-          return res.status(403).json({ error: "Invalid or expired token" });
+          res.clearCookie("sessionId", {
+            httpOnly: true,
+            sameSite: "strict",
+          });
+          return res.redirect("/");
         }
         req.user = decoded;
       });
@@ -22,7 +26,11 @@ const authMiddleware = (req, res, next) => {
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
-      return res.status(403).json({ error: "Invalid or expired token" });
+      res.clearCookie("sessionId", {
+        httpOnly: true,
+        sameSite: "strict",
+      });
+      return res.redirect("/");
     }
 
     req.user = decoded;

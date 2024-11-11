@@ -1,7 +1,7 @@
 const sharp = require("sharp");
 const path = require("path");
 const fs = require("fs");
-const LoopRoute = require("../models/loopRoute.js");
+const LoopRoute = require("../models/LoopRoute.js");
 async function fetchLoopRoutes(req, res) {
   const data = await LoopRoute.find();
   res.json(data);
