@@ -32,5 +32,3 @@ Thumbs.db
 coverage/
 *.tgz
 *.lock
-
-admin.json
