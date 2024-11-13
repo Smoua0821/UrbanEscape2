@@ -456,6 +456,8 @@
         $(".sidebar-container .sidebar .menu ul li").click(function () {
           const linkId = $(this).data("link");
           if (!linkId) return;
+          $(".sidebar-container .sidebar .menu ul li").removeClass("active");
+          $(this).addClass("active");
           if (linkId == "routes") {
             if (!isNewMap) {
               renderRoutes();
@@ -640,6 +642,13 @@
 
       .sidebar-container .sidebar .menu ul li:hover {
         background: white;
+      }
+
+      .sidebar-container .sidebar .menu ul li.active {
+        background: white;
+        border-radius: 20px;
+        border: 2px solid lightgrey;
+        box-shadow: 2px 5px 10px lightgrey;
       }
 
       .map-controller {
