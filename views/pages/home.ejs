@@ -99,11 +99,12 @@
                   data.message === "Image Captured successfully!"
                 ) {
                   notyf.success("Picture Added to Your Profile!");
-                  polygonCoordinates.pop();
-                  polyIndex -= 1;
-                  if (polyIndex < 0) {
+                  if (polygonCoordinates.length > 0) {
+                    removeObjectByIndex(polygonCoordinates, polyIndex);
+                    polyIndex = nearestPolygon().index;
+                  } else {
                     notyf.success("You have Captured All images!");
-                    //$(".WinScreen").fadeIn();
+                    $(".WinScreen").fadeIn();
                   }
                 } else {
                   const errorMessage =
@@ -116,6 +117,13 @@
               const errorMessage =
                 xhr.responseJSON?.message || "An unexpected error occurred.";
               notyf.error(errorMessage);
+              let dCode = xhr.responseJSON?.code || 0;
+              if (dCode == 1) {
+                if (polygonCoordinates.length > 0) {
+                  removeObjectByIndex(polygonCoordinates, polyIndex);
+                  polyIndex = nearestPolygon().index;
+                }
+              }
             });
           }
           nearestPolygon();
@@ -151,6 +159,11 @@
         }
         markerElement.position = coordinates[polyIndex];
         circle.setRadius(polygonCoordinates[polyIndex].radius);
+      }
+      function removeObjectByIndex(arr, index) {
+        if (index > -1 && index < arr.length) {
+          arr.splice(index, 1);
+        }
       }
       let isFirstTime = 1;
       function updateCurrentLocation() {

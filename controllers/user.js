@@ -23,7 +23,9 @@ const captureImage = async (req, res) => {
 
     // Check if the image already exists
     if (capturedImages.includes(image)) {
-      return res.status(400).json({ message: "Image already exists!" });
+      return res
+        .status(400)
+        .json({ message: "Image already exists!", code: 1 });
     }
 
     // Add the new image to the user's capturedImages array
@@ -35,14 +37,16 @@ const captureImage = async (req, res) => {
       { $set: { capturedImages } }
     );
 
-    return res.status(200).json({ message: "Image Captured successfully!" });
+    return res
+      .status(200)
+      .json({ message: "Image Captured successfully!", code: 1 });
   } catch (error) {
-    // Improved error response with message
-    console.error(error); // Log error for debugging
+    console.error(error);
     return res.status(500).json({
       status: "error",
       message: "An error occurred while capturing the image.",
       error: error.message || error,
+      code: 0,
     });
   }
 };
