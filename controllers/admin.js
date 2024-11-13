@@ -2,6 +2,7 @@ const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
 const path = require("path");
 const User = require("../models/User");
+const LoopRoute = require("../models/LoopRoute");
 const Map = require("../models/Map");
 async function adminPage(req, res) {
   const user = req.user;
@@ -98,11 +99,18 @@ const deleteMap = async (req, res) => {
     return res.status(404).json({ status: "error", message: "No Map Found" });
 
   try {
+    const map = await Map.find({ id: mapId });
+    if (!map)
+      return res.status(404).json({ status: "error", message: "No Map Found" });
     await Map.deleteOne({ id: mapId });
+    await LoopRoute.deleteMany({ mapId: map._id });
     return res
       .status(200)
       .status(200)
-      .json({ status: "success", message: "Map Deleted Successfully!" });
+      .json({
+        status: "success",
+        message: `Map '${map.name}' Deleted Successfully!`,
+      });
   } catch (error) {
     return res
       .status(401)
