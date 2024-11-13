@@ -638,9 +638,22 @@
           const myData = data.maps.reverse();
           myData.forEach((d) => {
             $("tbody.map_list").append(
-              `<tr><td>${d.name}</td><td><a href='/map/${d.id}'>View Map</a></td><td><button class='btn btn-info me-1'>Edit</button><button class='btn btn-danger'>delete</button></td></tr>`
+              `<tr><td>${d.name}</td><td><a href='/map/${d.id}'>View Map</a></td><td><button class='btn btn-info me-1 edit_map' data-id='${d.id}'>Edit</button><button class='btn btn-danger delete_map' data-id='${d.id}'>delete</button></td></tr>`
             );
           });
+          $(".delete_map")
+            .off("click")
+            .on("click", function () {
+              const mapId = $(this).data("id");
+              if (!mapId) return;
+              if (!confirm("Are You sure?")) return;
+              $.post("/admin/map/delete", { mapId: mapId }, (data) => {
+                if (data.status == "success") {
+                  notyf.success(data.message);
+                  fetchMaps();
+                }
+              });
+            });
         });
       }
     </script>

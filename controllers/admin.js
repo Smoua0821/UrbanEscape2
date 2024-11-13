@@ -84,13 +84,29 @@ const newMap = async (req, res) => {
       .status(201)
       .json({ status: "success", message: "Map created", data: savedMap });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        status: "error",
-        message: "Failed to create map",
-        error: error.message,
-      });
+    res.status(500).json({
+      status: "error",
+      message: "Failed to create map",
+      error: error.message,
+    });
   }
 };
-module.exports = { adminPage, deleteUser, fetchMaps, newMap };
+
+const deleteMap = async (req, res) => {
+  const { mapId } = req.body;
+  if (!mapId)
+    return res.status(404).json({ status: "error", message: "No Map Found" });
+
+  try {
+    await Map.deleteOne({ id: mapId });
+    return res
+      .status(200)
+      .status(200)
+      .json({ status: "success", message: "Map Deleted Successfully!" });
+  } catch (error) {
+    return res
+      .status(401)
+      .json({ status: "error", message: "Something went Wrong" });
+  }
+};
+module.exports = { adminPage, deleteUser, fetchMaps, newMap, deleteMap };
