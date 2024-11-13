@@ -13,11 +13,18 @@ const loopRouteSchema = new mongoose.Schema(
       required: true,
     },
     image: {
-      type: String, // URL or file path for the image
+      type: String,
       required: true,
     },
+    size: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 10,
+      default: 5,
+    },
     radius: {
-      type: Number, // Radius in meters
+      type: Number,
       required: true,
     },
     speed: {

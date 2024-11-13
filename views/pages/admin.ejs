@@ -158,6 +158,34 @@
                   </div>
                 </div>
                 <div class="form-group mb-2">
+                  <p class="m-0">Adjust Size:</p>
+                  <div class="row m-0 p-0">
+                    <div class="col-sm-8">
+                      <input
+                        type="range"
+                        oninput="setMarkerSize(this)"
+                        max="10"
+                        step="1"
+                        value="5"
+                        class="form-control"
+                        id="sizeRange"
+                      />
+                    </div>
+                    <div class="col-sm-4">
+                      <input
+                        type="number"
+                        oninput="setMarkerSizeNum(this)"
+                        max="10"
+                        step="1"
+                        value="5"
+                        class="form-control"
+                        placeholder="Size of Image"
+                        id="sizeNum"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group mb-2">
                   <p class="m-0">Image Speed</p>
                   <input
                     type="number"
@@ -221,6 +249,7 @@
       let map, marker, polygon, circle, iconMarker, radius;
       let polyCoords = [];
       let speed = 1;
+      let tmpImg;
       const beachFlagImg = document.createElement("img");
       let pos = { lat: 55.5, lng: 254.7 };
 
@@ -233,6 +262,28 @@
         }
         speed = event.value;
         payloadData.speed = speed;
+      };
+      const setMarkerSize = (event) => {
+        let size = parseInt(event.value);
+        if (size < 1) {
+          size = 1;
+        }
+        if (size > 10) {
+          size = 10;
+        }
+        payloadData.size = size;
+        $("#sizeNum").val(size);
+      };
+      const setMarkerSizeNum = (event) => {
+        let size = parseInt(event.value);
+        if (size < 1) {
+          size = 1;
+        }
+        if (size > 10) {
+          size = 10;
+        }
+        $("#sizeRange").val(size);
+        beachFlagImg.width = size * 10;
       };
       const setMapRadius = (event) => {
         circle.setCenter(polyCoords[0]);
@@ -517,9 +568,13 @@
               radius: path.radius,
               center: cco,
             });
+            tmpImg = document.createElement("img");
+            tmpImg.src = path.image;
+            tmpImg.width = 10 * path.size;
             bulkMarker = new google.maps.marker.AdvancedMarkerElement({
               position: cco,
               map: map,
+              content: tmpImg,
             });
             bulkMarker.addListener("click", function () {
               const cnf = confirm("Do you want to delete this Route?");
