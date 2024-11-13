@@ -157,6 +157,7 @@
         if (!iconMarker.src.match(imageSrc)) {
           iconMarker.src = imageSrc;
         }
+        iconMarker.width = polygonCoordinates[polyIndex].size * 10;
         markerElement.position = coordinates[polyIndex];
         circle.setRadius(polygonCoordinates[polyIndex].radius);
       }
