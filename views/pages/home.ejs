@@ -329,6 +329,7 @@
         }
         speed = polygonCoordinates[polyIndex].speed * 10;
         nearestPolygon();
+        map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
         circle.setMap(map);
         stepsPerSegment =
           haversineDistance(
