@@ -15,17 +15,11 @@ const mapSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
-    settings: {
-      zoom: {
-        type: Number,
-        required: true,
-        min: 0,
-        max: 22,
-      },
-      center: {
-        lat: { type: Number, required: true },
-        lng: { type: Number, required: true },
-      },
+    zoom: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 22,
     },
   },
   {
