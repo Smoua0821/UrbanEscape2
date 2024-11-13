@@ -2,7 +2,12 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const path = require("path");
-const { adminPage, deleteUser } = require("../controllers/admin");
+const {
+  adminPage,
+  deleteUser,
+  fetchMaps,
+  newMap,
+} = require("../controllers/admin");
 const {
   fetchLoopRoutes,
   saveLoopRoutes,
@@ -29,5 +34,8 @@ router.post("/looproute/delete", deleteRoute);
 router.post("/looproute/image", upload.single("image"), uploadImage);
 
 router.post("/delete/:id", deleteUser);
+
+router.get("/map", fetchMaps);
+router.post("/map", newMap);
 
 module.exports = router;

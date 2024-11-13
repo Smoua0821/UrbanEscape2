@@ -1,6 +1,8 @@
+const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
 const path = require("path");
 const User = require("../models/User");
+const Map = require("../models/Map");
 async function adminPage(req, res) {
   const user = req.user;
   if (user.role.current != "admin") return res.end("Unauthorised!");
@@ -56,4 +58,39 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { adminPage, deleteUser };
+const fetchMaps = async (req, res) => {
+  const maps = await Map.find({});
+  let message;
+  if (!maps) message = "No Map Found, Please Create New!";
+  message = `success`;
+  return res.status(200).json({
+    message: message,
+    maps: maps,
+  });
+};
+const newMap = async (req, res) => {
+  const { name } = req.body;
+
+  if (!name) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "Map name is required" });
+  }
+
+  try {
+    const newMap = new Map({ name, id: uuidv4(), zoom: 15 });
+    const savedMap = await newMap.save();
+    res
+      .status(201)
+      .json({ status: "success", message: "Map created", data: savedMap });
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        status: "error",
+        message: "Failed to create map",
+        error: error.message,
+      });
+  }
+};
+module.exports = { adminPage, deleteUser, fetchMaps, newMap };

@@ -110,6 +110,7 @@
                   <th>Link</th>
                   <th>Action</th>
                 </thead>
+                <tbody class="map_list"></tbody>
               </table>
             </div>
           </div>
@@ -397,6 +398,7 @@
         }
       });
       $(document).ready(() => {
+        fetchMaps();
         $("#image-upload").on("change", function (e) {
           const file = e.target.files[0];
           if (!file) {
@@ -600,6 +602,16 @@
                 }
               );
             });
+          });
+        });
+      }
+      function fetchMaps() {
+        $.get("/admin/map", (data) => {
+          $("tbody.map_list").empty();
+          data.maps.forEach((d) => {
+            $("tbody.map_list").append(
+              `<tr><td>${d.name}</td><td><a href='/map/${d.id}'>View Map</a></td><td><button class='btn btn-info me-1'>Edit</button><button class='btn btn-danger'>delete</button></td></tr>`
+            );
           });
         });
       }
