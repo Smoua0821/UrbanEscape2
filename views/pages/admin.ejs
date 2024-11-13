@@ -104,6 +104,21 @@
               </div>
             </div>
             <div class="vj_dynamic maplist">
+              <div class="row justify-content-center">
+                <form
+                  class="form my-5 bg-light p-3 col-sm-10 col-md-8 col-lg-6 m-0 new_map_form"
+                >
+                  <h3 class="text-center m-0 mb-3">New Map</h3>
+                  <div class="d-flex">
+                    <input
+                      placeholder="Map Name"
+                      class="form-control"
+                      name="name"
+                    />
+                    <button class="btn btn-success ms-2">Submit</button>
+                  </div>
+                </form>
+              </div>
               <table class="table table-striped">
                 <thead>
                   <th>Name</th>
@@ -399,6 +414,18 @@
       });
       $(document).ready(() => {
         fetchMaps();
+        $("form.new_map_form").submit(function () {
+          const mapName = $("form.new_map_form input").val();
+          if (!mapName) alert("Please Enter a Valid Name");
+          $.post("/admin/map", { name: mapName }, (data) => {
+            if (data.status == "success") {
+              notyf.success(`Form '${mapName}' created successfully!`);
+              fetchMaps();
+              $("form.new_map_form input").val("");
+            }
+          });
+          return false;
+        });
         $("#image-upload").on("change", function (e) {
           const file = e.target.files[0];
           if (!file) {
@@ -608,7 +635,8 @@
       function fetchMaps() {
         $.get("/admin/map", (data) => {
           $("tbody.map_list").empty();
-          data.maps.forEach((d) => {
+          const myData = data.maps.reverse();
+          myData.forEach((d) => {
             $("tbody.map_list").append(
               `<tr><td>${d.name}</td><td><a href='/map/${d.id}'>View Map</a></td><td><button class='btn btn-info me-1'>Edit</button><button class='btn btn-danger'>delete</button></td></tr>`
             );
