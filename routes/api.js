@@ -3,6 +3,6 @@ const router = express.Router();
 
 const { fetchLoopRoutes } = require("../controllers/loopRoute");
 
-router.get("/looproute", fetchLoopRoutes);
+router.get("/looproute/:mapid", fetchLoopRoutes);
 
 module.exports = router;

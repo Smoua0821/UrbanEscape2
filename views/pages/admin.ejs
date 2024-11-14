@@ -270,7 +270,6 @@
 
     <script>
       const notyf = new Notyf();
-      let isNewMap = 0;
       let isClosedPath = 0;
       let map, marker, polygon, circle, iconMarker, radius;
       let polyCoords = [];
@@ -278,6 +277,7 @@
       let tmpImg;
       const beachFlagImg = document.createElement("img");
       let pos = { lat: 55.5, lng: 254.7 };
+      let mapId = 0;
 
       const setMarkerSpeed = (event) => {
         speed = event.value;
@@ -495,17 +495,52 @@
         $(".sidebar-container .sidebar .menu ul li").click(function () {
           const linkId = $(this).data("link");
           if (!linkId) return;
-          $(".sidebar-container .sidebar .menu ul li").removeClass("active");
-          $(this).addClass("active");
           if (linkId == "routes") {
-            if (!isNewMap) {
-              renderRoutes();
-              isNewMap = 1;
-            }
+            if (!mapId) return notyf.error("Choose a Valid Map!");
+            renderRoutes();
           }
           $(".vj_dynamic").hide();
           $(`.vj_dynamic.${linkId}`).fadeIn();
+          $(".sidebar-container .sidebar .menu ul li").removeClass("active");
+          $(this).addClass("active");
         });
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              pos.lat = position.coords.latitude;
+              pos.lng = position.coords.longitude;
+              map.panTo(pos);
+            },
+            (error) => {
+              $(".errorScreen").show();
+              $("#map").remove();
+              let locerrmsg = "";
+              switch (error.code) {
+                case error.PERMISSION_DENIED:
+                  locerrmsg = "User denied the request for Geolocation.";
+                  break;
+                case error.POSITION_UNAVAILABLE:
+                  locerrmsg = "Location information is unavailable.";
+                  break;
+                case error.TIMEOUT:
+                  locerrmsg = "The request to get user location timed out.";
+                  break;
+                case error.UNKNOWN_ERROR:
+                  locerrmsg = "An unknown error occurred.";
+                  break;
+                default:
+                  locerrmsg = "An error occurred while retrieving location.";
+              }
+              notyf.error(locerrmsg);
+              $(".locerrmsg").text(locerrmsg);
+            }
+          );
+        } else {
+          notyf.error("Geolocation is not supported by this browser.");
+        }
+      });
+      let bulkPolyLine, bulkCircle, bulkMarker;
+      function renderRoutes() {
         map = new google.maps.Map(document.getElementsByClassName("g-map")[0], {
           zoom: 15,
           center: pos,
@@ -554,50 +589,14 @@
             polygon.setMap(map);
           }
         });
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              pos.lat = position.coords.latitude;
-              pos.lng = position.coords.longitude;
-              map.panTo(pos);
-            },
-            (error) => {
-              $(".errorScreen").show();
-              $("#map").remove();
-              let locerrmsg = "";
-              switch (error.code) {
-                case error.PERMISSION_DENIED:
-                  locerrmsg = "User denied the request for Geolocation.";
-                  break;
-                case error.POSITION_UNAVAILABLE:
-                  locerrmsg = "Location information is unavailable.";
-                  break;
-                case error.TIMEOUT:
-                  locerrmsg = "The request to get user location timed out.";
-                  break;
-                case error.UNKNOWN_ERROR:
-                  locerrmsg = "An unknown error occurred.";
-                  break;
-                default:
-                  locerrmsg = "An error occurred while retrieving location.";
-              }
-              notyf.error(locerrmsg);
-              $(".locerrmsg").text(locerrmsg);
-            }
-          );
-        } else {
-          notyf.error("Geolocation is not supported by this browser.");
-        }
-      });
-      let bulkPolyLine, bulkCircle, bulkMarker;
-      function renderRoutes() {
+
         if (bulkPolyLine) bulkPolyLine.setMap(null);
         if (bulkCircle) bulkCircle.setMap(null);
         if (bulkMarker) {
           bulkMarker.setMap(null);
           bulkMarker.remo;
         }
-        $.get("/api/looproute", (data) => {
+        $.get(`/api/looproute/${mapId}`, (data) => {
           data.forEach((path) => {
             bulkPolyLine = new google.maps.Polyline({
               map: map,
@@ -653,6 +652,17 @@
                   fetchMaps();
                 }
               });
+            });
+
+          $(".edit_map")
+            .off("click")
+            .on("click", function () {
+              mapId = $(this).data("id");
+              if (!mapId) return;
+              payloadData.mapId = mapId;
+              $(
+                ".sidebar-container .sidebar .menu ul li[data-link='routes']"
+              ).click();
             });
         });
       }
