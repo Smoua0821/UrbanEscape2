@@ -32,6 +32,13 @@ const loopRouteSchema = new mongoose.Schema(
       required: true,
       default: 1,
     },
+    opacity: {
+      type: Number,
+      required: true,
+      default: 100,
+      min: 0,
+      max: 100,
+    },
     mapId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Map",
