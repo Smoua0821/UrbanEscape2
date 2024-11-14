@@ -99,7 +99,7 @@ const deleteMap = async (req, res) => {
     return res.status(404).json({ status: "error", message: "No Map Found" });
 
   try {
-    const map = await Map.find({ id: mapId });
+    const map = await Map.findOne({ id: mapId });
     if (!map)
       return res.status(404).json({ status: "error", message: "No Map Found" });
     await Map.deleteOne({ id: mapId });
