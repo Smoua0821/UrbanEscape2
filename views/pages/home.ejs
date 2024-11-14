@@ -47,6 +47,7 @@
     <script>
       let notyf;
       let mapParsedId = document.getElementById("mapParsedId").value;
+      let circleOpacity = 100;
       $(document).ready(() => {
         if (!mapParsedId) return false;
         notyf = new Notyf();
@@ -164,6 +165,13 @@
       function moveMarker(imageSrc, coordinates) {
         if (!iconMarker.src.match(imageSrc)) {
           iconMarker.src = imageSrc;
+        }
+        if (circleOpacity != polygonCoordinates[polyIndex].circleOpacity) {
+          circleOpacity = polygonCoordinates[polyIndex].opacity;
+          circle.setValues({
+            fillOpacity: circleOpacity / 200,
+            strokeOpacity: circleOpacity / 100,
+          });
         }
         iconMarker.width = polygonCoordinates[polyIndex].size * 10;
         markerElement.position = coordinates[polyIndex];

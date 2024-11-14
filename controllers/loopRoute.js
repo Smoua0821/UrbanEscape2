@@ -21,7 +21,8 @@ async function fetchLoopRoutes(req, res) {
 }
 
 async function saveLoopRoutes(req, res) {
-  const { polygonCoords, image, radius, speed, size, mapId } = req.body;
+  const { polygonCoords, image, radius, speed, size, mapId, opacity } =
+    req.body;
   if (!mapId)
     return res
       .status(400)
@@ -37,6 +38,7 @@ async function saveLoopRoutes(req, res) {
     radius,
     speed,
     size,
+    opacity,
     mapId: map._id,
   });
 
