@@ -625,6 +625,7 @@
                 (data) => {
                   if (!data) return;
                   notyf.success(data.message);
+                  renderRoutes();
                 }
               );
             });
