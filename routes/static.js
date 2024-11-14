@@ -3,7 +3,7 @@ const router = express.Router();
 const Map = require("../models/Map");
 
 router.get("/", (req, res) => {
-  return res.send("Homepage");
+  return res.render("pages/landing");
 });
 router.get("/map/:mapId", async (req, res) => {
   const { mapId } = req.params;

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome - MapLoopGame</title>
+    <link rel="stylesheet" href="/css/bs.css" />
+  </head>
+  <body>
+    <div class="row vh-100 justify-content-center align-items-center m-0">
+      <div class="col-sm-10 col-md-8 col-lg-6">
+        <h2 class="text-center text-warning">
+          Welcome To
+          <span class="bg-warning rounded-1 border-1 p-3 text-white"
+            >MapLoopGame</span
+          >
+        </h2>
+        <div class="d-flex mt-5">
+          <input
+            id="mapId"
+            class="form-control me-1"
+            placeholder="Enter Map ID"
+          />
+          <button class="btn btn-warning ms-1" onclick="submitt()">Play</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      function submitt(event) {
+        const mapId = document.getElementById("mapId").value;
+        if (!mapId) return alert("Please Enter a Map ID");
+        window.location.href = `/map/${mapId}`;
+      }
+    </script>
+  </body>
+</html>
