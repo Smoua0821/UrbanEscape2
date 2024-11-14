@@ -3,7 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Google Map Integration</title>
+    <title>
+      <% if (locals.title) { %> <%= title.toUpperCase() %> - MapLoopGame<%
+      }else{%>MapLoopGame<%}%>
+    </title>
     <link rel="stylesheet" href="/css/style.css" />
     <link
       rel="stylesheet"
@@ -23,6 +26,9 @@
       <div class="text-container">
         <h2>Please Wait......</h2>
         <p>Ensure You have enabled your location for a better experience</p>
+        <% if (locals.mapParsed) { %>
+        <input type="hidden" id="mapParsedId" value="<%= mapParsed %>" />
+        <% } %>
       </div>
     </div>
     <div class="errorScreen" style="display: none">
@@ -40,7 +46,9 @@
     <%- include('../components/navbar') %>
     <script>
       let notyf;
+      let mapParsedId = document.getElementById("mapParsedId").value;
       $(document).ready(() => {
+        if (!mapParsedId) return false;
         notyf = new Notyf();
         $(".user-navbar .navbar-container ul li").click(function () {
           const target = $(this).data("id");
@@ -146,7 +154,7 @@
       }
 
       function showAllPolygons() {
-        $.get("/api/looproute", (data, success) => {
+        $.get(`/api/looproute/${mapParsedId}`, (data, success) => {
           if (!success) return;
           polygonCoordinates = data;
           updateCurrentLocation();

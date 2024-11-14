@@ -638,7 +638,7 @@
           const myData = data.maps.reverse();
           myData.forEach((d) => {
             $("tbody.map_list").append(
-              `<tr><td>${d.name}</td><td><a href='/map/${d.id}'>View Map</a></td><td><button class='btn btn-info me-1 edit_map' data-id='${d.id}'>Edit</button><button class='btn btn-danger delete_map' data-id='${d.id}'>delete</button></td></tr>`
+              `<tr><td>${d.name}</td><td><a target='_blank' href='/map/${d.id}'>View Map</a></td><td><button class='btn btn-info me-1 edit_map' data-id='${d.id}'>Edit</button><button class='btn btn-danger delete_map' data-id='${d.id}'>delete</button></td></tr>`
             );
           });
           $(".delete_map")
