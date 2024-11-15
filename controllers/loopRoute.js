@@ -3,7 +3,11 @@ const path = require("path");
 const fs = require("fs");
 const LoopRoute = require("../models/LoopRoute.js");
 const Map = require("../models/Map");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User.js");
+require("dotenv").config();
 async function fetchLoopRoutes(req, res) {
+  let imgexist = [];
   const { mapid } = req.params;
   if (!mapid)
     return res
@@ -16,8 +20,38 @@ async function fetchLoopRoutes(req, res) {
       .status(404)
       .status({ status: "error", message: "Invalid Id parsed!" });
 
+  const token = req.cookies.sessionId;
+  if (token) {
+    try {
+      const userO = await jwt.verify(token, process.env.JWT_SECRET);
+      if (userO) {
+        const user = await User.findOne({ email: userO.email });
+        if (user) {
+          imgexist = user.capturedImages.filter(
+            (ci) => ci.mapId.toString() === map._id.toString()
+          );
+          if (!imgexist) imgexist = [];
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   const data = await LoopRoute.find({ mapId: map._id });
-  res.json(data);
+  const balle = [];
+  data.forEach((d) => {
+    let dimg = d.image.split("/");
+    dimg = dimg[dimg.length - 1];
+    if (
+      d.mapId.toString() == map._id.toString() &&
+      imgexist.find((eif) => eif.images.includes(dimg))
+    ) {
+    } else {
+      balle.push(d);
+    }
+  });
+  res.json(balle);
 }
 
 async function saveLoopRoutes(req, res) {

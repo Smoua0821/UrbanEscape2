@@ -19,7 +19,16 @@ const UserSchema = new mongoose.Schema(
     },
     capturedImages: [
       {
-        type: String,
+        mapId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Map",
+          required: true,
+        },
+        images: [
+          {
+            type: String,
+          },
+        ],
       },
     ],
     role: {

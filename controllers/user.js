@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Map = require("../models/Map");
 const userProfile = async (req, res) => {
   const user = await User.findOne({ email: req.user.email });
   return res.render("pages/profile", {
@@ -7,51 +8,50 @@ const userProfile = async (req, res) => {
 };
 
 const captureImage = async (req, res) => {
-  const { image } = req.body;
-
-  // Check if image is provided
-  if (!image) return res.status(404).end("Invalid Request");
-
-  try {
-    // Find user based on email
-    const user = await User.findOne({ email: req.user.email });
-
-    // If user is not found, return an Unauthorized error
-    if (!user) return res.status(400).json({ message: "Unauthorised!" });
-
-    const capturedImages = user.capturedImages;
-
-    // Check if the image already exists
-    if (capturedImages.includes(image)) {
-      return res
-        .status(400)
-        .json({ message: "Image already exists!", code: 1 });
-    }
-
-    // Add the new image to the user's capturedImages array
-    capturedImages.push(image);
-
-    // Update the user's capturedImages array in the database
-    await User.updateOne(
-      { email: req.user.email }, // Use req.user.email here
-      { $set: { capturedImages } }
+  let { image, mapId } = req.body;
+  if (!image || !mapId) return res.status(400).end("Invalid Request");
+  const map = await Map.findOne({ id: mapId });
+  if (!map) return res.json({ status: "error", message: "No Map Found!" });
+  mapId = map._id.toString();
+  const user = await User.findOne({
+    email: req.user.email,
+  });
+  if (!user) return res.redirect("/auth");
+  let capturedImages = user.capturedImages;
+  if (capturedImages.length == 0) {
+    capturedImages.push({ mapId: mapId, images: [image] });
+  } else {
+    if (
+      capturedImages.find(
+        (cii) => cii.mapId.toString() === mapId && cii.images.includes(image)
+      )
+    )
+      return res.json({ message: "Exists Already" });
+    const capturedImagesFilter = capturedImages.find(
+      (ci) => ci.mapId.toString() === mapId
     );
 
-    return res
-      .status(200)
-      .json({
-        message: "Image Captured successfully!",
-        code: 1,
-        title: "Congrats",
-      });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      status: "error",
-      message: "An error occurred while capturing the image.",
-      error: error.message || error,
-      code: 0,
+    if (!capturedImagesFilter) {
+      capturedImages.push({ mapId: mapId, images: [image] });
+    } else {
+      capturedImagesFilter.images.push(image);
+    }
+  }
+  if (capturedImages.length == 0)
+    return res.json({ message: "Something went Wrong!" });
+
+  try {
+    await User.updateOne(
+      { email: req.user.email },
+      { $set: { capturedImages: capturedImages } }
+    );
+    return res.json({
+      status: "success",
+      message: "Image Captured successfully!",
     });
+  } catch (error) {
+    console.log(error);
+    return res.json({ message: "Can't Update" });
   }
 };
 
