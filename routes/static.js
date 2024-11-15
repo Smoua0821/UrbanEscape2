@@ -3,7 +3,9 @@ const router = express.Router();
 const Map = require("../models/Map");
 
 router.get("/", (req, res) => {
-  return res.render("pages/landing");
+  return res.render("pages/landing", {
+    user: req.user,
+  });
 });
 router.get("/map/:mapId", async (req, res) => {
   const { mapId } = req.params;

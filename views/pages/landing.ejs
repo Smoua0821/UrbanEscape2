@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome - MapLoopGame</title>
+    <title>Welcome - Urban Escape</title>
     <link rel="stylesheet" href="/css/bs.css" />
   </head>
   <body>
@@ -12,7 +12,7 @@
         <h2 class="text-center text-warning">
           Welcome To
           <span class="bg-warning rounded-1 border-1 p-3 text-white"
-            >MapLoopGame</span
+            >Urban Escape</span
           >
         </h2>
         <div class="d-flex mt-5">
@@ -22,6 +22,18 @@
             placeholder="Enter Map ID"
           />
           <button class="btn btn-warning ms-1" onclick="submitt()">Play</button>
+        </div>
+        <div class="extra mt-2 text-center">
+          <% if (locals.user) { %>
+          <p class="alert alert-warning">
+            Hey <%= user.name.toUpperCase() %>,
+            <a href="/user/profile">Profile</a>
+          </p>
+          <% }else{ %>
+          <p class="alert alert-warning">
+            Please <a href="/auth">Login</a> to enjoy all features
+          </p>
+          <%}%>
         </div>
       </div>
     </div>
