@@ -39,7 +39,11 @@ const captureImage = async (req, res) => {
 
     return res
       .status(200)
-      .json({ message: "Image Captured successfully!", code: 1 });
+      .json({
+        message: "Image Captured successfully!",
+        code: 1,
+        title: "Congrats",
+      });
   } catch (error) {
     console.error(error);
     return res.status(500).json({

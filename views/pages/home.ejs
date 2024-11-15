@@ -12,6 +12,7 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css"
     />
+    <link rel="stylesheet" href="/css/bs.css" />
     <script src="/js/jquery.js"></script>
   </head>
   <body style="margin: 0">
@@ -29,6 +30,7 @@
         <% if (locals.mapParsed) { %>
         <input type="hidden" id="mapParsedId" value="<%= mapParsed %>" />
         <% } %>
+        <button class=""></button>
       </div>
     </div>
     <div class="errorScreen" style="display: none">
@@ -44,6 +46,52 @@
     </div>
     <div class="WinScreen" style="display: none"></div>
     <%- include('../components/navbar') %>
+    <div
+      class="modal fade"
+      id="bsModal"
+      tabindex="-1"
+      aria-labelledby="bsModal"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="bsModalTitle">Congrats</h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body bsModalBody">
+            <div
+              class="multimodel"
+              id="CapturedImagePopUp"
+              style="display: none"
+            >
+              <div class="row m-0">
+                <div class="col-md-5">
+                  <div
+                    class="h-100 d-flex justify-content-center align-items-center"
+                  >
+                    <img src="" width="100%" />
+                  </div>
+                </div>
+                <div class="col-md-7 text-center">
+                  <div class="h-100 d-flex align-items-center">
+                    <p class="alert alert-warning w-100" id="captureMessage">
+                      Congrats, You have Captured the Image!
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
       let notyf;
       let mapParsedId = document.getElementById("mapParsedId").value;
@@ -99,6 +147,10 @@
           );
           if (clickDist <= circle.getRadius() / 1000) {
             const ImgPath = iconMarker.src.split("/");
+            $("#CapturedImagePopUp img").attr(
+              "src",
+              `/images/mapicons/${ImgPath[ImgPath.length - 1]}`
+            );
             $.post(
               "/user/profile/capture",
               { image: ImgPath[ImgPath.length - 1] },
@@ -107,7 +159,10 @@
                   status === "success" &&
                   data.message === "Image Captured successfully!"
                 ) {
-                  notyf.success("Picture Added to Your Profile!");
+                  $("#CapturedImagePopUp").fadeIn();
+                  $("#bsModalTitle").text(data.title);
+                  $("#captureMessage").text(data.message);
+                  $("#bsModal").modal("show");
                   if (polygonCoordinates.length > 0) {
                     removeObjectByIndex(polygonCoordinates, polyIndex);
                     polyIndex = nearestPolygon().index;
@@ -370,7 +425,11 @@
         });
       }, 1000);
     </script>
-
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
     <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
   </body>
 </html>
