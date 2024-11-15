@@ -175,9 +175,13 @@
                     data.message ||
                     "An error occurred while capturing the image.";
                   notyf.error(errorMessage);
+                  return (window.location.href = "/auth");
                 }
               }
             ).fail((xhr, status, error) => {
+              if (xhr.status == 302) {
+                return (window.location.href = "/auth");
+              }
               const errorMessage =
                 xhr.responseJSON?.message || "An unexpected error occurred.";
               notyf.error(errorMessage);
