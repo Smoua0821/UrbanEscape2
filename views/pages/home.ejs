@@ -166,7 +166,8 @@
                   if (polygonCoordinates.length > 0) {
                     removeObjectByIndex(polygonCoordinates, polyIndex);
                     polyIndex = nearestPolygon().index;
-                  } else {
+                  }
+                  if (polygonCoordinates.length == 0) {
                     notyf.success("You have Captured All images!");
                     $(".WinScreen").fadeIn();
                   }
