@@ -31,7 +31,7 @@
         </div>
       </div>
       <div class="col-md-8 col-lg-9">
-        <div class="body-container">
+        <div class="body-container vh-100" style="overflow-y: scroll">
           <div class="dynamic-container">
             <div class="vj_dynamic home">
               <div
@@ -119,50 +119,60 @@
                     <button class="ms-2 btn btn-warning">Create</button>
                   </div>
                 </form>
-                <div class="missionsCreator" style="display: none">
-                  <p class="mb-1 mt-2">Set Missions</p>
-                  <div class="form-group mb-2">
-                    <input
-                      placeholder="Mission Name"
-                      class="form-control"
-                      name="missionname"
-                      id="missionname"
-                    />
-                  </div>
-                  <div class="form-group mb-2">
-                    <input
-                      placeholder="Redirect URL"
-                      type="url"
-                      class="form-control"
-                      name="missionredirect"
-                      id="missionurl"
-                    />
-                  </div>
-                  <% if (icons) { %>
-                  <p class="m-0">Select Image</p>
-                  <div class="mission-icons row">
-                    <% icons.forEach(icon => { %>
-                    <div
-                      class="col-sm-4 p-2 border-1 rounded-1 text-center mission-icon-select"
-                      data-src="<%= icon %>"
-                    >
-                      <img
-                        class="lazy"
-                        alt="<%= icon %>"
-                        data-src="/images/mapicons/<%= icon %>"
-                        width="100px"
+                <div class="row justify-content-center">
+                  <div
+                    class="missionsCreator text-center col-sm-10 col-md-8 col-lg-6 mt-3"
+                    style="display: none"
+                  >
+                    <p class="mb-1 mt-2">Set Missions</p>
+                    <div class="form-group mb-2">
+                      <input
+                        placeholder="Mission Name"
+                        class="form-control"
+                        name="missionname"
+                        id="missionname"
                       />
                     </div>
-                    <% }) %>
+                    <div class="form-group mb-2">
+                      <input
+                        placeholder="Redirect URL"
+                        type="url"
+                        class="form-control"
+                        name="missionredirect"
+                        id="missionurl"
+                      />
+                    </div>
+                    <% if (icons) { %>
+                    <p class="m-0">Select Image</p>
+                    <div class="mission-icons row">
+                      <% icons.forEach(icon => { %>
+                      <div
+                        class="col-sm-4 p-2 border-1 rounded-1 text-center mission-icon-select"
+                        data-src="<%= icon %>"
+                      >
+                        <img
+                          class="lazy"
+                          alt="<%= icon %>"
+                          data-src="/images/mapicons/<%= icon %>"
+                          width="100px"
+                        />
+                      </div>
+                      <% }) %>
+                    </div>
+                    <p
+                      class="bg-danger py-2 px-4 text-white rounded-2 d-inline-block"
+                    >
+                      <span id="selectedImagesCount">0</span> Image Selected
+                    </p>
+                    <a
+                      class="btn btn-warning missionBtnSave w-100 my-2"
+                      href="javascript:saveMission()"
+                      style="display: none"
+                    >
+                      Save
+                    </a>
+                    <% } %>
                   </div>
-                  <p><span id="selectedImagesCount">0</span> Selected</p>
-                  <a
-                    class="btn btn-warning w-100 my-2"
-                    href="javascript:saveMission()"
-                  >
-                    Save
-                  </a>
-                  <% } %>
                 </div>
               </div>
               <table class="table table-striped">
@@ -344,6 +354,9 @@
         missions.images.push(imgSrc);
         $(this).fadeOut();
         $("#selectedImagesCount").text(missions.images.length);
+        missions.images.length > 0
+          ? $(".missionBtnSave").fadeIn()
+          : $(".missionBtnSave").hide();
       });
       const setCircleOpacity = (event) => {
         circleOpacity = parseInt(event.value);
@@ -495,7 +508,7 @@
         if (!mapId) return notyf.error("Invalid MapId");
         const missionName = $("#missionname").val();
         const missionUrl = $("#missionurl").val();
-        if (!missionName || !missionUrl)
+        if (!missionName || !missionUrl || missions.images.length == 0)
           return notyf.error("Name or URL can't be Empty");
 
         missions.redeemLink = missionUrl;
