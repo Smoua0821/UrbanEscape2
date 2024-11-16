@@ -40,8 +40,8 @@
                 <div class="text-center">
                   <h3>Welcome</h3>
                   <img
-                    loading="lazy"
-                    src="/images/dancer.gif"
+                    class="lazy"
+                    data-src="/images/dancer.gif"
                     width="200px"
                     alt="welcome dancer"
                   />
@@ -147,9 +147,9 @@
                       data-src="<%= icon %>"
                     >
                       <img
-                        loading="lazy"
+                        class="lazy"
                         alt="<%= icon %>"
-                        src="/images/mapicons/<%= icon %>"
+                        data-src="/images/mapicons/<%= icon %>"
                         width="100px"
                       />
                     </div>
@@ -291,9 +291,9 @@
                     data-src="/images/mapicons/<%= icon %>"
                   >
                     <img
-                      loading="lazy"
+                      class="lazy"
                       alt="<%= icon %>"
-                      src="/images/mapicons/<%= icon %>"
+                      data-src="/images/mapicons/<%= icon %>"
                       width="100px"
                     />
                   </div>
@@ -552,7 +552,7 @@
                 $(this).data("src", response.imageName);
                 $(".icon-container")
                   .prepend(`<div class="p-2 border-1 rounded-1 col-sm-4 icon-selector" data-src="/images/mapicons/${response.imageName}">
-                    <img loading="lazy" alt="${response.imageName}" src="/images/mapicons/${response.imageName}" width="100px">
+                    <img class="lazy" alt="${response.imageName}" data-src="/images/mapicons/${response.imageName}" width="100px">
                   </div>`);
                 $(".icon-selector")
                   .off("click")
@@ -783,6 +783,34 @@
             });
         });
       }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const images = document.querySelectorAll(".lazy");
+
+        let loadDelay = 0;
+        function loadImageWithDelay(image) {
+          setTimeout(() => {
+            image.src = image.dataset.src;
+            image.classList.remove("lazy");
+          }, loadDelay);
+          loadDelay += 200;
+        }
+
+        const observer = new IntersectionObserver(
+          (entries, observer) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                loadImageWithDelay(entry.target);
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { rootMargin: "100px" }
+        );
+        images.forEach((image) => {
+          observer.observe(image);
+        });
+      });
     </script>
     <style>
       .icon-selector .addImage {
