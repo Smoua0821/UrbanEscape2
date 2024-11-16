@@ -117,4 +117,50 @@ const deleteMap = async (req, res) => {
       .json({ status: "error", message: "Something went Wrong" });
   }
 };
-module.exports = { adminPage, deleteUser, fetchMaps, newMap, deleteMap };
+
+const newMapMission = async (req, res) => {
+  const { mapId, missions } = req.body;
+  if (!mapId || !missions)
+    return res
+      .status(400)
+      .json({ status: "error", message: "Invalid Request" });
+
+  try {
+    const map = await Map.findOne({ id: mapId });
+    if (!map)
+      return res.status(404).json({ status: "error", message: "No Map Found" });
+
+    const missionsExist = map.missions || [];
+
+    if (missionsExist.includes(missions)) {
+      return res
+        .status(409)
+        .json({ status: "error", message: "Duplicate Mission" });
+    }
+
+    if (missionsExist.find((me) => me.name === missions.name))
+      return res.status(409).json({
+        status: "error",
+        message: `${missions.name} Already used, Try Different Name`,
+      });
+
+    missionsExist.push(missions);
+
+    await Map.updateOne({ id: mapId }, { $set: { missions: missionsExist } });
+    return res
+      .status(200)
+      .json({ status: "success", message: "Missions Added" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ status: "error", message: "Server Error" });
+  }
+};
+
+module.exports = {
+  adminPage,
+  deleteUser,
+  fetchMaps,
+  newMap,
+  deleteMap,
+  newMapMission,
+};

@@ -8,6 +8,7 @@ const {
   fetchMaps,
   newMap,
   deleteMap,
+  newMapMission,
 } = require("../controllers/admin");
 const {
   fetchLoopRoutes,
@@ -39,5 +40,7 @@ router.post("/delete/:id", deleteUser);
 router.get("/map", fetchMaps);
 router.post("/map", newMap);
 router.post("/map/delete", deleteMap);
+
+router.post("/map/missions", newMapMission);
 
 module.exports = router;
