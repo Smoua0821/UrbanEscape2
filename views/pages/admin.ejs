@@ -109,13 +109,59 @@
                   class="form my-5 bg-light p-3 col-sm-10 col-md-8 col-lg-6 m-0 new_map_form"
                 >
                   <h3 class="text-center m-0 mb-3">New Map</h3>
-                  <div class="d-flex">
+                  <div class="form-group mb-2">
                     <input
                       placeholder="Map Name"
                       class="form-control"
                       name="name"
+                      id="name"
                     />
-                    <button class="btn btn-success ms-2">Submit</button>
+                  </div>
+                  <p class="mb-1 mt-2">Set Missions</p>
+                  <div class="form-group mb-2">
+                    <input
+                      placeholder="Mission Name"
+                      class="form-control"
+                      name="missionname"
+                      id="missionname"
+                    />
+                  </div>
+                  <div class="form-group mb-2">
+                    <input
+                      placeholder="Redirect URL"
+                      type="url"
+                      class="form-control"
+                      name="missionredirect"
+                      id="missionurl"
+                    />
+                  </div>
+                  <% if (icons) { %>
+                  <p class="m-0">Select Image</p>
+                  <div class="mission-icons row">
+                    <% icons.forEach(icon => { %>
+                    <div
+                      class="col-sm-4 p-2 border-1 rounded-1 text-center mission-icon-select"
+                      data-src="<%= icon %>"
+                    >
+                      <img
+                        loading="lazy"
+                        alt="<%= icon %>"
+                        src="/images/mapicons/<%= icon %>"
+                        width="100px"
+                      />
+                    </div>
+                    <% }) %>
+                  </div>
+                  <p><span id="selectedImagesCount">0</span> Selected</p>
+                  <a
+                    class="btn btn-warning w-100 my-2"
+                    href="javascript:saveMission()"
+                  >
+                    Save
+                  </a>
+                  <% } %>
+                  <div class="mission-list mb-2">
+                    <div class="alert alert-warning">No Missions</div>
                   </div>
                 </form>
               </div>
@@ -290,6 +336,16 @@
       let pos = { lat: 55.5, lng: 254.7 };
       let mapId = 0;
       let circleOpacity = 100;
+      const missions = { redeemLink: "", adventures: [] };
+      let missionImages = [];
+      $(".mission-icons div.mission-icon-select").click(function () {
+        const imgSrc = $(this).data("src");
+        if (!imgSrc) return;
+        if (missionImages.includes(imgSrc)) return;
+        missionImages.push(imgSrc);
+        $(this).fadeOut();
+        $("#selectedImagesCount").text(missionImages.length);
+      });
       const setCircleOpacity = (event) => {
         circleOpacity = parseInt(event.value);
         if (circleOpacity < 0 && circleOpacity.value) {
@@ -436,16 +492,27 @@
           marker.setMap(null);
         }
       });
+      function saveMission() {
+        const missionName = $("#missionname").val();
+        const missionUrl = $("#missionurl").val();
+        if (!missionName || !missionUrl)
+          return notyf.error("Name or URL can't be Empty");
+
+        missions.redeemLink = missionUrl;
+        missions.adventures.push({ name: missionName, images: missionImages });
+        missionImages = [];
+        notyf.success("Mission Saved!");
+      }
       $(document).ready(() => {
         fetchMaps();
         $("form.new_map_form").submit(function () {
-          const mapName = $("form.new_map_form input").val();
+          const mapName = $("form.new_map_form input#name").val();
           if (!mapName) alert("Please Enter a Valid Name");
           $.post("/admin/map", { name: mapName }, (data) => {
             if (data.status == "success") {
               notyf.success(`Form '${mapName}' created successfully!`);
               fetchMaps();
-              $("form.new_map_form input").val("");
+              $("form.new_map_form input#name").val("");
             }
           });
           return false;

@@ -21,6 +21,23 @@ const mapSchema = new mongoose.Schema(
       min: 0,
       max: 22,
     },
+    missions: {
+      redeemLink: {
+        type: String,
+      },
+      adventures: [
+        {
+          name: {
+            type: String,
+          },
+          images: [
+            {
+              type: String,
+            },
+          ],
+        },
+      ],
+    },
   },
   {
     timestamps: true,
