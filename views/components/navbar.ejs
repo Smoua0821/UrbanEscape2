@@ -6,7 +6,9 @@
       <%}%>
       <li data-id="/user/profile">Profile</li>
       <li data-id="/logout">Logout</li>
-      <% }else{ %>
+      <% if (locals.missions) { %>
+      <li data-id="/missions">Missions</li>
+      <% } %> <% }else{ %>
       <li data-id="/auth">Login</li>
       <% } %>
     </ul>

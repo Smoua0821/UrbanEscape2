@@ -91,17 +91,76 @@
         </div>
       </div>
     </div>
-
+    <div class="mission-popup" style="display: none">
+      <div
+        class="col-11 col-sm-10 col-md-8 col-lg-6 col-xl-4 mission-container"
+      >
+        <div class="popup-header">
+          <h1 class="text-center title">Missions</h1>
+        </div>
+        <div class="popup-body">
+          <a href="javascript:void()" class="hideMissionsPopup">Close</a>
+          <div class="missions-list">
+            <ul></ul>
+          </div>
+          <div class="mission-interface" style="display: none">
+            <a href="javascript:console.log();" id="backFromInterface">Back</a>
+            <div class="user-image-pick">
+              <div class="image-line">
+                <div class="mission-image image-picker"></div>
+                <div class="mission-image">
+                  <img src="/images/mapicons/gif.gif" loading="lazy" />
+                </div>
+              </div>
+              <div class="image-line">
+                <div class="mission-image image-picker"></div>
+                <div class="mission-image">
+                  <img src="/images/mapicons/user_marker.png" loading="lazy" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <script>
       let mapParsedId = document.getElementById("mapParsedId").value;
+      let missions=<%- JSON.stringify(missions) %>;
       let notyf;
       let circleOpacity = 100;
       $(document).ready(() => {
+        let index=0;
+        $(".mission-container .missions-list ul").empty();
+        missions.forEach(mission=>{
+            $(".mission-container .missions-list ul").append(`<li data-id=${++index}>${mission.name}</li>`);
+        })
+        $(".mission-container .missions-list ul li").click(function(){
+            const missionId=$(this).data("id");
+            if(!missionId) return;
+            const targetMission=missions[missionId-1];
+            if(!targetMission) return $(".mission-interface").hide(()=>{$(".missions-list").fadeIn()});
+            $(".missions-list").hide();
+            $(".mission-interface").fadeIn();
+            $(".user-image-pick").empty();
+            $(".mission-container .title").text(targetMission.name);
+            targetMission.images.forEach((image)=>{
+                $(".user-image-pick").append(`<div class="image-line"><div class="mission-image image-picker"></div><div class="mission-image"><img src="/images/mapicons/${image}" loading="lazy"></div></div>`);
+            });
+        });
+        $("#backFromInterface").click(()=>{
+            $(".missions-list").fadeIn();
+            $(".mission-interface").hide();
+            $(".mission-container .title").text("Missions");
+        });
+        $(".hideMissionsPopup").click(()=>{
+          $(".mission-popup").fadeOut();
+        });
         if (!mapParsedId) return false;
         notyf = new Notyf();
         $(".user-navbar .navbar-container ul li").click(function () {
           const target = $(this).data("id");
           if (!target) return;
+          if(target=="/missions") return $(".mission-popup").fadeIn();
           window.location.href = target;
         });
       });
@@ -421,7 +480,7 @@
         gameStarted = 1;
       }
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?v=beta&callback=initMap&libraries=marker&key=<%= apiKey %>"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?callback=initMap&v=beta&libraries=marker&key=<%= apiKey %>"></script>
 
     <script>
       setTimeout(function () {

@@ -134,3 +134,90 @@
   font-weight: 700;
   color: green;
 }
+
+.mission-popup {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(45deg, #ffff0047, #ff8d0059);
+  top: 0;
+  z-index: 99;
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mission-container {
+  text-transform: uppercase;
+  font-family: monospace;
+  padding: 20px;
+  background: linear-gradient(45deg, #4a2074, #300060);
+  color: yellow;
+}
+
+.mission-container .popup-body ul {
+  list-style: none;
+  padding: 0;
+  text-align: center;
+  color: white;
+}
+
+.mission-container .popup-body ul li {
+  margin: 5px 0;
+  padding: 5px 0;
+  cursor: pointer;
+  transition: 0.1s;
+}
+
+.mission-container .popup-body ul li:hover {
+  background: #7878784a;
+  letter-spacing: 1.1px;
+}
+
+.mission-container .popup-header h1 {
+  border-bottom: 1px solid #444400;
+  padding-bottom: 10px;
+}
+
+.mission-container .user-image-pick .image-line {
+  display: inline-flex;
+  width: 100%;
+  margin: 10px 0;
+}
+
+.mission-container .user-image-pick .image-line .mission-image {
+  width: 50%;
+  max-height: 100px;
+  text-align: center;
+}
+
+.mission-container .user-image-pick .image-line .mission-image img {
+  height: 100%;
+}
+
+.mission-container .user-image-pick .image-line .mission-image.image-picker {
+  background: #ffffff0f;
+  position: relative;
+  cursor: pointer;
+}
+
+.mission-container
+  .user-image-pick
+  .image-line
+  .mission-image.image-picker:before {
+  content: "+";
+  display: inline-flex;
+  height: 100%;
+  align-items: center;
+  font-weight: 700;
+  color: #80808061;
+  font-size: 5rem;
+}
+
+.mission-container
+  .user-image-pick
+  .image-line
+  .mission-image.image-picker:hover {
+  background: #ffffff29;
+}

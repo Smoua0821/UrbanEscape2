@@ -17,13 +17,13 @@ router.get("/map/:mapId", async (req, res) => {
       status: "error",
       message: "Map Not found!",
     });
-  const mapUnId = map._id;
   const user = req.user;
   res.render("pages/home", {
     apiKey: "AIzaSyBaQ334LSpDNZXU8flkT1VjGpdj7f3_BZI",
     user: user,
     mapParsed: mapId,
     title: map.name,
+    missions: map.missions,
   });
 });
 
