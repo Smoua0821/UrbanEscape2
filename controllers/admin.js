@@ -156,6 +156,25 @@ const newMapMission = async (req, res) => {
   }
 };
 
+const MapMissions = async (req, res) => {
+  const { mapId } = req.query;
+  if (!mapId)
+    return res
+      .status(400)
+      .json({ status: "error", message: "Invalid Request" });
+
+  try {
+    const map = await Map.findOne({ id: mapId });
+    if (!map)
+      return res.status(404).json({ status: "error", message: "No Map Found" });
+
+    return res.json({ missions: map.missions });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Something Went Wrong!" });
+  }
+};
+
 module.exports = {
   adminPage,
   deleteUser,
@@ -163,4 +182,5 @@ module.exports = {
   newMap,
   deleteMap,
   newMapMission,
+  MapMissions,
 };
