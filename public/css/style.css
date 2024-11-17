@@ -221,3 +221,7 @@
   .mission-image.image-picker:hover {
   background: #ffffff29;
 }
+
+body {
+  user-select: none;
+}
