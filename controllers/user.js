@@ -55,4 +55,22 @@ const captureImage = async (req, res) => {
   }
 };
 
-module.exports = { userProfile, captureImage };
+const getCaptureImage = async (req, res) => {
+  let imgexist = [];
+  const { mapId } = req.query;
+  if (!mapId) return res.status(400).json({ message: "mapId can't be Empty!" });
+  const map = await Map.findOne({ id: mapId });
+  if (!map) return res.status(404).json({ message: "Map not found!" });
+  const user = await User.findOne({ email: req.user.email });
+  if (user) {
+    imgexist = user.capturedImages.filter(
+      (ci) => ci.mapId.toString() === map._id.toString()
+    );
+    if (!imgexist) imgexist = [];
+  }
+  return res
+    .status(200)
+    .json({ message: "Data Retrieved Successfully", imgexist: imgexist });
+};
+
+module.exports = { userProfile, captureImage, getCaptureImage };

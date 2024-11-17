@@ -107,47 +107,16 @@
             <a href="javascript:console.log();" class="backFromInterface"
               >Back</a
             >
-            <div class="user-image-pick">
-              <div class="image-line">
-                <div class="mission-image image-picker"></div>
-                <div class="mission-image">
-                  <img src="/images/mapicons/gif.gif" loading="lazy" />
-                </div>
-              </div>
-              <div class="image-line">
-                <div class="mission-image image-picker"></div>
-                <div class="mission-image">
-                  <img src="/images/mapicons/user_marker.png" loading="lazy" />
-                </div>
-              </div>
-            </div>
+            <div class="user-image-pick"></div>
           </div>
           <div class="mission-selector" style="display: none">
             <a href="javascript:console.log();" class="backFromInterface"
               >Back</a
             >
-            <table class="table table-striped">
-              <% if (locals.imageExist && imageExist.images &&
-              imageExist.images.length>0) { %> <%
-              imageExist.images.forEach((img)=>{ %>
-              <tr>
-                <td>
-                  <img
-                    src="/images/mapicons/<%= img %>"
-                    width="100px"
-                    alt="<%= img %>"
-                    loading="lazy"
-                  />
-                </td>
-                <td class="align-middle"><h1><%= img %></h1></td>
-                <td class="align-middle">
-                  <button class="btn btn-primary">Select</button>
-                </td>
-              </tr>
-              <% }); %><% }else{%>
-              <div class="p-2 border-1 rounded-1">No Image Captured!</div>
-              <%}%>
-            </table>
+            <div class="captured_image"></div>
+          </div>
+          <div class="redeem-action-bar text-center mt-3" style="display: none">
+            <button class="btn btn-primary redeembtn">REDEEM</button>
           </div>
         </div>
       </div>
@@ -160,6 +129,51 @@
       let imageExists=<%- JSON.stringify(imageExist) %>;
       let notyf;
       let circleOpacity = 100;
+      let selectedImages=[];
+      let targetMission=[];
+      let boxIndex=0;
+
+      function renderCapturedImage(){
+        $.get("/user/profile/capture", {mapId:mapParsedId}, (data)=>{
+          if(!data.imgexist || data.imgexist[0].length==0 || !data.imgexist[0].images || data.imgexist[0].images.length==0){
+            $("div.captured_image").html("<tr><td><div class='p-2 text-center'>No Captured Image Found</div></td></tr>");
+            return notyf.error("No Captured Image Found");
+          }else{
+            $("div.captured_image").empty();
+            data.imgexist[0].images.forEach((img)=>{
+              if(selectedImages.includes(img)) return;
+              $("div.captured_image").append(`<div class='capturedUnitImage row m-0 mb-2' data-id='${img}'><div class='col-sm-3'><img src='/images/mapicons/${img}' alt='${img}' width='50px'></div><div class='col-sm-6'><h3>${img}</h3></div><div class='col-sm-3'><button class='btn btn-primary' data-id='${img}'>Select</button></div></div>`);
+            });
+            $(".capturedUnitImage button.btn").off("click").on("click", function(){
+              const tarImg = $(this).data("id");
+              if (!tarImg) return;
+              selectedImages.push(tarImg);
+              $(".mission-interface").fadeIn();
+              $(".mission-selector").hide();
+              $(`.capturedUnitImage[data-id='${tarImg}']`).fadeOut(function() {
+                  $(this).remove();
+              });
+              $(`.image-picker[data-id='${boxIndex}']`).html(`<img src='/images/mapicons/${tarImg}' />`);
+              $(`.image-picker[data-id='${boxIndex}']`).removeClass("image-picker");
+              if(targetMission.images.length==selectedImages.length){
+                let isOkay=1;
+                console.log(targetMission.images);
+                console.log(selectedImages);
+                for (let index = 0; index < selectedImages.length; index++) {
+                  if(targetMission.images[index]!=selectedImages[index]){
+                    isOkay=0;
+                    break;
+                  }
+                }
+                if(!isOkay) return ;
+                $(".redeem-action-bar").show();
+                notyf.success("Perfectly Done!");
+              }
+            })
+          }
+        })
+      }
+
       $(document).ready(() => {
 
         let index=0;
@@ -170,28 +184,42 @@
         $(".mission-container .missions-list ul li").click(function(){
             const missionId=$(this).data("id");
             if(!missionId) return;
-            const targetMission=missions[missionId-1];
+            targetMission=missions[missionId-1];
             if(!targetMission) return $(".mission-interface").hide(()=>{$(".missions-list").fadeIn()});
+            $("button.btn.redeembtn").off("click").on("click", ()=>{
+              window.location.href=targetMission.redeemLink;
+            })
             $(".missions-list").hide();
             $(".mission-interface").fadeIn();
             $(".user-image-pick").empty();
             $(".mission-container .title").text(targetMission.name);
+            let index=0;
             targetMission.images.forEach((image)=>{
-                $(".user-image-pick").append(`<div class="image-line"><div class="mission-image image-picker"></div><div class="mission-image"><img src="/images/mapicons/${image}" loading="lazy"></div></div>`);
+                $(".user-image-pick").append(`<div class="image-line"><div class="mission-image image-picker" data-id='${++index}'></div><div class="mission-image"><img src="/images/mapicons/${image}" loading="lazy"></div></div>`);
             });
-            $(".image-picker").off("click").on("click",()=>{
+            $(".image-picker").off("click").on("click",function(){
+              boxIndex=$(this).data("id");
+              if(!boxIndex) return;
               $(".mission-selector").show();
               $(".mission-interface").hide();
+              renderCapturedImage();
             });
         });
         $(".backFromInterface").click(()=>{
+            $(".redeem-action-bar").hide();
             $(".missions-list").fadeIn();
             $(".mission-interface").hide();
             $(".mission-selector").hide();
             $(".mission-container .title").text("Missions");
+            selectedImages=[];
         });
         $(".hideMissionsPopup").click(()=>{
+          $(".redeem-action-bar").hide();
+          $(".missions-list").fadeIn();
+          $(".mission-interface").hide();
+          $(".mission-selector").hide();
           $(".mission-popup").fadeOut();
+          selectedImages=[];
         });
         if (!mapParsedId) return false;
         notyf = new Notyf();
