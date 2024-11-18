@@ -92,31 +92,34 @@
       </div>
     </div>
     <div class="mission-popup" style="display: none">
-      <div
-        class="col-11 col-sm-10 col-md-8 col-lg-6 col-xl-4 mission-container"
-      >
-        <div class="popup-header">
-          <h1 class="text-center title">Missions</h1>
-        </div>
-        <div class="popup-body">
-          <a href="javascript:voeed()" class="hideMissionsPopup">Close</a>
-          <div class="missions-list">
-            <ul></ul>
+      <div class="col-11 col-sm-10 col-md-8 col-lg-6 col-xl-4">
+        <div class="mission-container">
+          <div class="popup-header">
+            <h1 class="text-center title">Missions</h1>
           </div>
-          <div class="mission-interface" style="display: none">
-            <a href="javascript:console.log();" class="backFromInterface"
-              >Back</a
+          <div class="popup-body">
+            <a href="javascript:voeed()" class="hideMissionsPopup">Close</a>
+            <div class="missions-list">
+              <ul></ul>
+            </div>
+            <div class="mission-interface" style="display: none">
+              <a href="javascript:console.log();" class="backFromInterface"
+                >Back</a
+              >
+              <div class="user-image-pick"></div>
+            </div>
+            <div class="mission-selector" style="display: none">
+              <a href="javascript:console.log();" class="backFromInterface"
+                >Back</a
+              >
+              <div class="captured_image"></div>
+            </div>
+            <div
+              class="redeem-action-bar text-center mt-3"
+              style="display: none"
             >
-            <div class="user-image-pick"></div>
-          </div>
-          <div class="mission-selector" style="display: none">
-            <a href="javascript:console.log();" class="backFromInterface"
-              >Back</a
-            >
-            <div class="captured_image"></div>
-          </div>
-          <div class="redeem-action-bar text-center mt-3" style="display: none">
-            <button class="btn btn-primary redeembtn">REDEEM</button>
+              <button class="btn btn-primary redeembtn">REDEEM</button>
+            </div>
           </div>
         </div>
       </div>
@@ -132,18 +135,26 @@
       let selectedImages=[];
       let targetMission=[];
       let boxIndex=0;
+      let profileImages=[];
+      let isFirstTimeFetchProfilePicture=1;
 
       function renderCapturedImage(){
-        $.get("/user/profile/capture", {mapId:mapParsedId}, (data)=>{
-          if(!data.imgexist || data.imgexist[0].length==0 || !data.imgexist[0].images || data.imgexist[0].images.length==0){
+          if(!profileImages){
             $("div.captured_image").html("<tr><td><div class='p-2 text-center'>No Captured Image Found</div></td></tr>");
             return notyf.error("No Captured Image Found");
           }else{
             $("div.captured_image").empty();
-            data.imgexist[0].images.forEach((img)=>{
+            profileImages.forEach((img)=>{
               if(selectedImages.includes(img)) return;
-              $("div.captured_image").append(`<div class='capturedUnitImage row m-0 mb-2' data-id='${img}'><div class='col-sm-3'><img src='/images/mapicons/${img}' alt='${img}' width='50px'></div><div class='col-sm-6'><h3>${img}</h3></div><div class='col-sm-3'><button class='btn btn-primary' data-id='${img}'>Select</button></div></div>`);
+              $("div.captured_image").append(`<div class='capturedUnitImage row m-0 mb-2' data-id='${img}'><div class='col-sm-4'><img src='/images/mapicons/${img}' alt='${img}' width='50px'></div><div class='col-sm-8'><button class='btn btn-primary' data-id='${img}'>Select</button></div></div>`);
             });
+            if($(".captured_image")[0].childNodes.length == 0){
+              $(".mission-selector").hide();
+              $(".mission-interface").show();
+              return notyf.error("No More Images in your Profile!");
+            }
+            $(".mission-selector").show();
+            $(".mission-interface").hide();
             $(".capturedUnitImage button.btn").off("click").on("click", function(){
               const tarImg = $(this).data("id");
               if (!tarImg) return;
@@ -154,6 +165,7 @@
                   $(this).remove();
               });
               $(`.image-picker[data-id='${boxIndex}']`).html(`<img src='/images/mapicons/${tarImg}' />`);
+              $(`.image-picker[data-id='${boxIndex}']`).off("click");
               $(`.image-picker[data-id='${boxIndex}']`).removeClass("image-picker");
               if(targetMission.images.length==selectedImages.length){
                 let isOkay=1;
@@ -171,7 +183,6 @@
               }
             })
           }
-        })
       }
 
       $(document).ready(() => {
@@ -200,8 +211,6 @@
             $(".image-picker").off("click").on("click",function(){
               boxIndex=$(this).data("id");
               if(!boxIndex) return;
-              $(".mission-selector").show();
-              $(".mission-interface").hide();
               renderCapturedImage();
             });
         });
@@ -254,7 +263,13 @@
         $(document).ready(() => {
           $(".simpleLoading").show();
         });
-
+        $.get("/user/profile/capture", {mapId:mapParsedId}, (data)=>{
+          if(!data.imgexist || data.imgexist[0].length==0 || !data.imgexist[0].images || data.imgexist[0].images.length==0){
+            console.log("No Picture is saved in Profile");
+          }else{
+            profileImages=data.imgexist[0].images;
+          }
+        });
         map.addListener("click", (event) => {
           if (polygonCoordinates.length == 0)
             return notyf.error("No Route Available");

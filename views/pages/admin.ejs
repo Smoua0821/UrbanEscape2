@@ -350,9 +350,9 @@
       $(".mission-icons div.mission-icon-select").click(function () {
         const imgSrc = $(this).data("src");
         if (!imgSrc) return;
-        if (missions.images.includes(imgSrc)) return;
+        // if (missions.images.includes(imgSrc)) return;
         missions.images.push(imgSrc);
-        $(this).fadeOut();
+        // $(this).fadeOut();
         $("#selectedImagesCount").text(missions.images.length);
         missions.images.length > 0
           ? $(".missionBtnSave").fadeIn()

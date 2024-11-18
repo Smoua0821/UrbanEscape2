@@ -154,6 +154,8 @@
   padding: 20px;
   background: linear-gradient(45deg, #4a2074, #300060);
   color: yellow;
+  max-height: 80vh;
+  overflow-y: scroll;
 }
 
 .mission-container .popup-body ul {
