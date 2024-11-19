@@ -330,9 +330,11 @@
               } else {
                 const errorMessage =
                   data.message ||
-                  "An error occurred while capturing the image.";
+                  "It seems You are not logged in, Please login";
                 notyf.error(errorMessage);
-                // return (window.location.href = "/auth");
+                setTimeout(()=>{
+                  return (window.location.href = "/auth");
+                }, 2000);
               }
             }
           ).fail((xhr, status, error) => {
