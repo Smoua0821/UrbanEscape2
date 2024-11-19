@@ -27,9 +27,7 @@ async function fetchLoopRoutes(req, res) {
       if (userO) {
         const user = await User.findOne({ email: userO.email });
         if (user) {
-          imgexist = user.capturedImages.filter(
-            (ci) => ci.mapId.toString() === map._id.toString()
-          );
+          imgexist = user.capturedImages.find((ci) => ci.mapId === map.id);
           if (!imgexist) imgexist = [];
         }
       }
@@ -37,18 +35,13 @@ async function fetchLoopRoutes(req, res) {
       console.log(error);
     }
   }
-
   const data = await LoopRoute.find({ mapId: map._id });
   const balle = [];
   data.forEach((d) => {
-    let dimg = d.image.split("/");
-    dimg = dimg[dimg.length - 1];
-    if (
-      d.mapId.toString() == map._id.toString() &&
-      imgexist.find((eif) => eif.images.includes(dimg))
-    ) {
-    } else {
+    if (!imgexist.images?.includes(d._id)) {
       balle.push(d);
+    } else {
+      console.log(`Removed ${d._id}`);
     }
   });
   res.json(balle);

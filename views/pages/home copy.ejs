@@ -137,7 +137,6 @@
       let boxIndex=0;
       let profileImages=[];
       let isFirstTimeFetchProfilePicture=1;
-      const capturedPolygons=[];
 
       function renderCapturedImage(){
           if(!profileImages){
@@ -147,7 +146,7 @@
             $("div.captured_image").empty();
             profileImages.forEach((img)=>{
               if(selectedImages.includes(img)) return;
-              $("div.captured_image").append(`<div class='capturedUnitImage row m-0 mb-2' data-id='${img}'><div class='col-sm-4'><img src='/static/image/${img}' alt='${img}' width='50px'></div><div class='col-sm-8'><button class='btn btn-primary' data-id='${img}'>Select</button></div></div>`);
+              $("div.captured_image").append(`<div class='capturedUnitImage row m-0 mb-2' data-id='${img}'><div class='col-sm-4'><img src='/images/mapicons/${img}' alt='${img}' width='50px'></div><div class='col-sm-8'><button class='btn btn-primary' data-id='${img}'>Select</button></div></div>`);
             });
             if($(".captured_image")[0].childNodes.length == 0){
               $(".mission-selector").hide();
@@ -165,7 +164,7 @@
               $(`.capturedUnitImage[data-id='${tarImg}']`).fadeOut(function() {
                   $(this).remove();
               });
-              $(`.image-picker[data-id='${boxIndex}']`).html(`<img src='/static/image/${tarImg}' />`);
+              $(`.image-picker[data-id='${boxIndex}']`).html(`<img src='/images/mapicons/${tarImg}' />`);
               $(`.image-picker[data-id='${boxIndex}']`).off("click");
               $(`.image-picker[data-id='${boxIndex}']`).removeClass("image-picker");
               if(targetMission.images.length==selectedImages.length){
@@ -265,12 +264,10 @@
           $(".simpleLoading").show();
         });
         $.get("/user/profile/capture", {mapId:mapParsedId}, (data)=>{
-          if(!data.imgexist || !data.imgexist.length>0){
+          if(!data.imgexist || !data.imgexist.length>0 || !data.imgexist[0].images || data.imgexist[0].images.length==0){
             console.log("No Picture is saved in Profile");
           }else{
-            const targetPolygon=data.imgexist.find(dt=>dt.mapId==mapParsedId);
-            if(!targetPolygon) return console.log("Not Played Yet!");
-            profileImages=targetPolygon.images;
+            profileImages=data.imgexist[0].images;
           }
         });
         map.addListener("click", (event) => {
@@ -285,71 +282,59 @@
             },
             markerElement.position
           );
-          const clickDist2 = haversineDistance(
-            {
-              lat: clickedLocation.lat(),
-              lng: clickedLocation.lng(),
-            },
-            markerElement.position
-          );
-          if(clickDist2 > circle.getRadius()/1000) return console.log("Clicked Outside Circle");
-          if(clickDist > circle.getRadius()/1000) return console.log("Your live Location is Outside Circle");
           console.log(
-            `From You: ${clickDist}   From Click: ${clickDist2}  Radii: ${circle.getRadius() / 1000}`
-        );
-          const ImgPath = iconMarker.src.split("/");
-          $("#CapturedImagePopUp img").attr(
-            "src",
-            `/images/mapicons/${ImgPath[ImgPath.length - 1]}`
+            `Clicked: ${clickDist}  Radii: ${circle.getRadius() / 1000}`
           );
-          const polyId=polygonCoordinates[polyIndex]._id;
-          $.post(
-            "/user/profile/capture",
-            { mapId: mapParsedId, polyId:polyId },
-            (data, status, xhr) => {
-              if (
-                status === "success" &&
-                data.message === "Image Captured successfully!"
-              ) {
-                // capturedPolygons.push(polyId);
-                $(`img.mapPolyImage#${polyId}`).hide();
-                $("#CapturedImagePopUp").fadeIn();
-                $("#bsModalTitle").text(data.title);
-                $("#captureMessage").text(data.message);
-                $("#bsModal").modal("show");
+          if (clickDist <= circle.getRadius() / 1000) {
+            const ImgPath = iconMarker.src.split("/");
+            $("#CapturedImagePopUp img").attr(
+              "src",
+              `/images/mapicons/${ImgPath[ImgPath.length - 1]}`
+            );
+            $.post(
+              "/user/profile/capture",
+              { image: ImgPath[ImgPath.length - 1], mapId: mapParsedId },
+              (data, status, xhr) => {
+                if (
+                  status === "success" &&
+                  data.message === "Image Captured successfully!"
+                ) {
+                  $("#CapturedImagePopUp").fadeIn();
+                  $("#bsModalTitle").text(data.title);
+                  $("#captureMessage").text(data.message);
+                  $("#bsModal").modal("show");
+                  if (polygonCoordinates.length > 0) {
+                    removeObjectByIndex(polygonCoordinates, polyIndex);
+                    polyIndex = nearestPolygon().index;
+                  }
+                  if (polygonCoordinates.length == 0) {
+                    notyf.success("You have Captured All images!");
+                    $(".WinScreen").fadeIn();
+                  }
+                } else {
+                  const errorMessage =
+                    data.message ||
+                    "An error occurred while capturing the image.";
+                  notyf.error(errorMessage);
+                  // return (window.location.href = "/auth");
+                }
+              }
+            ).fail((xhr, status, error) => {
+              if (xhr.status == 302) {
+                // return (window.location.href = "/auth");
+              }
+              const errorMessage =
+                xhr.responseJSON?.message || "An unexpected error occurred.";
+              notyf.error(errorMessage);
+              let dCode = xhr.responseJSON?.code || 0;
+              if (dCode == 1) {
                 if (polygonCoordinates.length > 0) {
                   removeObjectByIndex(polygonCoordinates, polyIndex);
                   polyIndex = nearestPolygon().index;
-                  map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
-                  $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
                 }
-                if (polygonCoordinates.length == 0) {
-                  notyf.success("You have Captured All images!");
-                  $(".WinScreen").fadeIn();
-                }
-              } else {
-                const errorMessage =
-                  data.message ||
-                  "An error occurred while capturing the image.";
-                notyf.error(errorMessage);
-                // return (window.location.href = "/auth");
               }
-            }
-          ).fail((xhr, status, error) => {
-            if (xhr.status == 302) {
-              // return (window.location.href = "/auth");
-            }
-            const errorMessage =
-              xhr.responseJSON?.message || "An unexpected error occurred.";
-            notyf.error(errorMessage);
-            let dCode = xhr.responseJSON?.code || 0;
-            if (dCode == 1) {
-              if (polygonCoordinates.length > 0) {
-                removeObjectByIndex(polygonCoordinates, polyIndex);
-                polyIndex = nearestPolygon().index;
-              }
-            }
-          });
+            });
+          }
           nearestPolygon();
           if (!gameStarted) {
             startGaming();
@@ -373,19 +358,6 @@
         $.get(`/api/looproute/${mapParsedId}`, (data, success) => {
           if (!success) return;
           polygonCoordinates = data;
-          polygonCoordinates.forEach((pl)=>{
-            const img=document.createElement("img");
-            img.src=pl.image;
-            img.width=10*pl.size;
-            img.id=pl._id;
-            img.className="mapPolyImage";
-            new google.maps.marker.AdvancedMarkerElement({
-                position: pl.polygonCoords[0],
-                content: img,
-                map:map
-            });
-            console.log(img);
-          });
           updateCurrentLocation();
         });
       }
@@ -564,7 +536,6 @@
         }
         if (polyIndex != tmpaihjhsg.index) {
           polyIndex = tmpaihjhsg.index;
-          $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
         }
         return tmpaihjhsg;
       }

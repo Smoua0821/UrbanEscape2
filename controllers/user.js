@@ -8,22 +8,21 @@ const userProfile = async (req, res) => {
 };
 
 const captureImage = async (req, res) => {
-  let { image, mapId } = req.body;
-  if (!image || !mapId) return res.status(400).end("Invalid Request");
+  let { polyId, mapId } = req.body;
+  if (!polyId || !mapId) return res.status(400).end("Invalid Request");
   const map = await Map.findOne({ id: mapId });
   if (!map) return res.json({ status: "error", message: "No Map Found!" });
-  mapId = map._id.toString();
   const user = await User.findOne({
     email: req.user.email,
   });
   if (!user) return res.redirect("/auth");
   let capturedImages = user.capturedImages;
   if (capturedImages.length == 0) {
-    capturedImages.push({ mapId: mapId, images: [image] });
+    capturedImages.push({ mapId: mapId, images: [polyId] });
   } else {
     if (
       capturedImages.find(
-        (cii) => cii.mapId.toString() === mapId && cii.images.includes(image)
+        (cii) => cii.mapId.toString() === mapId && cii.images.includes(polyId)
       )
     )
       return res.json({ message: "Exists Already" });
@@ -32,9 +31,9 @@ const captureImage = async (req, res) => {
     );
 
     if (!capturedImagesFilter) {
-      capturedImages.push({ mapId: mapId, images: [image] });
+      capturedImages.push({ mapId: mapId, images: [polyId] });
     } else {
-      capturedImagesFilter.images.push(image);
+      capturedImagesFilter.images.push(polyId);
     }
   }
   if (capturedImages.length == 0)
@@ -63,9 +62,7 @@ const getCaptureImage = async (req, res) => {
   if (!map) return res.status(404).json({ message: "Map not found!" });
   const user = await User.findOne({ email: req.user.email });
   if (user) {
-    imgexist = user.capturedImages.filter(
-      (ci) => ci.mapId.toString() === map._id.toString()
-    );
+    imgexist = user.capturedImages.filter((ci) => ci.mapId === mapId);
     if (!imgexist) imgexist = [];
   }
   return res
