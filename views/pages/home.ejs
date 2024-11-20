@@ -319,13 +319,10 @@
                 $("#bsModal").modal("show");
                 if (polygonCoordinates.length > 0) {
                   removeObjectByIndex(polygonCoordinates, polyIndex);
+                if (polygonCoordinates.length == 0) return gameWon();
                   polyIndex = nearestPolygon().index;
                   map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
                   $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
-                }
-                if (polygonCoordinates.length == 0) {
-                  notyf.success("You have Captured All images!");
-                  $(".WinScreen").fadeIn();
                 }
               } else {
                 const errorMessage =
@@ -478,8 +475,16 @@
         };
       }
 
+      function gameWon(){
+        const x=$(".WinScreen")[0];
+        $("body").empty();
+        document.body.appendChild(x);
+        x.style="";
+        return notyf.success("You Won the Game!");
+      }
       function animateMarker() {
         const urlParsed = new URL(iconMarker.src);
+        if(polygonCoordinates.length==0) return gameWon();
         if (urlParsed.pathname != polygonCoordinates[polyIndex].image) {
           iconMarker.src = polygonCoordinates[polyIndex].image;
         }
@@ -590,6 +595,7 @@
         );
         animateMarker();
         gameStarted = 1;
+        $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
       }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?callback=initMap&v=beta&libraries=marker&key=<%= apiKey %>"></script>

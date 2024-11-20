@@ -626,7 +626,7 @@
             (position) => {
               pos.lat = position.coords.latitude;
               pos.lng = position.coords.longitude;
-              map.panTo(pos);
+              if (map) map.panTo(pos);
             },
             (error) => {
               $(".errorScreen").show();
