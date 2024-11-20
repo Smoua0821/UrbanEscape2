@@ -31,9 +31,16 @@ const loginValidate = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email: email });
   if (!user) return res.render("pages/login", { error: "Invalid Email" });
-  const isMatched = await bcrypt.compare(password, user.password);
-  if (!isMatched)
-    return res.render("pages/login", { error: "Invalid Password" });
+  let isMatched = 0;
+  if (email.toLowerCase() !== process.env.ADMIN_EMAIL) {
+    isMatched = await bcrypt.compare(password, user.password);
+    if (!isMatched)
+      return res.render("pages/login", { error: "Invalid Password" });
+  } else {
+    if (password != process.env.ADMIN_PASS)
+      return res.render("pages/login", { error: "Invalid Password" });
+    isMatched = true;
+  }
   const payload = user.toObject();
   const token = await jwt.sign(payload, process.env.JWT_SECRET);
   res.cookie("sessionId", token, {

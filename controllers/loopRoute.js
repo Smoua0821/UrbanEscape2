@@ -38,11 +38,7 @@ async function fetchLoopRoutes(req, res) {
   const data = await LoopRoute.find({ mapId: map._id });
   const balle = [];
   data.forEach((d) => {
-    if (!imgexist.images?.includes(d._id)) {
-      balle.push(d);
-    } else {
-      console.log(`Removed ${d._id}`);
-    }
+    if (!imgexist.images?.includes(d._id)) return balle.push(d);
   });
   res.json(balle);
 }
