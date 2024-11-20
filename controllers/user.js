@@ -1,5 +1,7 @@
 const User = require("../models/User");
 const Map = require("../models/Map");
+const LoopRoute = require("../models/LoopRoute");
+const mongoose = require("mongoose");
 const userProfile = async (req, res) => {
   const user = await User.findOne({ email: req.user.email });
   return res.render("pages/profile", {
@@ -70,4 +72,55 @@ const getCaptureImage = async (req, res) => {
     .json({ message: "Data Retrieved Successfully", imgexist: imgexist });
 };
 
-module.exports = { userProfile, captureImage, getCaptureImage };
+const routeRedeem = async (req, res) => {
+  try {
+    const { images, secrets } = req.body;
+
+    if (!images || !secrets) {
+      return res
+        .status(400)
+        .json({ message: "Images and secrets are required" });
+    }
+
+    if (images.length !== secrets.length) {
+      return res
+        .status(400)
+        .json({ message: "Images and secrets must have the same length" });
+    }
+
+    const objectIds = secrets.map((id) => {
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: `Invalid Secret: ${id}` });
+      }
+      return new mongoose.Types.ObjectId(id);
+    });
+
+    const data = await LoopRoute.find({ _id: { $in: objectIds } });
+
+    if (!data || data.length === 0) {
+      return res.status(404).json({ message: "No matching records found" });
+    }
+    let isOkay = 1;
+    for (let index = 0; index < data.length; index++) {
+      const decimg = data[index].image.split("/");
+      if (decimg[decimg.length - 1] !== images[index]) {
+        isOkay = 0;
+        console.log(
+          `Required ${images[index]} given ${decimg[decimg.length - 1]}`
+        );
+        break;
+      }
+    }
+    if (!isOkay) return res.status(405).json({ message: "Invalid Matching!" });
+    res
+      .status(200)
+      .json({ message: "Perfectly Done!", redeemLink: "https://google.com" });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: err.message });
+  }
+};
+
+module.exports = { userProfile, captureImage, getCaptureImage, routeRedeem };
