@@ -37,7 +37,7 @@ const loginValidate = async (req, res) => {
     if (!isMatched)
       return res.render("pages/login", { error: "Invalid Password" });
   } else {
-    if (password != process.env.ADMIN_PASS)
+    if (password !== process.env.ADMIN_PASS)
       return res.render("pages/login", { error: "Invalid Password" });
     isMatched = true;
   }

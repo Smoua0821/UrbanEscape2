@@ -21,12 +21,14 @@ async function fetchLoopRoutes(req, res) {
       .status({ status: "error", message: "Invalid Id parsed!" });
 
   const token = req.cookies.sessionId;
+  const data = await LoopRoute.find({ mapId: map._id });
   if (token) {
     try {
       const userO = await jwt.verify(token, process.env.JWT_SECRET);
       if (userO) {
         const user = await User.findOne({ email: userO.email });
         if (user) {
+          if (user.email == process.env.ADMIN_EMAIL) return res.json(data);
           imgexist = user.capturedImages.find((ci) => ci.mapId === map.id);
           if (!imgexist) imgexist = [];
         }
@@ -35,7 +37,6 @@ async function fetchLoopRoutes(req, res) {
       console.log(error);
     }
   }
-  const data = await LoopRoute.find({ mapId: map._id });
   const balle = [];
   data.forEach((d) => {
     if (!imgexist.images?.includes(d._id)) return balle.push(d);
