@@ -2,6 +2,19 @@ const User = require("../models/User");
 const Map = require("../models/Map");
 const LoopRoute = require("../models/LoopRoute");
 const mongoose = require("mongoose");
+
+function isSubset(smallArray, bigArray) {
+  for (let i = 0; i < smallArray.length; i++) {
+    const element = smallArray[i];
+    const index = bigArray.indexOf(element);
+    if (index === -1) {
+      return false;
+    }
+    bigArray.splice(index, 1);
+  }
+  return true;
+}
+
 const userProfile = async (req, res) => {
   const user = await User.findOne({ email: req.user.email });
   return res.render("pages/profile", {
@@ -74,7 +87,7 @@ const getCaptureImage = async (req, res) => {
 
 const routeRedeem = async (req, res) => {
   try {
-    const { images, secrets } = req.body;
+    const { images, secrets, mapId } = req.body;
 
     if (!images || !secrets) {
       return res
@@ -87,6 +100,25 @@ const routeRedeem = async (req, res) => {
         .status(400)
         .json({ message: "Images and secrets must have the same length" });
     }
+
+    const profilePics = await User.findOne({ email: req.user.email });
+    if (
+      !profilePics ||
+      !profilePics.capturedImages ||
+      profilePics.capturedImages.length == 0 ||
+      !profilePics.capturedImages.find((d) => d.mapId === mapId) ||
+      profilePics.capturedImages.find((d) => d.mapId === mapId).images.length ==
+        0
+    )
+      return res.status(400).json({ message: "No Image in Profile!" });
+
+    const imgAvailable = profilePics.capturedImages.find(
+      (d) => d.mapId === mapId
+    ).images;
+    if (!isSubset(secrets, imgAvailable))
+      return res
+        .status(400)
+        .json({ message: "Requested Image not exist in Your Profile" });
 
     const objectIds = secrets.map((id) => {
       if (!mongoose.Types.ObjectId.isValid(id)) {

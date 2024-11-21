@@ -224,10 +224,10 @@
               if(!redeemReady) return;
               redeemReady=0;
               $(this).text("Please Wait ...");
-              $.post("/user/redeem/route", { images: targetMission.images, secrets: selectedImages })
+              $.post("/user/redeem/route", { images: targetMission.images, secrets: selectedImages, mapId:mapParsedId })
                 .done(function(data, textStatus, xhr) {
                   const response = xhr.responseJSON || {};
-                  console.log(response.redeemLink);
+                  window.location.href=response.redeemLink;
                   if (xhr.status === 200) {
                     notyf.success(response.message);
                   }
