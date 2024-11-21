@@ -45,8 +45,17 @@ async function fetchLoopRoutes(req, res) {
 }
 
 async function saveLoopRoutes(req, res) {
-  const { polygonCoords, image, radius, speed, size, mapId, opacity } =
-    req.body;
+  const {
+    title,
+    description,
+    polygonCoords,
+    image,
+    radius,
+    speed,
+    size,
+    mapId,
+    opacity,
+  } = req.body;
   if (!mapId)
     return res
       .status(400)
@@ -57,6 +66,8 @@ async function saveLoopRoutes(req, res) {
       .status(404)
       .json({ status: "error", message: "No map Found with corresponding ID" });
   const newLoopRoute = new LoopRoute({
+    title,
+    description,
     polygonCoords,
     image,
     radius,

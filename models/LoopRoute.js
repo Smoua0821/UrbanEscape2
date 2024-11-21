@@ -2,6 +2,14 @@ const mongoose = require("mongoose");
 
 const loopRouteSchema = new mongoose.Schema(
   {
+    title: {
+      type: String,
+      default: "Calgary",
+    },
+    description: {
+      type: String,
+      default: "All the Best for the Game!",
+    },
     polygonCoords: {
       type: [
         {

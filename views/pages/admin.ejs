@@ -211,6 +211,22 @@
               <form class="m-0 p-0" method="POST">
                 <input type="hidden" name="polyCoords" />
                 <div class="form-group mb-2">
+                  <input
+                    type="text"
+                    id="routeTitle"
+                    class="form-control"
+                    placeholder="Enter Route Title"
+                  />
+                </div>
+                <div class="form-group mb-2">
+                  <textarea
+                    rows="8"
+                    id="routeDescription"
+                    class="form-control"
+                    placeholder="Enter Route Description"
+                  ></textarea>
+                </div>
+                <div class="form-group mb-2">
                   <p class="m-0">Adjust Radius:</p>
                   <div class="row m-0 p-0">
                     <div class="col-sm-8">
@@ -428,12 +444,26 @@
         radius: radius,
         speed: speed,
       };
+      $("#routeDescription")
+        .off("input")
+        .on("input", function () {
+          const value = $(this).val();
+          payloadData.description = value.trim();
+        });
+      $("#routeTitle")
+        .off("input")
+        .on("input", function () {
+          const value = $(this).val();
+          payloadData.title = value.trim();
+        });
       $(".save_final").click(() => {
         if (
           payloadData.polygonCoords.length > 2 &&
           payloadData.radius > 0 &&
           payloadData.image &&
-          payloadData.speed
+          payloadData.speed &&
+          payloadData.title &&
+          payloadData.description
         ) {
           payloadData.polygonCoords = polyCoords;
           $.post("/admin/looproute", payloadData, (success, data) => {

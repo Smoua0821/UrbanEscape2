@@ -124,6 +124,28 @@
         </div>
       </div>
     </div>
+    <div
+      class="informationWindow position-fixed vh-100 z-3 vw-100 top-0 start-0"
+      style="
+        display: none;
+        background: linear-gradient(45deg, #005c5c, #00004a);
+      "
+    >
+      <div class="row justify-content-center align-items-center vh-100">
+        <div class="col-sm-10 col-md-8 col-lg-6 col-xl-4">
+          <div class="body text-center bg-white border-1 rounded-2 p-2">
+            <h3 class="infoTitle pb-2 border-bottom">AJAY</h3>
+            <p>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas
+              nesciunt mollitia quae, tempore sed neque eveniet numquam veniam
+              architecto et eius aperiam ducimus. Ducimus, quibusdam
+              repellendus? Fugit tenetur repudiandae nam.
+            </p>
+            <button class="btn btn-danger infodiscart">Exit</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <script>
 
       function voeed(){return true;}
@@ -176,9 +198,12 @@
       }
 
       $(document).ready(() => {
-
         let index=0;
         let redeemReady=1;
+        $(".simpleLoading").show();
+        $(".informationWindow .infodiscart").click(()=>{
+          $(".informationWindow").hide();
+        });
         $(".mission-container .missions-list ul").empty();
         missions.forEach(mission=>{
             $(".mission-container .missions-list ul").append(`<li data-id=${++index}>${mission.name}</li>`);
@@ -272,9 +297,6 @@
           position: pos,
         });
 
-        $(document).ready(() => {
-          $(".simpleLoading").show();
-        });
         $.get("/user/profile/capture", {mapId:mapParsedId}, (data)=>{
           if(!data.imgexist || !data.imgexist.length>0){
             console.log("No Picture is saved in Profile");
@@ -307,7 +329,7 @@
           if(clickDist > circle.getRadius()/1000) return console.log("Your live Location is Outside Circle");
           console.log(
             `From You: ${clickDist}   From Click: ${clickDist2}  Radii: ${circle.getRadius() / 1000}`
-        );
+          );
           const ImgPath = iconMarker.src.split("/");
           $("#CapturedImagePopUp img").attr(
             "src",
@@ -389,6 +411,12 @@
             img.width=10*pl.size;
             img.id=pl._id;
             img.className="mapPolyImage";
+            img.addEventListener("click", function(event){
+              const tarId=event.target.id;
+              if(!tarId) return notyf.error("No Information");
+              InfoModal(tarId);
+              return false;
+            });
             new google.maps.marker.AdvancedMarkerElement({
                 position: pl.polygonCoords[0],
                 content: img,
@@ -607,6 +635,13 @@
         animateMarker();
         gameStarted = 1;
         $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
+      }
+      function InfoModal(polyid){
+        const tarPolygon = polygonCoordinates.find((d)=>d._id==polyid);
+        if(!tarPolygon) return notyf.error("No Information found!");
+        $(".informationWindow .infoTitle").text(tarPolygon.title);
+        $(".informationWindow p").text(tarPolygon.description);
+        $(".informationWindow").fadeIn();
       }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?callback=initMap&v=beta&libraries=marker&key=<%= apiKey %>"></script>
