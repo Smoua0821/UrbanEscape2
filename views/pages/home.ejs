@@ -176,7 +176,7 @@
             $("div.captured_image").empty();
             profileImages.forEach((img)=>{
               if(selectedImages.includes(img)) return;
-              $("div.captured_image").append(`<div class='capturedUnitImage row m-0 mb-2' data-id='${img}'><div class='col-sm-4'><img src='/static/image/${img}' alt='${img}' width='50px'></div><div class='col-sm-8'><button class='btn btn-primary' data-id='${img}'>Select</button></div></div>`);
+              $("div.captured_image").append(`<div class='capturedUnitImage d-flex m-0 mb-2' data-id='${img}'><img src='/static/image/${img}' alt='${img}' width='100px'><div class="w-100 d-flex align-items-center justify-content-center"><button class='btn btn-primary w-100' data-id='${img}'>Select</button></div></div>`);
             });
             if($(".captured_image")[0].childNodes.length == 0){
               $(".mission-selector").hide();
@@ -210,7 +210,6 @@
         $(".simpleLoading").show();
         $(".informationWindow .infodiscart").click(()=>{
           $(".informationWindow").hide();
-          $("#map").show();
         });
         $(".mission-container .missions-list ul").empty();
         missions.forEach(mission=>{
@@ -355,7 +354,7 @@
                 status === "success" &&
                 data.message === "Image Captured successfully!"
               ) {
-                // capturedPolygons.push(polyId);
+                profileImages.push(polyId);
                 $(`img.mapPolyImage#${polyId}`).hide();
                 $("#CapturedImagePopUp").fadeIn();
                 $("#bsModalTitle").text(data.title);
@@ -396,6 +395,7 @@
           nearestPolygon();
           if (!gameStarted) {
             startGaming();
+            $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
           }
         });
         markerElement = new google.maps.marker.AdvancedMarkerElement({
@@ -434,7 +434,6 @@
                 content: img,
                 map:map
             });
-            console.log(img);
           });
           updateCurrentLocation();
         });
@@ -476,7 +475,6 @@
                 map.panTo(pos);
                 startGaming();
               }
-              console.log(pos);
             },
             (error) => {
               $(".errorScreen").show();
@@ -651,7 +649,6 @@
       function InfoModal(polyid){
         const tarPolygon = polygonCoordinates.find((d)=>d._id==polyid);
         if(!tarPolygon) return notyf.error("No Information found!");
-        $("#map").hide();
         $(".informationWindow .infoTitle").text(tarPolygon.title);
         $(".informationWindow p").text(tarPolygon.description);
         $(".informationWindow").fadeIn();
