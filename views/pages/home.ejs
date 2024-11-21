@@ -416,6 +416,7 @@
             img.id=pl._id;
             img.className="mapPolyImage";
             img.addEventListener("click", function(event){
+              alert("Clicked!");
               const tarId=event.target.id;
               if(!tarId) return notyf.error("No Information");
               InfoModal(tarId);
