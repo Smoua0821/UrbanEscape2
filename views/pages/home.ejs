@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="/css/bs.css" />
     <script src="/js/jquery.js"></script>
   </head>
-  <body style="margin: 0">
+  <body style="margin: 0; height: 100vh">
     <div id="map" style="height: 100vh; width: 100vw"></div>
     <div class="simpleLoading">
       <div class="loadingAnime"></div>
@@ -203,6 +203,7 @@
         $(".simpleLoading").show();
         $(".informationWindow .infodiscart").click(()=>{
           $(".informationWindow").hide();
+          $("#map").show();
         });
         $(".mission-container .missions-list ul").empty();
         missions.forEach(mission=>{
@@ -292,6 +293,7 @@
           zoom: 15,
           center: pos,
           mapId: "f543ed7dd1b2a7e2",
+          fullscreenControl: false
         });
         marker = new google.maps.marker.AdvancedMarkerElement({
           position: pos,
@@ -642,6 +644,7 @@
       function InfoModal(polyid){
         const tarPolygon = polygonCoordinates.find((d)=>d._id==polyid);
         if(!tarPolygon) return notyf.error("No Information found!");
+        $("#map").hide();
         $(".informationWindow .infoTitle").text(tarPolygon.title);
         $(".informationWindow p").text(tarPolygon.description);
         $(".informationWindow").fadeIn();
