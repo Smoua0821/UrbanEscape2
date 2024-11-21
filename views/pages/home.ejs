@@ -288,14 +288,11 @@
       let gameStarted = 0;
       iconMarker.width = 50;
       let polyIndex = 0;
-      let mapElement=document.getElementById("map");
-
       function initMap() {
-        map = new google.maps.Map(mapElement, {
+        map = new google.maps.Map(document.getElementById("map"), {
           zoom: 15,
           center: pos,
           mapId: "f543ed7dd1b2a7e2",
-          fullscreenControl: false
         });
         marker = new google.maps.marker.AdvancedMarkerElement({
           position: pos,
@@ -651,16 +648,6 @@
         $(".informationWindow p").text(tarPolygon.description);
         $(".informationWindow").fadeIn();
       }
-      let isajsgsh=0;
-      document.addEventListener("click", ()=>{
-        if(!isajsgsh){
-          isajsgsh=1;
-          mapElement.requestFullscreen();
-          setTimeout(()=>{
-            if(document.fullscreen){document.exitFullscreen();}
-          }, 1000);
-        }
-      })
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?callback=initMap&v=beta&libraries=marker&key=<%= apiKey %>"></script>
 
