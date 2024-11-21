@@ -132,7 +132,7 @@
       "
     >
       <div class="row justify-content-center align-items-center vh-100">
-        <div class="col-sm-10 col-md-8 col-lg-6 col-xl-4">
+        <div class="col-11 col-sm-10 col-md-8 col-lg-6 col-xl-4">
           <div class="body text-center bg-white border-1 rounded-2 p-2">
             <h3 class="infoTitle pb-2 border-bottom">AJAY</h3>
             <p>
@@ -326,7 +326,10 @@
             markerElement.position
           );
           if(clickDist2 > circle.getRadius()/1000) return console.log("Clicked Outside Circle");
-          if(clickDist > circle.getRadius()/1000) return console.log("Your live Location is Outside Circle");
+          if(clickDist > circle.getRadius()/1000){
+            InfoModal(polygonCoordinates[polyIndex]._id);
+            return console.log("Your live Location is Outside Circle");
+          }
           console.log(
             `From You: ${clickDist}   From Click: ${clickDist2}  Radii: ${circle.getRadius() / 1000}`
           );
