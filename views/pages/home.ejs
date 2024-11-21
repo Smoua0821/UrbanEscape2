@@ -30,7 +30,7 @@
         <% if (locals.mapParsed) { %>
         <input type="hidden" id="mapParsedId" value="<%= mapParsed %>" />
         <% } %>
-        <button class=""></button>
+        <button onclick="requestStart()">Start</button>
       </div>
     </div>
     <div class="errorScreen" style="display: none">
@@ -161,6 +161,13 @@
       let isFirstTimeFetchProfilePicture=1;
       const capturedPolygons=[];
 
+      function requestStart(){
+        $(".gm-fullscreen-control").click();
+        setTimeout(()=>{
+          $(".gm-fullscreen-control").click();
+          $(".loadingScreen").hide();
+        }, 1000);
+      }
       function renderCapturedImage(){
           if(!profileImages){
             $("div.captured_image").html("<tr><td><div class='p-2 text-center'>No Captured Image Found</div></td></tr>");
@@ -403,6 +410,7 @@
           clickable: false,
         });
         showAllPolygons();
+
       }
 
       function showAllPolygons() {
@@ -416,7 +424,6 @@
             img.id=pl._id;
             img.className="mapPolyImage";
             img.addEventListener("click", function(event){
-              alert("Clicked!");
               const tarId=event.target.id;
               if(!tarId) return notyf.error("No Information");
               InfoModal(tarId);
@@ -642,7 +649,6 @@
         $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
       }
       function InfoModal(polyid){
-        alert(polyid);
         const tarPolygon = polygonCoordinates.find((d)=>d._id==polyid);
         if(!tarPolygon) return notyf.error("No Information found!");
         $("#map").hide();
@@ -653,13 +659,7 @@
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?callback=initMap&v=beta&libraries=marker&key=<%= apiKey %>"></script>
 
-    <script>
-      setTimeout(function () {
-        $(".loadingScreen").fadeOut(() => {
-          $(".loadingScreen").remove();
-        });
-      }, 1000);
-    </script>
+    <script></script>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"

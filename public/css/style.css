@@ -58,11 +58,9 @@
   0%,
   100% {
     padding: 0;
-    width: 100px;
   }
   50% {
     padding: 10px;
-    width: 80px;
   }
 }
 
