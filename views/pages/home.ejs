@@ -30,7 +30,6 @@
         <% if (locals.mapParsed) { %>
         <input type="hidden" id="mapParsedId" value="<%= mapParsed %>" />
         <% } %>
-        <button onclick="requestStart()">Start</button>
       </div>
     </div>
     <div class="errorScreen" style="display: none">
@@ -161,13 +160,6 @@
       let isFirstTimeFetchProfilePicture=1;
       const capturedPolygons=[];
 
-      function requestStart(){
-        $(".gm-fullscreen-control").click();
-        setTimeout(()=>{
-          $(".gm-fullscreen-control").click();
-          $(".loadingScreen").hide();
-        }, 1000);
-      }
       function renderCapturedImage(){
           if(!profileImages){
             $("div.captured_image").html("<tr><td><div class='p-2 text-center'>No Captured Image Found</div></td></tr>");
@@ -295,10 +287,12 @@
       iconMarker.width = 50;
       let polyIndex = 0;
       function initMap() {
+
         map = new google.maps.Map(document.getElementById("map"), {
           zoom: 15,
           center: pos,
           mapId: "f543ed7dd1b2a7e2",
+          fullscreenControl:false
         });
         marker = new google.maps.marker.AdvancedMarkerElement({
           position: pos,
@@ -313,6 +307,7 @@
             profileImages=targetPolygon.images;
           }
         });
+        $(".loadingScreen").hide();
         map.addListener("click", (event) => {
           if (polygonCoordinates.length == 0)
             return notyf.error("No Route Available");
@@ -355,7 +350,6 @@
                 data.message === "Image Captured successfully!"
               ) {
                 profileImages.push(polyId);
-                $(`img.mapPolyImage#${polyId}`).hide();
                 $("#CapturedImagePopUp").fadeIn();
                 $("#bsModalTitle").text(data.title);
                 $("#captureMessage").text(data.message);
@@ -365,7 +359,6 @@
                 if (polygonCoordinates.length == 0) return gameWon();
                   polyIndex = nearestPolygon().index;
                   map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
-                  $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
                 }
               } else {
                 const errorMessage =
@@ -394,8 +387,8 @@
           });
           nearestPolygon();
           if (!gameStarted) {
+            gameStarted=1;
             startGaming();
-            $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
           }
         });
         markerElement = new google.maps.marker.AdvancedMarkerElement({
@@ -620,8 +613,8 @@
         }
         if (polyIndex != tmpaihjhsg.index) {
           polyIndex = tmpaihjhsg.index;
-          $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
         }
+        $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
         return tmpaihjhsg;
       }
       function startGaming() {
@@ -644,7 +637,6 @@
         );
         animateMarker();
         gameStarted = 1;
-        $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
       }
       function InfoModal(polyid){
         const tarPolygon = polygonCoordinates.find((d)=>d._id==polyid);
