@@ -147,16 +147,52 @@ const newMapMission = async (req, res) => {
     missionsExist.push(missions);
 
     await Map.updateOne({ id: mapId }, { $set: { missions: missionsExist } });
-    return res
-      .status(200)
-      .json({
-        status: "success",
-        message: "Mission Added",
-        data: missionsExist,
-      });
+    return res.status(200).json({
+      status: "success",
+      message: "Mission Added",
+      data: missionsExist,
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ status: "error", message: "Server Error" });
+  }
+};
+
+const removeMapMission = async (req, res) => {
+  try {
+    const { mapId, missionId } = req.body;
+    if (!mapId || !missionId)
+      return res
+        .status(400)
+        .json({ status: "error", message: "Missing Required Arguments!" });
+
+    const map = await Map.findOne({ id: mapId });
+    if (!map)
+      return res
+        .status(404)
+        .json({ status: "error", message: "Map not Found!" });
+
+    if (!Array.isArray(map.missions) || map.missions.length === 0)
+      return res
+        .status(204)
+        .json({
+          status: "success",
+          message: `No missions to delete for ${map.name}`,
+        });
+
+    const updatedMissions = map.missions.filter(
+      (d) => d._id.toString() !== missionId
+    );
+    await Map.updateOne({ id: mapId }, { $set: { missions: updatedMissions } });
+
+    return res.json({
+      status: "success",
+      message: "Mission Deleted Successfully!",
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ status: "error", message: "Server Error", error: error.message });
   }
 };
 
@@ -252,4 +288,5 @@ module.exports = {
   newMapMission,
   MapMissions,
   duplicateMap,
+  removeMapMission,
 };

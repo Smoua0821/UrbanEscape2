@@ -716,18 +716,30 @@
             if (!tarid) return;
             if ($(`.unitMission[data-id='${tarid}']`).length == 0) return false;
             const tarMission = maps.maps.find((d) => d.id === mapId).missions;
-            $(`.unitMission[data-id='${tarid}']`).fadeOut(function () {
-              $(this).remove();
-              maps.maps.find((d) => d.id === mapId).missions =
-                tarMission.filter((d) => d._id !== tarid);
+            $.post(
+              "/admin/map/missions/remove",
+              {
+                missionId: tarid,
+                mapId: mapId,
+              },
+              (data) => {
+                if (data.status == "success") {
+                  notyf.success(data.message);
+                  $(`.unitMission[data-id='${tarid}']`).remove();
+                  maps.maps.find((d) => d.id === mapId).missions =
+                    tarMission.filter((d) => d._id !== tarid);
 
-              if (maps.maps.find((d) => d.id === mapId).missions.length == 0) {
-                $(".missionEditContainer").html(
-                  `<div class='alert alert-danger'>No Mission exists!</div>`
-                );
-                return false;
+                  if (
+                    maps.maps.find((d) => d.id === mapId).missions.length == 0
+                  ) {
+                    $(".missionEditContainer").html(
+                      `<div class='alert alert-danger'>No Mission exists!</div>`
+                    );
+                    return false;
+                  }
+                }
               }
-            });
+            );
           });
       }
       function renderRoutes() {
