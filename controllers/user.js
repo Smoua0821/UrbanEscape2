@@ -17,6 +17,7 @@ function isSubset(smallArray, bigArray) {
 
 const userProfile = async (req, res) => {
   const user = await User.findOne({ email: req.user.email });
+  if (!user) return res.redirect("/logout");
   return res.render("pages/profile", {
     user: user,
   });

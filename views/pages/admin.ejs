@@ -121,10 +121,11 @@
                   </div>
                 </form>
                 <div
-                  class="row justify-content-center align-items-center missionsHandler"
+                  class="row justify-content-center missionsHandler"
                   style="display: none"
                 >
                   <div class="missionEditor col-md-12 col-lg-6">
+                    <h5 class="text-center pb-3 border-bottom m-0">Missions</h5>
                     <div class="missionEditContainer vh-50"></div>
                   </div>
                   <div class="missionsCreator text-center col-md-12 col-lg-6">
@@ -705,7 +706,7 @@
         }
         tarMission.forEach((e) => {
           $(".missionEditContainer").append(
-            `<div class='unitMission' data-id='${e._id}'><h5>${e.name}</h5><span data-id='${e._id}'>Delete</span></div>`
+            `<div class='unitMission' data-id='${e._id}'><h5>${e.name} (${e.images.length})</h5><span data-id='${e._id}'>Delete</span></div>`
           );
         });
 
@@ -872,7 +873,7 @@
           $(".setupMissions")
             .off("click")
             .on("click", function () {
-              $(".selectedImagesCount").text("0");
+              $("#selectedImagesCount").text("0");
               mapId = $(this).data("id");
               if (!mapId) return notyf.error("Invalid Map");
               $(".missionsHandler").fadeIn();
