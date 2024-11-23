@@ -9,6 +9,7 @@ const {
   newMap,
   deleteMap,
   MapMissions,
+  duplicateMap,
   newMapMission,
 } = require("../controllers/admin");
 const {
@@ -40,6 +41,7 @@ router.post("/delete/:id", deleteUser);
 
 router.get("/map", fetchMaps);
 router.post("/map", newMap);
+router.post("/map/duplicate", duplicateMap);
 router.post("/map/delete", deleteMap);
 
 router.get("/map/missions", MapMissions);

@@ -175,6 +175,51 @@ const MapMissions = async (req, res) => {
   }
 };
 
+const duplicateMap = async (req, res) => {
+  const { name, id } = req.body;
+
+  if (!name || !id) {
+    return res.status(400).json({ message: "Missing Required Parameters!" });
+  }
+
+  try {
+    const map = await Map.findOne({ id: id });
+
+    if (!map) {
+      return res.status(404).json({ message: "No Map Found to duplicate!" });
+    }
+
+    const newMap = map.toObject();
+    newMap.name = name;
+    newMap._id = undefined;
+    newMap.id = uuidv4();
+    newMap.createdAt = undefined;
+    newMap.updatedAt = undefined;
+    // newMap.missions.forEach((d) => {
+    //   d._id = undefined;
+    // });
+
+    // return res.json(newMap);
+
+    const duplicatedMap = new Map(newMap);
+    await duplicatedMap.save();
+
+    return res.status(200).json(duplicatedMap);
+  } catch (err) {
+    if (err.name === "CastError") {
+      return res.status(400).json({ message: "Invalid ID format" });
+    } else if (err.name === "ValidationError") {
+      return res
+        .status(422)
+        .json({ message: "Validation Error", error: err.message });
+    } else {
+      return res
+        .status(500)
+        .json({ message: "Internal Server Error", error: err.message });
+    }
+  }
+};
+
 module.exports = {
   adminPage,
   deleteUser,
@@ -183,4 +228,5 @@ module.exports = {
   deleteMap,
   newMapMission,
   MapMissions,
+  duplicateMap,
 };
