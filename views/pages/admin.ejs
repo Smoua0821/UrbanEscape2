@@ -120,14 +120,14 @@
                     <button class="ms-2 btn btn-warning">Create</button>
                   </div>
                 </form>
-                <div class="row justify-content-center align-items-center">
+                <div
+                  class="row justify-content-center align-items-center missionsHandler"
+                  style="display: none"
+                >
                   <div class="missionEditor col-md-12 col-lg-6">
                     <div class="missionEditContainer vh-50"></div>
                   </div>
-                  <div
-                    class="missionsCreator text-center col-md-12 col-lg-6"
-                    style="display: none"
-                  >
+                  <div class="missionsCreator text-center col-md-12 col-lg-6">
                     <p class="mb-1 mt-2">Set Missions</p>
                     <div class="form-group mb-2">
                       <input
@@ -554,7 +554,7 @@
           (data) => {
             maps.maps.find((d) => d.id === mapId).missions = data.data;
             renderMapMissions();
-            $(".missionsCreator").hide();
+            $(".missionsHandler").hide();
             $(".new_map_form").fadeIn();
             missions.redeemLink = "";
             missions.name = "";
@@ -863,7 +863,7 @@
               $(".selectedImagesCount").text("0");
               mapId = $(this).data("id");
               if (!mapId) return notyf.error("Invalid Map");
-              $(".missionsCreator").fadeIn();
+              $(".missionsHandler").fadeIn();
               $(".new_map_form").hide();
               renderMapMissions();
             });
