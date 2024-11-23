@@ -173,12 +173,10 @@ const removeMapMission = async (req, res) => {
         .json({ status: "error", message: "Map not Found!" });
 
     if (!Array.isArray(map.missions) || map.missions.length === 0)
-      return res
-        .status(204)
-        .json({
-          status: "success",
-          message: `No missions to delete for ${map.name}`,
-        });
+      return res.status(204).json({
+        status: "success",
+        message: `No missions to delete for ${map.name}`,
+      });
 
     const updatedMissions = map.missions.filter(
       (d) => d._id.toString() !== missionId
