@@ -119,9 +119,20 @@
                     <button class="ms-2 btn btn-warning">Create</button>
                   </div>
                 </form>
-                <div class="row justify-content-center">
+                <div class="row justify-content-center align-items-center">
+                  <div class="missionEditor col-md-12 col-lg-6">
+                    <div class="missionEditContainer vh-50">
+                      <div class="text-center">Loading.....</div>
+                      <div
+                        class="missionEditUnit bg-light p-2 rounded-1 border-1"
+                        style="display: none"
+                      >
+                        <h5>Dragon</h5>
+                      </div>
+                    </div>
+                  </div>
                   <div
-                    class="missionsCreator text-center col-sm-10 col-md-8 col-lg-6 mt-3"
+                    class="missionsCreator text-center col-md-12 col-lg-6"
                     style="display: none"
                   >
                     <p class="mb-1 mt-2">Set Missions</p>
@@ -354,6 +365,7 @@
     <script>
       const notyf = new Notyf();
       let isClosedPath = 0;
+      let maps = [];
       let map, marker, polygon, circle, iconMarker, radius;
       let polyCoords = [];
       let speed = 1;
@@ -781,6 +793,7 @@
       }
       function fetchMaps() {
         $.get("/admin/map", (data) => {
+          maps = data;
           $("tbody.map_list").empty();
           const myData = data.maps.reverse();
           myData.forEach((d) => {
@@ -820,6 +833,11 @@
               if (!mapId) return notyf.error("Invalid Map");
               $(".missionsCreator").fadeIn();
               $(".new_map_form").hide();
+              maps.maps
+                .find((d) => d.id === mapId)
+                .missions.forEach((e) => {
+                  console.log(e.name);
+                });
             });
 
           $(".setUpDuplicate")
