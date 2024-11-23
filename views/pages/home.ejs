@@ -134,13 +134,18 @@
         <div class="col-11 col-sm-10 col-md-8 col-lg-6 col-xl-4">
           <div class="body text-center bg-white border-1 rounded-2 p-2">
             <h3 class="infoTitle pb-2 border-bottom">AJAY</h3>
-            <p>
+            <img
+              class="img-thumbnail infoBoxMarkimage my-2"
+              src=""
+              loading="lazy"
+            />
+            <p class="alert alert-info" style="text-transform: capitalize">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas
               nesciunt mollitia quae, tempore sed neque eveniet numquam veniam
               architecto et eius aperiam ducimus. Ducimus, quibusdam
               repellendus? Fugit tenetur repudiandae nam.
             </p>
-            <button class="btn btn-danger infodiscart">Exit</button>
+            <button class="btn btn-danger w-75 infodiscart">Exit</button>
           </div>
         </div>
       </div>
@@ -645,6 +650,7 @@
       function InfoModal(polyid){
         const tarPolygon = polygonCoordinates.find((d)=>d._id==polyid);
         if(!tarPolygon) return notyf.error("No Information found!");
+        $(".infoBoxMarkimage").attr("src", tarPolygon.image);
         $(".informationWindow .infoTitle").text(tarPolygon.title);
         $(".informationWindow p").text(tarPolygon.description);
         $(".informationWindow").fadeIn();
