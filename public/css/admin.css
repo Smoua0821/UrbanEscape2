@@ -1,0 +1,122 @@
+.missionEditor {
+  padding: 20px 10px;
+}
+
+.missionEditor .unitMission {
+  background: #00000005;
+  padding: 5px 10px;
+  margin: 5px 0;
+  border: 1px solid lightgrey;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.1s;
+  color: #000000bf;
+  box-shadow: 1px 1px 5px 0 #c1c1c1;
+  display: flex;
+}
+
+.missionEditor .unitMission:hover {
+  background: #00000009;
+  box-shadow: 0 0 0 0 transparent;
+}
+
+.missionEditor .unitMission h5 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 400;
+  text-transform: capitalize;
+  padding: 0 10px;
+}
+
+.icon-selector .addImage {
+  width: 100px;
+  height: 100px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-selector .addImage:before {
+  content: "+";
+  font-size: 3rem;
+  height: 5rem;
+}
+
+.sidebar-container {
+  background: #e5ffbd;
+  box-shadow: 2px 0px 11px 0px #00000091;
+}
+
+.sidebar-container .sidebar .logo {
+  color: #ffffff;
+  -webkit-text-stroke: 1px #000;
+  text-shadow: 2px 2px #000000;
+  transition: 0.1s;
+  cursor: pointer;
+}
+
+.sidebar-container .sidebar .logo:hover {
+  text-shadow: 0 0 #000000;
+}
+
+.sidebar-container .sidebar .menu ul li {
+  padding: 5px 10px;
+  margin: 2px 0;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.sidebar-container .sidebar .menu ul {
+  text-align: center;
+  font-weight: 500;
+  letter-spacing: 2px;
+  padding: 0;
+}
+
+.sidebar-container .sidebar .menu ul li:hover {
+  background: white;
+}
+
+.sidebar-container .sidebar .menu ul li.active {
+  background: white;
+  border-radius: 20px;
+  border: 2px solid lightgrey;
+  box-shadow: 2px 5px 10px lightgrey;
+}
+
+.map-controller {
+  position: fixed;
+  z-index: 999;
+  bottom: 5px;
+}
+
+.map-controller .btn {
+  margin: 0 5px;
+}
+
+.icon-container div {
+  border: 1px solid lightgrey;
+  box-shadow: 0 2px 10px 0 lightgrey;
+  cursor: pointer;
+  transition: 0.1s;
+}
+
+.icon-container div:hover {
+  box-shadow: 0 0 0 0 lightgrey;
+}
+
+.icon-container div.active {
+  background: #ededed;
+  border: 2px dashed green;
+  box-shadow: 0 0 0 0 lightgrey;
+}
+
+.missionEditor .unitMission span {
+  margin-left: auto;
+  color: #ff000078;
+  margin-right: 10px;
+}
+
+.missionEditor .unitMission span:hover {
+  color: red;
+}

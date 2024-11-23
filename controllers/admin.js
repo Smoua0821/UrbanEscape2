@@ -149,7 +149,11 @@ const newMapMission = async (req, res) => {
     await Map.updateOne({ id: mapId }, { $set: { missions: missionsExist } });
     return res
       .status(200)
-      .json({ status: "success", message: "Missions Added" });
+      .json({
+        status: "success",
+        message: "Mission Added",
+        data: missionsExist,
+      });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ status: "error", message: "Server Error" });

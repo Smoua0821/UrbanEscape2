@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin</title>
     <link href="/css/bs.css" rel="stylesheet" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/css/admin.css" />
     <script src="/js/jquery.js"></script>
     <link
       rel="stylesheet"
@@ -121,15 +122,7 @@
                 </form>
                 <div class="row justify-content-center align-items-center">
                   <div class="missionEditor col-md-12 col-lg-6">
-                    <div class="missionEditContainer vh-50">
-                      <div class="text-center">Loading.....</div>
-                      <div
-                        class="missionEditUnit bg-light p-2 rounded-1 border-1"
-                        style="display: none"
-                      >
-                        <h5>Dragon</h5>
-                      </div>
-                    </div>
+                    <div class="missionEditContainer vh-50"></div>
                   </div>
                   <div
                     class="missionsCreator text-center col-md-12 col-lg-6"
@@ -559,6 +552,8 @@
           "/admin/map/missions",
           { mapId: mapId, missions: missions },
           (data) => {
+            maps.maps.find((d) => d.id === mapId).missions = data.data;
+            renderMapMissions();
             $(".missionsCreator").hide();
             $(".new_map_form").fadeIn();
             missions.redeemLink = "";
@@ -621,7 +616,6 @@
                     beachFlagImg.src = $(this).data("src");
                     payloadData.image = $(this).data("src");
                   });
-                console.log("Image uploaded successfully:", response.imageName);
                 notyf.success(
                   `Image uploaded successfully: ${response.imageName}`
                 );
@@ -699,6 +693,43 @@
         }
       });
       let bulkPolyLine, bulkCircle, bulkMarker;
+      function renderMapMissions() {
+        $(".missionEditContainer").empty();
+        const tarMission = maps.maps.find((d) => d.id === mapId).missions;
+        if (!tarMission) return false;
+        if (tarMission.length == 0) {
+          $(".missionEditContainer").html(
+            `<div class='alert alert-danger'>No Mission exists!</div>`
+          );
+          return false;
+        }
+        tarMission.forEach((e) => {
+          $(".missionEditContainer").append(
+            `<div class='unitMission' data-id='${e._id}'><h5>${e.name}</h5><span data-id='${e._id}'>Delete</span></div>`
+          );
+        });
+
+        $(".unitMission span")
+          .off("click")
+          .on("click", function () {
+            const tarid = $(this).data("id");
+            if (!tarid) return;
+            if ($(`.unitMission[data-id='${tarid}']`).length == 0) return false;
+            const tarMission = maps.maps.find((d) => d.id === mapId).missions;
+            $(`.unitMission[data-id='${tarid}']`).fadeOut(function () {
+              $(this).remove();
+              maps.maps.find((d) => d.id === mapId).missions =
+                tarMission.filter((d) => d._id !== tarid);
+
+              if (maps.maps.find((d) => d.id === mapId).missions.length == 0) {
+                $(".missionEditContainer").html(
+                  `<div class='alert alert-danger'>No Mission exists!</div>`
+                );
+                return false;
+              }
+            });
+          });
+      }
       function renderRoutes() {
         map = new google.maps.Map(document.getElementsByClassName("g-map")[0], {
           zoom: 15,
@@ -829,22 +860,19 @@
           $(".setupMissions")
             .off("click")
             .on("click", function () {
+              $(".selectedImagesCount").text("0");
               mapId = $(this).data("id");
               if (!mapId) return notyf.error("Invalid Map");
               $(".missionsCreator").fadeIn();
               $(".new_map_form").hide();
-              maps.maps
-                .find((d) => d.id === mapId)
-                .missions.forEach((e) => {
-                  console.log(e.name);
-                });
+              renderMapMissions();
             });
 
           $(".setUpDuplicate")
             .off("click")
             .on("click", function () {
               const name = prompt("New Map Name?");
-              if (!name || !name.trim()) return notyf.error("Invalid Name");
+              if (!name || !name.trim()) return false;
               const mapId = $(this).data("id");
               if (!mapId) return notyf.error("Invalid MAP ID!");
               $.post(
@@ -889,90 +917,6 @@
         });
       });
     </script>
-    <style>
-      .icon-selector .addImage {
-        width: 100px;
-        height: 100px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .icon-selector .addImage:before {
-        content: "+";
-        font-size: 3rem;
-        height: 5rem;
-      }
-
-      .sidebar-container {
-        background: #e5ffbd;
-        box-shadow: 2px 0px 11px 0px #00000091;
-      }
-
-      .sidebar-container .sidebar .logo {
-        color: #ffffff;
-        -webkit-text-stroke: 1px #000;
-        text-shadow: 2px 2px #000000;
-        transition: 0.1s;
-        cursor: pointer;
-      }
-
-      .sidebar-container .sidebar .logo:hover {
-        text-shadow: 0 0 #000000;
-      }
-
-      .sidebar-container .sidebar .menu ul li {
-        padding: 5px 10px;
-        margin: 2px 0;
-        transition: 0.2s;
-        cursor: pointer;
-      }
-
-      .sidebar-container .sidebar .menu ul {
-        text-align: center;
-        font-weight: 500;
-        letter-spacing: 2px;
-        padding: 0;
-      }
-
-      .sidebar-container .sidebar .menu ul li:hover {
-        background: white;
-      }
-
-      .sidebar-container .sidebar .menu ul li.active {
-        background: white;
-        border-radius: 20px;
-        border: 2px solid lightgrey;
-        box-shadow: 2px 5px 10px lightgrey;
-      }
-
-      .map-controller {
-        position: fixed;
-        z-index: 999;
-        bottom: 5px;
-      }
-
-      .map-controller .btn {
-        margin: 0 5px;
-      }
-
-      .icon-container div {
-        border: 1px solid lightgrey;
-        box-shadow: 0 2px 10px 0 lightgrey;
-        cursor: pointer;
-        transition: 0.1s;
-      }
-
-      .icon-container div:hover {
-        box-shadow: 0 0 0 0 lightgrey;
-      }
-
-      .icon-container div.active {
-        background: #ededed;
-        border: 2px dashed green;
-        box-shadow: 0 0 0 0 lightgrey;
-      }
-    </style>
     <script src="https://maps.googleapis.com/maps/api/js?libraries=marker&key=<%= apiKey %>"></script>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
