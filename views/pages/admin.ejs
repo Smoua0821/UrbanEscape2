@@ -829,6 +829,16 @@
               if (!name || !name.trim()) return notyf.error("Invalid Name");
               const mapId = $(this).data("id");
               if (!mapId) return notyf.error("Invalid MAP ID!");
+              $.post(
+                "/admin/map/duplicate",
+                { name: name, id: mapId },
+                (data) => {
+                  notyf.success("Map duplicated successfully!");
+                  fetchMaps();
+                }
+              ).fail(function (xhr, status, error) {
+                notyf.error("An error occurred: " + error);
+              });
             });
         });
       }

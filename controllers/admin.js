@@ -195,16 +195,35 @@ const duplicateMap = async (req, res) => {
     newMap.id = uuidv4();
     newMap.createdAt = undefined;
     newMap.updatedAt = undefined;
-    // newMap.missions.forEach((d) => {
-    //   d._id = undefined;
-    // });
-
-    // return res.json(newMap);
+    newMap.missions.forEach((d) => {
+      d._id = undefined;
+    });
 
     const duplicatedMap = new Map(newMap);
-    await duplicatedMap.save();
+    const savedMap = await duplicatedMap.save();
 
-    return res.status(200).json(duplicatedMap);
+    const routes = await LoopRoute.find({ mapId: map._id });
+
+    if (routes && routes.length > 0) {
+      for (const rout of routes) {
+        const route = rout.toObject();
+        route._id = undefined;
+        route.mapId = savedMap._id;
+        route.createdAt = undefined;
+        route.updatedAt = undefined;
+
+        const duplicateRoute = new LoopRoute(route);
+
+        try {
+          const savedRoute = await duplicateRoute.save(); // Save the duplicated route
+          console.log(savedRoute); // Log the saved route
+        } catch (error) {
+          console.error("Error saving duplicated route:", error);
+        }
+      }
+    }
+
+    return res.status(200).json(savedMap);
   } catch (err) {
     if (err.name === "CastError") {
       return res.status(400).json({ message: "Invalid ID format" });

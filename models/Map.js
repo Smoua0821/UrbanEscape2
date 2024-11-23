@@ -28,7 +28,6 @@ const mapSchema = new mongoose.Schema(
         },
         name: {
           type: String,
-          required: true,
         },
         images: [
           {
@@ -43,11 +42,7 @@ const mapSchema = new mongoose.Schema(
   }
 );
 
-// Adding indexes for faster lookups on name and id fields
 mapSchema.index({ id: 1 });
-mapSchema.index({ name: 1 });
-
-// Create the model
 const Map = mongoose.model("Map", mapSchema);
 
 module.exports = Map;
