@@ -10,6 +10,11 @@ let pos = { lat: 55.5, lng: 254.7 };
 let mapId = 0;
 let circleOpacity = 100;
 const missions = { redeemLink: "", name: "", images: [] };
+let loopRouteOptions = {
+  url: "/admin/looproute",
+  smessage: "New Route added successfully!",
+  mode: "new",
+};
 $(".mission-icons div.mission-icon-select").click(function () {
   const imgSrc = $(this).data("src");
   if (!imgSrc) return;
@@ -105,7 +110,8 @@ $("#routeTitle")
   });
 $(".save_final").click(() => {
   if (
-    payloadData.polygonCoords.length > 2 &&
+    (payloadData.polygonCoords.length > 2 ||
+      loopRouteOptions.mode == "update") &&
     payloadData.radius > 0 &&
     payloadData.image &&
     payloadData.speed &&
@@ -113,24 +119,17 @@ $(".save_final").click(() => {
     payloadData.description
   ) {
     payloadData.polygonCoords = polyCoords;
-    $.post("/admin/looproute", payloadData, (success, data) => {
+    $.post(loopRouteOptions.url, payloadData, (success, data) => {
       if (success) {
-        notyf.success("New Route added successfully!");
+        isClosedPath = 0;
+        notyf.success(loopRouteOptions.smessage);
+        renderRoutes();
+        if (loopRouteOptions.mode == "update") return;
         $("#savePolyModal").modal("hide");
         marker.setMap(null);
         iconMarker.setMap(null);
         polygon.setMap(null);
         circle.setMap(null);
-
-        new google.maps.Polyline({
-          path: payloadData.polygonCoords,
-          map: map,
-        });
-        new google.maps.Circle({
-          center: payloadData.polygonCoords[0],
-          map: map,
-          radius: payloadData.radius,
-        });
       }
     });
     $(".icon-selector").removeClass("active");
@@ -165,6 +164,9 @@ $(".map-controller .undo").click(() => {
   }
 });
 $(".map-controller .save").click(() => {
+  loopRouteOptions.mode = "new";
+  loopRouteOptions.url = "/admin/looproute";
+  loopRouteOptions.smessage = "New Route added successfully!";
   if (isClosedPath) {
     $("#savePolyModal").modal("show");
   } else {
@@ -180,6 +182,7 @@ $(".map-controller .cpath").click(() => {
     polygon.setPath(polyCoords);
     marker.setMap(null);
   }
+  payloadData.polygonCoords = polyCoords;
 });
 function saveMission() {
   if (!mapId) return notyf.error("Invalid MapId");
@@ -405,6 +408,9 @@ function renderRoutes() {
   });
   polygon.setMap(null);
   google.maps.event.addListener(map, "click", (event) => {
+    loopRouteOptions.mode = "new";
+    loopRouteOptions.url = "/admin/looproute";
+    loopRouteOptions.smessage = "New Route added successfully!";
     if (isClosedPath) {
       isClosedPath = 0;
       polyCoords = [];
@@ -438,6 +444,7 @@ function renderRoutes() {
     bulkMarker.remo;
   }
   $.get(`/api/looproute/${mapId}`, (data) => {
+    console.log(data);
     data.forEach((path) => {
       bulkPolyLine = new google.maps.Polyline({
         map: map,
@@ -458,13 +465,34 @@ function renderRoutes() {
         content: tmpImg,
       });
       bulkMarker.addListener("click", function () {
-        const cnf = confirm("Do you want to delete this Route?");
-        if (!cnf) return;
-        $.post("/admin/looproute/delete", { routeId: path._id }, (data) => {
-          if (!data) return;
-          notyf.success(data.message);
-          renderRoutes();
-        });
+        loopRouteOptions.mode = "update";
+        loopRouteOptions.url = "/admin/looproute/update";
+        loopRouteOptions.smessage = "Route Updated Successfully!";
+        console.log("Changed to YUpdate");
+        $("#savePolyModal").modal("show");
+        const tarObj = data.find((d) => d._id == path._id);
+        if (!tarObj) return notyf.error("Something went Wrong!");
+
+        $("#routeTitle").val(tarObj.title);
+        $("#routeDescription").val(tarObj.title);
+        $("#sizeRange").val(tarObj.title);
+        $("#radiusRange").val(tarObj.radius);
+        $("#sizeRange").val(tarObj.size);
+
+        payloadData.title = tarObj.title;
+        payloadData.loopId = path._id;
+        payloadData.description = tarObj.description;
+        payloadData.image = tarObj.image;
+        payloadData.radius = tarObj.radius;
+        payloadData.speed = tarObj.speed;
+        payloadData.opacity = tarObj.opacity;
+        payloadData.size = tarObj.size;
+
+        // $.post("/admin/looproute/delete", { routeId: path._id }, (data) => {
+        //   if (!data) return;
+        //   notyf.success(data.message);
+        //   renderRoutes();
+        // });
       });
     });
   });

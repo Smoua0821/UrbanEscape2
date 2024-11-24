@@ -18,6 +18,7 @@ const {
   saveLoopRoutes,
   deleteRoute,
   uploadImage,
+  updateLoopRoutes,
 } = require("../controllers/loopRoute");
 
 const storage = multer.diskStorage({
@@ -36,6 +37,7 @@ router.get("/", adminPage);
 router.get("/looproute", fetchLoopRoutes);
 router.post("/looproute", saveLoopRoutes);
 router.post("/looproute/delete", deleteRoute);
+router.post("/looproute/update", updateLoopRoutes);
 router.post("/looproute/image", upload.single("image"), uploadImage);
 
 router.post("/delete/:id", deleteUser);

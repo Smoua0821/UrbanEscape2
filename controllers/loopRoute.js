@@ -85,6 +85,42 @@ async function saveLoopRoutes(req, res) {
   }
 }
 
+async function updateLoopRoutes(req, res) {
+  const { title, description, image, radius, speed, size, opacity, loopId } =
+    req.body;
+  if (!loopId) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "Missing required Parameters!" });
+  }
+
+  try {
+    const route = await LoopRoute.findById(loopId);
+    if (!route) {
+      return res
+        .status(404)
+        .json({ status: "error", message: "No Route Found" });
+    }
+
+    await LoopRoute.updateOne(
+      { _id: loopId },
+      {
+        $set: { title, description, image, radius, speed, size, opacity },
+      }
+    );
+
+    return res.json({
+      status: "success",
+      message: "Route Updated successfully",
+    });
+  } catch (error) {
+    return res.status(400).json({
+      status: "error",
+      error: error.message || error,
+    });
+  }
+}
+
 const deleteRoute = async (req, res) => {
   const { routeId } = req.body;
   if (!routeId) return res.status(404).end("Invalid request");
@@ -114,4 +150,10 @@ const uploadImage = async (req, res) => {
 
   res.json({ imageName: req.file.filename });
 };
-module.exports = { fetchLoopRoutes, saveLoopRoutes, deleteRoute, uploadImage };
+module.exports = {
+  fetchLoopRoutes,
+  saveLoopRoutes,
+  deleteRoute,
+  uploadImage,
+  updateLoopRoutes,
+};
