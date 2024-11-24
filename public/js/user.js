@@ -397,6 +397,7 @@ function gameWon() {
   return notyf.success("You Won the Game!");
 }
 function animateMarker() {
+  $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
   const urlParsed = new URL(iconMarker.src);
   if (polygonCoordinates.length == 0) return gameWon();
   if (urlParsed.pathname != polygonCoordinates[polyIndex].image) {
@@ -482,10 +483,12 @@ function nearestPolygon() {
     polyIndex = tmpaihjhsg.index;
   }
   if (polygonCoordinates.length == 0) return;
+  $(`img.mapPolyImage`).show();
   $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
   return tmpaihjhsg;
 }
 function startGaming() {
+  $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
   if (polygonCoordinates && polygonCoordinates.length == 0) {
     notyf.error("No Route Found!");
     return false;
