@@ -70,6 +70,7 @@ const setMarkerSizeNum = (event) => {
   }
   $("#sizeRange").val(size);
   beachFlagImg.width = size * 10;
+  payloadData.size = size;
 };
 const setMapRadius = (event) => {
   circle.setCenter(polyCoords[0]);
@@ -77,7 +78,8 @@ const setMapRadius = (event) => {
   $("#radiusNum").val(event.value);
   circle.setRadius(radius);
   circle.setMap(map);
-  payloadData.radius = parseInt(radius);
+  payloadData.radius = parseInt(event.value);
+  console.log(payloadData);
 };
 const setMapRadiusNum = (event) => {
   if (event.value > 1000) {
@@ -88,7 +90,7 @@ const setMapRadiusNum = (event) => {
   $("#radiusRange").val(event.value);
   circle.setRadius(radius);
   circle.setMap(map);
-  payloadData.radius = parseInt(radius);
+  payloadData.radius = parseInt(event.value);
 };
 let payloadData = {
   polygonCoords: polyCoords,
@@ -474,10 +476,14 @@ function renderRoutes() {
         if (!tarObj) return notyf.error("Something went Wrong!");
 
         $("#routeTitle").val(tarObj.title);
-        $("#routeDescription").val(tarObj.title);
+        $("#routeDescription").val(tarObj.description);
         $("#sizeRange").val(tarObj.title);
         $("#radiusRange").val(tarObj.radius);
         $("#sizeRange").val(tarObj.size);
+        $("#radiusNum").val(tarObj.radius);
+        $("#sizeNum").val(tarObj.size);
+        $("#imageSpeed").val(tarObj.speed);
+        $("#loopOpacity").val(tarObj.opacity);
 
         payloadData.title = tarObj.title;
         payloadData.loopId = path._id;
