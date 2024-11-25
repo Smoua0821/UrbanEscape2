@@ -246,7 +246,7 @@ $(document).ready(() => {
           $(this).data("src", response.imageName);
           $(".icon-container")
             .prepend(`<div class="p-2 border-1 rounded-1 col-sm-4 icon-selector" data-src="/images/mapicons/${response.imageName}">
-              <img class="lazy" alt="${response.imageName}" data-src="/images/mapicons/${response.imageName}" width="100px">
+              <img class="lazy" alt="${response.imageName}" src="/images/mapicons/${response.imageName}" width="100px">
             </div>`);
           $(".icon-selector")
             .off("click")
