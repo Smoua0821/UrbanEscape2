@@ -4,16 +4,26 @@ const path = require("path");
 const User = require("../models/User");
 const LoopRoute = require("../models/LoopRoute");
 const Map = require("../models/Map");
+
 async function adminPage(req, res) {
   const user = req.user;
-  if (user.role.current != "admin") return res.end("Unauthorised!");
+  if (user.role.current !== "admin") return res.end("Unauthorized!");
+
   const dirPath = "./public/images/mapicons/";
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+
+  // Read the icons in the directory
   const icons = fs
     .readdirSync(dirPath)
     .filter((file) => fs.statSync(path.join(dirPath, file)).isFile())
     .map((file) => path.join(file));
 
+  // Fetch users from the database
   const users = await User.find();
+
+  // Render the admin page with the necessary data
   res.render("pages/admin", {
     apiKey: "AIzaSyBaQ334LSpDNZXU8flkT1VjGpdj7f3_BZI",
     users: users,
