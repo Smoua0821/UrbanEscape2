@@ -1,4 +1,4 @@
-public/images/mapicons/*.jpg
+public/images/mapicons/
 
 # Node modules
 node_modules/
