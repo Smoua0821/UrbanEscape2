@@ -170,6 +170,7 @@ function initMap() {
     center: pos,
     mapId: "f543ed7dd1b2a7e2",
     fullscreenControl: false,
+    disableDefaultUI: true,
   });
   marker = new google.maps.marker.AdvancedMarkerElement({
     position: pos,
