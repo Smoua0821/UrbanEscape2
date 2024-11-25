@@ -160,6 +160,9 @@ let stepsPerSegment = 100;
 let speed = 10;
 let gameStarted = 0;
 iconMarker.width = 50;
+iconMarker.addEventListener("click", () => {
+  InfoModal(polygonCoordinates[polyIndex]._id);
+});
 let polyIndex = 0;
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
