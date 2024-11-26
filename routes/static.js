@@ -78,4 +78,9 @@ router.get("/static/image/:id", async (req, res) => {
     return res.send("An Error Occured!");
   }
 });
+
+router.get("/privacy-policy", (req, res) => {
+  return res.render("pages/privacy_policy");
+});
+
 module.exports = router;
