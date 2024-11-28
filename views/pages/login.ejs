@@ -201,7 +201,6 @@
             });
 
             $("#citySelector").on("change", (event) => {
-              console.log(event.target.value);
               if (!event.target.value) return $("#registerBtn").hide();
               return $("#registerBtn").show();
             });
