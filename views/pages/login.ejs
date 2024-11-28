@@ -148,7 +148,20 @@
                   class="form-control_v"
                 />
               </div>
-              <button class="btn btn-success w-100">SUBMIT</button>
+              <div class="form-group mb-2">
+                <select class="form-control_v" id="citySelector">
+                  <option value="">Choose State--</option>
+                  <option value="Minnesota">Minnesota</option>
+                  <option value="Alberta">Alberta</option>
+                </select>
+              </div>
+              <button
+                class="btn btn-success w-100"
+                id="registerBtn"
+                style="display: none"
+              >
+                SUBMIT
+              </button>
             </div>
             <p class="m-0 mt-2">
               Already Have an account?
@@ -172,7 +185,29 @@
           $("form.register").hide();
         }
       }
-      $(document).ready(() => {});
+      $(document).ready(() => {
+        $.get("/auth/countries", (data) => {
+          if (data.status == "success") {
+            const countries = data.countries;
+            $("#citySelector").empty();
+            $("#citySelector").html(
+              "<option value=''>Select Countries</option>"
+            );
+
+            countries.forEach((country) => {
+              $("#citySelector").append(
+                `<option value="${country}">${country}</option>`
+              );
+            });
+
+            $("#citySelector").on("change", (event) => {
+              console.log(event.target.value);
+              if (!event.target.value) return $("#registerBtn").hide();
+              return $("#registerBtn").show();
+            });
+          }
+        });
+      });
     </script>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
   </body>
