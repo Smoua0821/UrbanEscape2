@@ -170,8 +170,14 @@ function initMap() {
     center: pos,
     mapId: "f543ed7dd1b2a7e2",
     fullscreenControl: false,
-    disableDefaultUI: true,
+    disableDefaultUI: true, // Hides all default controls
+    mapTypeControl: true, // Enables the map type toggle control
+    mapTypeControlOptions: {
+      style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR, // Options: DEFAULT, DROPDOWN_MENU, HORIZONTAL_BAR
+      mapTypeIds: ["roadmap", "satellite", "terrain"], // Specify map types
+    },
   });
+
   marker = new google.maps.marker.AdvancedMarkerElement({
     position: pos,
   });
