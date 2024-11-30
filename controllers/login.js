@@ -2,6 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
+const Province = require("../models/Provinces");
 dotenv.config();
 
 const loginPage = async (req, res) => {
@@ -68,6 +69,9 @@ const newUser = async (req, res) => {
         message: "Email already in use. Please use a different email.",
       });
     }
+    const province = await Province.findOne({ name: state });
+    if (!province)
+      return res.render("pages/login", { error: "Invalid State Choosen" });
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newuser = await User.create({
@@ -94,9 +98,10 @@ const newUser = async (req, res) => {
   }
 };
 
-const provinceList = (req, res) => {
-  const countries = ["Alberta", "Monnesta"];
-  return res.json({ status: "success", countries: countries });
+const provinceList = async (req, res) => {
+  const data = await Province.find({});
+  if (!data) return res.json({ status: "success", countries: [] });
+  return res.json({ status: "success", countries: data });
 };
 
 module.exports = { loginPage, loginValidate, newUser, provinceList };

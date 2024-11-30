@@ -42,4 +42,18 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+router.get("/", async (req, res) => {
+  try {
+    const provinces = await Province.find();
+    if (provinces.length === 0) {
+      return res.status(404).json({ message: "No provinces found" });
+    }
+    res.status(200).json(provinces);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: err.message });
+  }
+});
+
 module.exports = router;
