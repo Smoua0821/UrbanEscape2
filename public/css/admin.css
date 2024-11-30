@@ -1,3 +1,7 @@
+::-webkit-scrollbar {
+  display: none;
+}
+
 .missionEditor {
   padding: 20px 10px;
 }
@@ -143,7 +147,6 @@
   display: inline-block;
 }
 
-
 .myBtn:before {
   content: "DOWNLOAD";
   position: absolute;
@@ -152,13 +155,13 @@
   width: 140%;
   top: 0;
   left: -140%;
-  transition:0.2s;
+  transition: 0.2s;
   border-radius: 30px;
   display: inline-flex;
   align-items: center;
-  justify-content: center
+  justify-content: center;
 }
 
-.myBtn:hover:before{
+.myBtn:hover:before {
   left: -20%;
 }
