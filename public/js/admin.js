@@ -216,6 +216,12 @@ function saveMission() {
 $(document).ready(() => {
   fetchMaps();
   renderProvince();
+  $(".datatable.user").DataTable({
+    paging: false,
+    searching: true,
+    ordering: true,
+    info: false,
+  });
   $("form.provinceMaker").submit(() => {
     const pname = $("#provinceName").val();
     if (!pname) return false;
