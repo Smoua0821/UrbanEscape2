@@ -300,6 +300,7 @@ const exportExcel = async (req, res) => {
       { header: "Name", key: "name", width: 30 },
       { header: "Email", key: "email", width: 40 },
       { header: "province", key: "province", width: 10 },
+      { header: "role", key: "role", width: 10 },
       { header: "since", key: "since", width: 10 },
     ];
 
@@ -308,6 +309,7 @@ const exportExcel = async (req, res) => {
         name: user.name,
         email: user.email,
         province: user.state,
+        role: user.role.current,
         since: moment(user.createdAt).format("MM/DD/YYYY"),
       });
     });

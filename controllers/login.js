@@ -83,6 +83,7 @@ const newUser = async (req, res) => {
       name: name,
       email: email,
       password: hashedPassword,
+      state: state,
     });
     return res
       .status(200)

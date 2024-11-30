@@ -71,6 +71,7 @@
                       <th>Sr no.</th>
                       <th>Name</th>
                       <th>Email</th>
+                      <th>Province</th>
                       <th>Since</th>
                       <th>Actions</th>
                     </tr>
@@ -82,6 +83,7 @@
                       <td><%= index++ %></td>
                       <td><%= user.name %></td>
                       <td><%= user.email %></td>
+                      <td><%= user.state %></td>
                       <td>
                         <%= new Date(user.createdAt).toLocaleDateString('en-US')
                         %>
