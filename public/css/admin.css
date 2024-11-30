@@ -130,3 +130,35 @@
 .province-table span:hover {
   color: red;
 }
+
+.myBtn {
+  color: inherit;
+  text-decoration: none;
+  padding: 10px 15px;
+  background: #e5ff5f;
+  border: 1px solid #d4d500;
+  transition: 0.2s;
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+
+
+.myBtn:before {
+  content: "DOWNLOAD";
+  position: absolute;
+  background: #beffb8;
+  height: 100%;
+  width: 140%;
+  top: 0;
+  left: -140%;
+  transition:0.2s;
+  border-radius: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center
+}
+
+.myBtn:hover:before{
+  left: -20%;
+}
