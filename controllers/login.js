@@ -54,7 +54,12 @@ const loginValidate = async (req, res) => {
 };
 
 const newUser = async (req, res) => {
-  const { name, email, password, state } = req.body;
+  const { name, email, password, state, ppolicy } = req.body;
+
+  if (!ppolicy)
+    return res.render("pages/login", {
+      error: "Privacy Policy must be accepted!",
+    });
 
   if (!name || !email || !password || !state) {
     return res

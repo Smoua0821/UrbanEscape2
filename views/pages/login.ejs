@@ -151,10 +151,22 @@
               <div class="form-group mb-2">
                 <select class="form-control_v" id="citySelector" name="state">
                   <option value="">Choose State--</option>
-                  <option value="Minnesota">Minnesota</option>
-                  <option value="Alberta">Alberta</option>
                 </select>
               </div>
+              <div class="form-group mb-2 d-flex align-items-center">
+                <input
+                  type="checkbox"
+                  class="form-check"
+                  required
+                  name="ppolicy"
+                  id="ppolicyCheck"
+                />
+                <label class="form-check-label ms-2">
+                  I accept the
+                  <a href="/privacy-policy" target="_blank">Privacy Policy</a>
+                </label>
+              </div>
+
               <button
                 class="btn btn-success w-100"
                 id="registerBtn"
