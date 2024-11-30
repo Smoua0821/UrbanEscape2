@@ -1,3 +1,5 @@
+const ExcelJS = require("exceljs");
+const moment = require("moment");
 const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
 const path = require("path");
@@ -287,6 +289,47 @@ const duplicateMap = async (req, res) => {
   }
 };
 
+const exportExcel = async (req, res) => {
+  try {
+    const users = await User.find({});
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Users");
+
+    worksheet.columns = [
+      { header: "Name", key: "name", width: 30 },
+      { header: "Email", key: "email", width: 40 },
+      { header: "province", key: "province", width: 10 },
+      { header: "since", key: "since", width: 10 },
+    ];
+
+    users.forEach((user) => {
+      worksheet.addRow({
+        name: user.name,
+        email: user.email,
+        province: user.state,
+        since: moment(user.createdAt).format("MM/DD/YYYY"),
+      });
+    });
+
+    const filename = `users_${Date.now()}.xlsx`;
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${encodeURIComponent(filename)}"`
+    );
+
+    // Write the Excel file to the response
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (err) {
+    console.error("Error generating Excel file:", err);
+    res.status(500).send("Error generating Excel file");
+  }
+};
 module.exports = {
   adminPage,
   deleteUser,
@@ -297,4 +340,5 @@ module.exports = {
   MapMissions,
   duplicateMap,
   removeMapMission,
+  exportExcel,
 };
