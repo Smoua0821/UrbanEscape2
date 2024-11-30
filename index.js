@@ -9,6 +9,7 @@ const path = require("path");
 const app = express();
 connectDB();
 
+const adminProvinceRoutes = require("./routes/province");
 const staticRoutes = require("./routes/static");
 const adminRoutes = require("./routes/admin");
 const loginRoutes = require("./routes/login");
@@ -29,6 +30,7 @@ app.use("/api", apiRoutes);
 app.use("/", authMiddleware, staticRoutes);
 app.use("/user", userRoutes);
 app.use("/admin", adminMiddleware, adminRoutes);
+app.use("/admin/province", adminMiddleware, adminProvinceRoutes);
 
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);

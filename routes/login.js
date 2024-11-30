@@ -1,14 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const { loginPage, loginValidate, newUser } = require("../controllers/login");
+const {
+  loginPage,
+  loginValidate,
+  newUser,
+  provinceList,
+} = require("../controllers/login");
 router.get("/", loginPage);
 
 router.post("/", loginValidate);
 
 router.post("/new", newUser);
 
-router.get("/countries", (req, res) => {
-  const countries = ["Alberta", "Monnesta"];
-  return res.json({ status: "success", countries: countries });
-});
+router.get("/countries", provinceList);
 module.exports = router;

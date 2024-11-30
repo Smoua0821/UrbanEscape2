@@ -53,9 +53,9 @@ const loginValidate = async (req, res) => {
 };
 
 const newUser = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, state } = req.body;
 
-  if (!name || !email || !password) {
+  if (!name || !email || !password || !state) {
     return res
       .status(400)
       .json({ message: "All fields are required (name, email, password)." });
@@ -94,6 +94,9 @@ const newUser = async (req, res) => {
   }
 };
 
-module.exports = newUser;
+const provinceList = (req, res) => {
+  const countries = ["Alberta", "Monnesta"];
+  return res.json({ status: "success", countries: countries });
+};
 
-module.exports = { loginPage, loginValidate, newUser };
+module.exports = { loginPage, loginValidate, newUser, provinceList };
