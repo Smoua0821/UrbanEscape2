@@ -215,6 +215,17 @@ function saveMission() {
 }
 $(document).ready(() => {
   fetchMaps();
+  renderProvince();
+  $("form.provinceMaker").submit(() => {
+    const pname = $("#provinceName").val();
+    if (!pname) return false;
+    $.post("/admin/province", { name: pname }, (data) => {
+      notyf.success(`Provinvce "${data.name}" Created successfully!`);
+      renderProvince();
+      return $("#provinceName").val("");
+    });
+    return false;
+  });
   $("form.new_map_form").submit(function () {
     const mapName = $("form.new_map_form input#name").val();
     if (!mapName) alert("Please Enter a Valid Name");
@@ -593,3 +604,36 @@ document.addEventListener("DOMContentLoaded", () => {
     observer.observe(image);
   });
 });
+
+const renderProvince = () => {
+  $.get("/auth/countries", (data) => {
+    $(".province-table").empty();
+    data.countries.forEach((c) => {
+      $(".province-table").append(
+        `<tr data-id="${c._id}">
+          <td>${c.name}</td>
+          <td><span data-id='${c._id}'>delete</span></td>  
+        </tr>`
+      );
+    });
+    $(".province-table span")
+      .off("click")
+      .on("click", function () {
+        const tarId = $(this).data("id");
+        if (!tarId) return;
+        $(`.province-table tr[data-id='${tarId}']`).fadeOut(() => {
+          $.ajax({
+            url: `/admin/province/${tarId}`,
+            type: "DELETE",
+            success: function (data) {
+              notyf.success(data.message);
+              $(this).remove();
+            },
+            error: function (error) {
+              console.error("Error:", error);
+            },
+          });
+        });
+      });
+  });
+};

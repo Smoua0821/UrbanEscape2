@@ -114,9 +114,19 @@
 .missionEditor .unitMission span {
   margin-left: auto;
   color: #ff000078;
+  cursor: pointer;
   margin-right: 10px;
 }
 
 .missionEditor .unitMission span:hover {
+  color: red;
+}
+
+.province-table span {
+  color: #ff000078;
+  cursor: pointer;
+}
+
+.province-table span:hover {
   color: red;
 }
