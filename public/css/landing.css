@@ -24,11 +24,13 @@
 
 .history-container .body a {
   display: block;
+  text-transform: uppercase;
   color: inherit;
   text-decoration: none;
   background: #bdbdbd14;
   margin: 5px 0;
-  padding: 5px;
+  padding: 5px 0;
+  padding-left: 20px;
   font-size: 1.2rem;
   border-radius: 5px;
   border-left: 1px solid;
