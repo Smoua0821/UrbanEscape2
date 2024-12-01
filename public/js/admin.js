@@ -221,7 +221,7 @@ $(document).ready(() => {
   $(".primaryMapSelector").on("change", function () {
     if (!primaryMap.map) return $(".primaryUpdateBtn").show();
     const tarId = $(this).val();
-    $(".primaryUpdateBtn").hide();
+    if (primaryMap.map) $(".primaryUpdateBtn").hide();
     if (primaryMap.map && tarId == primaryMap.map._id) return false;
     $(".primaryUpdateBtn").show();
   });
@@ -232,7 +232,7 @@ $(document).ready(() => {
     $.post("/admin/map/primary", { mapId: tarId }, async (data) => {
       if (data.success) {
         await fetchPrimaryMap();
-        $(".primaryUpdateBtn").hide();
+        if (primaryMap.map) $(".primaryUpdateBtn").hide();
         return notyf.success(`Map "${primaryMap.map.name}" set to Primary`);
       }
     });
@@ -652,6 +652,8 @@ const fetchPrimaryMap = async () => {
     if (primaryMap.map) {
       $(".primaryMapSelector").val(primaryMap.map._id);
       $(".primary-map-card p").text(primaryMap.map.name.toUpperCase());
+    } else {
+      $(".primaryUpdateBtn").show();
     }
   } catch (error) {
     console.error(error);
