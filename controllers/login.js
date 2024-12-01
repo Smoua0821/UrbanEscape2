@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const Province = require("../models/Provinces");
+const PrimaryMap = require("../models/PrimaryMap");
 dotenv.config();
 
 const loginPage = async (req, res) => {
@@ -50,7 +51,9 @@ const loginValidate = async (req, res) => {
     sameSite: "strict",
   });
   if (user.role.current == "admin") return res.redirect("/admin");
-  return res.redirect("/");
+  const primaryMap = await PrimaryMap.findOne().populate("map");
+  if (primaryMap && primaryMap.map)
+    return res.redirect(`/map/${primaryMap.map.id}`);
 };
 
 const newUser = async (req, res) => {
