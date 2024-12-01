@@ -17,11 +17,22 @@ router.get("/map/:mapId", async (req, res) => {
   const { mapId } = req.params;
   if (!mapId) return res.status(301).redirect("/");
   const map = await Map.findOne({ id: mapId });
-  if (!map)
+  if (!map) {
+    const user = await User.findOne({ email: req.user?.email });
+    const savedMaps = user.savedMaps;
+    const removedMaps = savedMaps.filter((d) => d.id != mapId);
+    if (savedMaps.length != removedMaps.length) {
+      await User.updateOne(
+        { email: req.user?.email },
+        { $set: { savedMaps: removedMaps } }
+      );
+      return res.status(301).redirect("/");
+    }
     return res.status(404).json({
       status: "error",
       message: "Map Not found!",
     });
+  }
   const user = req.user;
   let imgexist = [];
   const token = req.cookies.sessionId;
