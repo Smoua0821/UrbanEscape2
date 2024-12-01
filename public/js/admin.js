@@ -15,6 +15,7 @@ let loopRouteOptions = {
   smessage: "New Route added successfully!",
   mode: "new",
 };
+let primaryMap = [];
 $(".mission-icons div.mission-icon-select").click(function () {
   const imgSrc = $(this).data("src");
   if (!imgSrc) return;
@@ -216,6 +217,13 @@ function saveMission() {
 $(document).ready(() => {
   fetchMaps();
   renderProvince();
+  $.get("/admin/map/primary", (data) => {
+    if (data.success) {
+      primaryMap = data.primaryMap;
+      $(".primaryMapSelector").val(primaryMap.map._id);
+      $(".primary-map-card p").text(primaryMap.map.name.toUpperCase());
+    }
+  });
   $(".datatable.user").DataTable({
     paging: false,
     searching: true,
