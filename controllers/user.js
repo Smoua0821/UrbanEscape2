@@ -158,4 +158,56 @@ const routeRedeem = async (req, res) => {
   }
 };
 
-module.exports = { userProfile, captureImage, getCaptureImage, routeRedeem };
+const handleRecentMaps = async (req, res) => {
+  if (!req.user) return res.json({ success: false, message: "Unauthorised!" });
+  const user = await User.findOne({ email: req.user.email });
+  if (!user) return res.json({ success: false, message: "Unauthorised User!" });
+  const { mapId } = req.body;
+  let currentMaps = user.savedMaps;
+  if (!currentMaps) currentMaps = [];
+  try {
+    const map = await Map.findOne({ id: mapId });
+    if (!map) {
+      const index = currentMaps.findIndex((d) => d.id == mapId);
+      if (index !== -1) {
+        currentMaps.splice(index, 1);
+        await User.updateOne(
+          { email: req.user.email },
+          { $set: { savedMaps: currentMaps } }
+        );
+        return res.json({
+          success: false,
+          message: "Map no longer exists, removed from saved maps",
+        });
+      }
+      return res.json({
+        success: false,
+        message: "Map not found in the database",
+      });
+    }
+    if (currentMaps.find((d) => d.id == mapId)) {
+      return res.json({
+        success: false,
+        message: "Map already exists in your saved maps",
+      });
+    }
+    currentMaps.push({ id: mapId, name: map.name });
+    await User.updateOne(
+      { email: req.user.email },
+      { $set: { savedMaps: currentMaps } }
+    );
+
+    return res.json({ success: true, message: "Map added to your saved maps" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+module.exports = {
+  userProfile,
+  captureImage,
+  getCaptureImage,
+  routeRedeem,
+  handleRecentMaps,
+};

@@ -56,7 +56,28 @@
       function submitt(event) {
         const mapId = document.getElementById("mapId").value;
         if (!mapId) return alert("Please Enter a Map ID");
-        window.location.href = `/map/${mapId}`;
+        fetch("/user/map", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ mapId: mapId }),
+        })
+          .then((response) => {
+            if (response.ok) {
+              window.location.href = `/map/${mapId}`;
+            } else {
+              return response.json();
+            }
+          })
+          .then((data) => {
+            if (data) {
+              console.error("Error:", data.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Request failed", error);
+          });
       }
     </script>
   </body>

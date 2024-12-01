@@ -45,6 +45,12 @@ const UserSchema = new mongoose.Schema(
         default: "user",
       },
     },
+    savedMaps: [
+      {
+        name: { type: String, required: true },
+        id: { type: String, required: true },
+      },
+    ],
   },
   {
     timestamps: true,
