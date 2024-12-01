@@ -6,6 +6,7 @@ const path = require("path");
 const User = require("../models/User");
 const LoopRoute = require("../models/LoopRoute");
 const Map = require("../models/Map");
+const PrimaryMap = require("../models/PrimaryMap");
 
 async function adminPage(req, res) {
   const user = req.user;
@@ -323,8 +324,6 @@ const exportExcel = async (req, res) => {
       "Content-Disposition",
       `attachment; filename="${encodeURIComponent(filename)}"`
     );
-
-    // Write the Excel file to the response
     await workbook.xlsx.write(res);
     res.end();
   } catch (err) {
@@ -332,6 +331,66 @@ const exportExcel = async (req, res) => {
     res.status(500).send("Error generating Excel file");
   }
 };
+
+const fetchPrimaryMap = async (req, res) => {
+  try {
+    const primaryMap = await PrimaryMap.findOne().populate("map");
+    if (!primaryMap) {
+      return res.status(404).json({ message: "PrimaryMap not found" });
+    }
+    return res.status(200).json({
+      success: true,
+      primaryMap,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+const handlePrimaryMap = async (req, res) => {
+  const { mapId } = req.body;
+
+  try {
+    const mapExists = await Map.findById(mapId);
+
+    if (!mapExists) {
+      return res.status(404).json({
+        success: false,
+        message: "Map with the provided ID does not exist.",
+      });
+    }
+
+    let primaryMap = await PrimaryMap.findOne();
+
+    if (primaryMap) {
+      primaryMap.map = mapId;
+      await primaryMap.save();
+      return res.status(200).json({
+        success: true,
+        message: "PrimaryMap updated successfully",
+        primaryMap,
+      });
+    } else {
+      primaryMap = new PrimaryMap({
+        map: mapId,
+      });
+      await primaryMap.save();
+      return res.status(201).json({
+        success: true,
+        message: "PrimaryMap created successfully",
+        primaryMap,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 module.exports = {
   adminPage,
   deleteUser,
@@ -343,4 +402,6 @@ module.exports = {
   duplicateMap,
   removeMapMission,
   exportExcel,
+  fetchPrimaryMap,
+  handlePrimaryMap,
 };

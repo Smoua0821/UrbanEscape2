@@ -525,9 +525,13 @@ function fetchMaps() {
     maps = data;
     $("tbody.map_list").empty();
     const myData = data.maps.reverse();
+    $(".primaryMapSelector").empty();
     myData.forEach((d) => {
       $("tbody.map_list").append(
         `<tr><td>${d.name}</td><td><a target='_blank' href='/map/${d.id}'>View Map</a></td><td><button class='btn btn-info me-1 edit_map' data-id='${d.id}'>Edit</button><button class='me-1 btn btn-danger delete_map' data-id='${d.id}'>delete</button><button class='btn btn-warning setupMissions' data-id='${d.id}'>Missions</button><button class='btn btn-info ms-2 setUpDuplicate' data-id='${d.id}'>Duplicate</button></td></tr>`
+      );
+      $(".primaryMapSelector").append(
+        `<option value='${d._id}'>${d.name}</option>`
       );
     });
     $(".delete_map")
