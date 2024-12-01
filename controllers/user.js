@@ -2,7 +2,7 @@ const User = require("../models/User");
 const Map = require("../models/Map");
 const LoopRoute = require("../models/LoopRoute");
 const mongoose = require("mongoose");
-
+const PrimaryMap = require("../models/PrimaryMap");
 function isSubset(smallArray, bigArray) {
   for (let i = 0; i < smallArray.length; i++) {
     const element = smallArray[i];
@@ -18,8 +18,10 @@ function isSubset(smallArray, bigArray) {
 const userProfile = async (req, res) => {
   const user = await User.findOne({ email: req.user.email });
   if (!user) return res.redirect("/logout");
+  const primaryMapdata = await PrimaryMap.findOne().populate("map");
   return res.render("pages/profile", {
     user: user,
+    primaryMap: primaryMapdata,
   });
 };
 

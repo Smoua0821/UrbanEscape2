@@ -86,8 +86,14 @@
             </table>
             <div class="link-container mt-3 text-center">
               <a href="/logout" class="btn btn-danger">Logout</a>
-              <a href="/" class="btn btn-success ms-2">Map</a>
-              <% if (user.role.current=="admin") { %>
+              <% if (locals.primaryMap && primaryMap.map && primaryMap.map.id) {
+              %>
+              <a
+                href="/map/<%= primaryMap.map.id %>"
+                class="btn btn-success ms-2"
+                >Map</a
+              >
+              <% } %> <% if (user.role.current=="admin") { %>
               <a href="/admin" class="btn btn-success ms-2">Admin</a>
               <% } %>
             </div>
