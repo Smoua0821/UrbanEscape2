@@ -36,6 +36,7 @@ router.get("/map/:mapId", async (req, res) => {
     });
   }
   const user = req.user;
+
   let imgexist = [];
   const token = req.cookies.sessionId;
   if (token) {
