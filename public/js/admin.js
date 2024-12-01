@@ -217,12 +217,23 @@ function saveMission() {
 $(document).ready(() => {
   fetchMaps();
   renderProvince();
-  $.get("/admin/map/primary", (data) => {
-    if (data.success) {
-      primaryMap = data.primaryMap;
-      $(".primaryMapSelector").val(primaryMap.map._id);
-      $(".primary-map-card p").text(primaryMap.map.name.toUpperCase());
-    }
+  fetchPrimaryMap();
+  $(".primaryMapSelector").on("change", function () {
+    const tarId = $(this).val();
+    $(".primaryUpdateBtn").hide();
+    if (tarId == primaryMap.map._id) return false;
+    $(".primaryUpdateBtn").show();
+  });
+  $(".primaryUpdateBtn").on("click", () => {
+    const tarId = $(".primaryMapSelector").val();
+    if (tarId == primaryMap.map._id) return notyf.error("Map Already Selected");
+    $.post("/admin/map/primary", { mapId: tarId }, async (data) => {
+      if (data.success) {
+        await fetchPrimaryMap();
+        $(".primaryUpdateBtn").hide();
+        return notyf.success(`Map "${primaryMap.map.name}" set to Primary`);
+      }
+    });
   });
   $(".datatable.user").DataTable({
     paging: false,
@@ -622,6 +633,26 @@ document.addEventListener("DOMContentLoaded", () => {
     observer.observe(image);
   });
 });
+
+const fetchPrimaryMap = async () => {
+  try {
+    const data = await new Promise((resolve, reject) => {
+      $.get("/admin/map/primary", (data) => {
+        if (data.success) {
+          resolve(data);
+        } else {
+          reject(new Error("Failed to fetch primary map"));
+        }
+      });
+    });
+
+    primaryMap = data.primaryMap;
+    $(".primaryMapSelector").val(primaryMap.map._id);
+    $(".primary-map-card p").text(primaryMap.map.name.toUpperCase());
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 const renderProvince = () => {
   $.get("/auth/countries", (data) => {
