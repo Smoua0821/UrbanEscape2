@@ -7,9 +7,10 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
+  const user = await User.findOne({ email: req.user?.email });
   return res.render("pages/landing", {
-    user: req.user,
+    user: user,
   });
 });
 router.get("/map/:mapId", async (req, res) => {
