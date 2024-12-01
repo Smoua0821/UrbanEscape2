@@ -219,14 +219,16 @@ $(document).ready(() => {
   renderProvince();
   fetchPrimaryMap();
   $(".primaryMapSelector").on("change", function () {
+    if (!primaryMap.map) return $(".primaryUpdateBtn").show();
     const tarId = $(this).val();
     $(".primaryUpdateBtn").hide();
-    if (tarId == primaryMap.map._id) return false;
+    if (primaryMap.map && tarId == primaryMap.map._id) return false;
     $(".primaryUpdateBtn").show();
   });
   $(".primaryUpdateBtn").on("click", () => {
     const tarId = $(".primaryMapSelector").val();
-    if (tarId == primaryMap.map._id) return notyf.error("Map Already Selected");
+    if (primaryMap.map && tarId == primaryMap.map._id)
+      return notyf.error("Map Already Selected");
     $.post("/admin/map/primary", { mapId: tarId }, async (data) => {
       if (data.success) {
         await fetchPrimaryMap();
@@ -647,8 +649,10 @@ const fetchPrimaryMap = async () => {
     });
 
     primaryMap = data.primaryMap;
-    $(".primaryMapSelector").val(primaryMap.map._id);
-    $(".primary-map-card p").text(primaryMap.map.name.toUpperCase());
+    if (primaryMap.map) {
+      $(".primaryMapSelector").val(primaryMap.map._id);
+      $(".primary-map-card p").text(primaryMap.map.name.toUpperCase());
+    }
   } catch (error) {
     console.error(error);
   }
