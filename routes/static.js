@@ -84,13 +84,21 @@ router.get("/static/image/:id", async (req, res) => {
     const imgPath = path.join(__dirname, "../public/", data.image);
     fs.access(imgPath, fs.constants.F_OK, (err) => {
       if (err) {
+        console.error("Image not found:", imgPath);
         return res.status(404).send("Image not found");
       }
-      res.sendFile(imgPath);
+      res.sendFile(imgPath, (err) => {
+        if (err) {
+          console.error("Error sending file:", err.message);
+          return res
+            .status(500)
+            .send("An error occurred while sending the file");
+        }
+      });
     });
   } catch (error) {
-    console.log(error.message);
-    return res.send("An Error Occured!");
+    console.error("Unexpected error:", error.message);
+    return res.status(500).send("An error occurred!");
   }
 });
 
