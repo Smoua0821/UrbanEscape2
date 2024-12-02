@@ -163,6 +163,7 @@ iconMarker.width = 50;
 iconMarker.addEventListener("click", () => {
   InfoModal(polygonCoordinates[polyIndex]._id);
 });
+
 let polyIndex = 0;
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
@@ -342,6 +343,39 @@ function removeObjectByIndex(arr, index) {
   }
 }
 let isFirstTime = 1;
+let pendingPromise = 0;
+function getCurrentLocation() {
+  if (pendingPromise) return;
+  return new Promise((resolve, reject) => {
+    pendingPromise = 1;
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          pendingPromise = 0;
+          notyf.success("Location Updated!");
+          const { latitude, longitude } = position.coords;
+          pos.lat = latitude;
+          pos.lng = longitude;
+          nearestPolygon();
+          marker.position = pos;
+          marker.setMap(map);
+          map.panTo(pos);
+          resolve({ lat: latitude, lng: longitude });
+        },
+        (error) => {
+          // Error: reject with an error message
+          notyf.error("Can't get Location, Try Again!");
+          reject(new Error("Unable to retrieve location"));
+        }
+      );
+    } else {
+      // Reject if geolocation is not available
+      notyf.error("Can't get Location, Try Again!");
+      reject(new Error("Geolocation not supported by this browser"));
+    }
+  });
+}
+
 function updateCurrentLocation() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(

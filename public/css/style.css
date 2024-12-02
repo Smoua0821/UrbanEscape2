@@ -233,3 +233,27 @@ body {
 .infoBoxMarkimage {
   max-width: 400px !important;
 }
+
+.currentLocationBtn {
+  position: fixed;
+  z-index: 99;
+  right: 10px;
+  top: 10px;
+  background: #ffffff;
+  border: 2px solid #000000;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.currentLocationBtn img {
+  width: 50px;
+}
+
+.currentLocationBtn:hover {
+  padding: 5px;
+  top: 12.5px;
+  right: 12.5px;
+  filter: invert(1);
+}
