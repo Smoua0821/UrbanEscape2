@@ -171,6 +171,7 @@ $(".map-controller .save").click(() => {
   loopRouteOptions.mode = "new";
   loopRouteOptions.url = "/admin/looproute";
   loopRouteOptions.smessage = "New Route added successfully!";
+  $(".delRouteBtn").hide();
   if (isClosedPath) {
     $("#savePolyModal").modal("show");
   } else {
@@ -452,6 +453,7 @@ function renderRoutes() {
     loopRouteOptions.mode = "new";
     loopRouteOptions.url = "/admin/looproute";
     loopRouteOptions.smessage = "New Route added successfully!";
+    $(".delRouteBtn").hide();
     if (isClosedPath) {
       isClosedPath = 0;
       polyCoords = [];
@@ -510,6 +512,7 @@ function renderRoutes() {
         loopRouteOptions.url = "/admin/looproute/update";
         loopRouteOptions.smessage = "Route Updated Successfully!";
         console.log("Changed to YUpdate");
+        $(".delRouteBtn").show();
         $("#savePolyModal").modal("show");
         const tarObj = data.find((d) => d._id == path._id);
         if (!tarObj) return notyf.error("Something went Wrong!");
@@ -533,11 +536,23 @@ function renderRoutes() {
         payloadData.opacity = tarObj.opacity;
         payloadData.size = tarObj.size;
 
-        // $.post("/admin/looproute/delete", { routeId: path._id }, (data) => {
-        //   if (!data) return;
-        //   notyf.success(data.message);
-        //   renderRoutes();
-        // });
+        $(".delRouteBtn")
+          .off("click")
+          .on("click", () => {
+            if (path && path._id) {
+              $.post(
+                "/admin/looproute/delete",
+                { routeId: path._id },
+                (data) => {
+                  if (!data) return;
+                  notyf.success(data.message);
+                  renderRoutes();
+
+                  $("#savePolyModal").modal("hide");
+                }
+              );
+            }
+          });
       });
     });
   });
