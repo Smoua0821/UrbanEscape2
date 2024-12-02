@@ -122,6 +122,7 @@ $(".save_final").click(() => {
     payloadData.description
   ) {
     payloadData.polygonCoords = polyCoords;
+    payloadData.radius = radius;
     $.post(loopRouteOptions.url, payloadData, (success, data) => {
       if (success) {
         isClosedPath = 0;
