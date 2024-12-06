@@ -31,29 +31,29 @@ const loginPage = async (req, res) => {
 
 const loginValidate = async (req, res) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ email: email });
+  const user = await User.findOne({ email: email }).lean();
+
   if (!user) return res.render("pages/login", { error: "Invalid Email" });
-  let isMatched = 0;
-  if (email.toLowerCase() !== process.env.ADMIN_EMAIL) {
-    isMatched = await bcrypt.compare(password, user.password);
-    if (!isMatched)
-      return res.render("pages/login", { error: "Invalid Password" });
-  } else {
-    if (password !== process.env.ADMIN_PASS)
-      return res.render("pages/login", { error: "Invalid Password" });
-    isMatched = true;
-  }
-  const payload = user.toObject();
-  const token = await jwt.sign(payload, process.env.JWT_SECRET);
+
+  let isMatched =
+    email.toLowerCase() === process.env.ADMIN_EMAIL
+      ? password === process.env.ADMIN_PASS
+      : await bcrypt.compare(password, user.password);
+
+  if (!isMatched)
+    return res.render("pages/login", { error: "Invalid Password" });
+
+  const token = await jwt.sign(user, process.env.JWT_SECRET);
   res.cookie("sessionId", token, {
     maxAge: 1000 * 60 * 60 * 24,
     httpOnly: true,
     sameSite: "strict",
   });
-  if (user.role.current == "admin") return res.redirect("/admin");
-  const primaryMap = await PrimaryMap.findOne().populate("map");
-  if (primaryMap && primaryMap.map)
-    return res.redirect(`/map/${primaryMap.map.id}`);
+
+  if (user.role.current === "admin") return res.redirect("/admin");
+
+  const primaryMap = await PrimaryMap.findOne().populate("map").lean();
+  if (primaryMap?.map) return res.redirect(`/map/${primaryMap.map.id}`);
 };
 
 const newUser = async (req, res) => {
