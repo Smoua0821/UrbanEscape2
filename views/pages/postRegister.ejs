@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome!</title>
+  </head>
+  <body>
+    <div class="body <%= type %>">
+      <div class="content <%= type %>">
+        <h2><%= message %></h2>
+        <a class="myBtn <%= type %>" href="/login">Login Now</a>
+      </div>
+    </div>
+
+    <style>
+      .body {
+        width: 100%;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: sans-serif;
+        background: rgb(0, 0, 30);
+      }
+
+      .body.danger {
+        background: rgb(30, 0, 0);
+      }
+
+      .content {
+        width: 100%;
+        text-align: center;
+        background: linear-gradient(45deg, #00000063, #7d74ff91);
+        border: 2px solid #6970f9;
+        border-left: 0;
+        border-right: 0;
+        backdrop-filter: blur(5px);
+        color: white;
+        text-transform: uppercase;
+        user-select: none;
+        padding-bottom: 40px;
+      }
+
+      .content.danger {
+        background: linear-gradient(45deg, #00000063, #ff747491);
+        border-color: #f96969;
+      }
+
+      a.myBtn {
+        text-decoration: none;
+        color: white;
+        text-shadow: 0 0 BLACK;
+        -webkit-text-stroke: 0;
+        font-size: 1.2rem;
+        background: #000;
+        padding: 10px 15px;
+        border-radius: 10px;
+        border: 2px solid;
+        transition: 0.2s;
+      }
+
+      a.myBtn:hover {
+        background: white;
+        color: #1200ff;
+        box-shadow: 0 0 5px #1200ff;
+      }
+
+      a.myBtn.danger:hover {
+        background: white;
+        color: #ff0000;
+        box-shadow: 0 0 5px #cdb5b5;
+      }
+
+      h2 {
+        font-weight: 500;
+        padding: 10px 0;
+      }
+    </style>
+  </body>
+</html>

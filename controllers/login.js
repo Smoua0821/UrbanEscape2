@@ -65,16 +65,19 @@ const newUser = async (req, res) => {
     });
 
   if (!name || !email || !password || !state) {
-    return res
-      .status(400)
-      .json({ message: "All fields are required (name, email, password)." });
+    return res.status(400).render("pages/postRegister", {
+      message: "All fields are required",
+      type: "danger",
+    });
   }
 
   try {
     const existingUser = await User.findOne({ email: email });
     if (existingUser) {
-      return res.status(400).json({
+      return res.status(400).render("pages/postRegister", {
         message: "Email already in use. Please use a different email.",
+        type: "danger",
+        user: existingUser,
       });
     }
     const province = await Province.findOne({ name: state });
@@ -88,19 +91,21 @@ const newUser = async (req, res) => {
       password: hashedPassword,
       state: state,
     });
-    return res
-      .status(200)
-      .send("Account Created Please <a href='/auth'>Login</a>");
+    return res.status(200).render("pages/postRegister", {
+      message: "Account Created Successfully!",
+      type: "success",
+      user: newuser,
+    });
   } catch (err) {
     console.error(err);
     if (err.code === 11000) {
-      return res.status(400).json({
-        status: "error",
+      return res.status(400).render("pages/postRegister", {
+        type: "danger",
         message: "Email already exists. Please use a different email.",
       });
     }
-    return res.status(500).json({
-      status: "error",
+    return res.status(500).render("pages/postRegister", {
+      type: "danger",
       message:
         "An error occurred during account creation. Please try again later.",
     });
