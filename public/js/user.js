@@ -479,8 +479,11 @@ function animateMarker() {
   }
   // Repeat animation
   if (speed > 100) speed = 100;
-  if (speed < 10) speed = 10;
-  setTimeout(animateMarker, 1000 / speed);
+  if (speed < 0) speed = 0;
+  const moveTimer = setTimeout(animateMarker, 1000 / speed);
+  if (!speed) {
+    clearTimeout(moveTimer);
+  }
 }
 
 function haversineDistance(coords1, coords2) {
@@ -537,7 +540,7 @@ function startGaming() {
     notyf.error("No Route Found!");
     return false;
   }
-  speed = polygonCoordinates[polyIndex].speed * 10;
+  speed = polygonCoordinates[polyIndex].speed;
   nearestPolygon();
   map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
   circle.setMap(map);

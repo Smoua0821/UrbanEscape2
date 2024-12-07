@@ -41,10 +41,10 @@ const setCircleOpacity = (event) => {
 };
 const setMarkerSpeed = (event) => {
   speed = event.value;
-  if (speed < 1) {
-    event.value = 1;
-  } else if (speed > 10) {
-    event.value = 10;
+  if (speed < 0) {
+    event.value = 0;
+  } else if (speed > 100) {
+    event.value = 100;
   }
   speed = event.value;
   payloadData.speed = speed;
