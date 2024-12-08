@@ -3,6 +3,8 @@ const Map = require("../models/Map");
 const LoopRoute = require("../models/LoopRoute");
 const mongoose = require("mongoose");
 const PrimaryMap = require("../models/PrimaryMap");
+const RedeemLink = require("../models/RedeemLink");
+const { v4: uuidv4 } = require("uuid");
 function isSubset(smallArray, bigArray) {
   for (let i = 0; i < smallArray.length; i++) {
     const element = smallArray[i];
@@ -146,10 +148,25 @@ const routeRedeem = async (req, res) => {
         break;
       }
     }
+    let missionId = "6755735aafb9e17ecf3ce275";
+    const map = await Map.findOne({ id: mapId });
+    const tarObj = map?.missions.find((d) => d._id == missionId);
+    if (!tarObj) return res.status(400).json({ message: "No Mission found!" });
+    const { v4: uuidv4 } = require("uuid");
+    const newRedeemLink = new RedeemLink({
+      id: uuidv4(),
+      email: req.user.email,
+      link: tarObj.redeemLink,
+      accessed: 1,
+    });
+    const savedLink = await newRedeemLink.save();
     if (!isOkay) return res.status(405).json({ message: "Invalid Matching!" });
-    res
+    return res
       .status(200)
-      .json({ message: "Perfectly Done!", redeemLink: "https://google.com" });
+      .json({
+        message: "Perfectly Done!",
+        redeemLink: `/user/redeem/route/${savedLink.id}`,
+      });
   } catch (err) {
     console.error(err);
     res
