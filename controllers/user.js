@@ -160,6 +160,12 @@ const routeRedeem = async (req, res) => {
     });
     const savedLink = await newRedeemLink.save();
     if (!isOkay) return res.status(405).json({ message: "Invalid Matching!" });
+
+    await User.updateOne(
+      { email: req.user.email },
+      { $set: { capturedImages: profilePics.capturedImages } }
+    );
+
     return res.status(200).json({
       message: "Perfectly Done!",
       redeemLink: `/user/redeem/route/${savedLink.id}`,
@@ -219,12 +225,24 @@ const handleRecentMaps = async (req, res) => {
 };
 
 const redeemLinkHandler = async (req, res) => {
-  const { id } = req.params;
-  if (!id) return res.status(404).json({ message: "Parameters Required!" });
-  const link = await RedeemLink.findOne({ id: id });
-  if (!link || link.email !== req.user.email)
-    return res.status(400).json({ message: "Link Not Found" });
-  return res.status(200).json(link);
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ message: "Parameters Required!" });
+
+    const link = await RedeemLink.findOne({ id: id });
+    if (!link) return res.status(404).json({ message: "Link Not Found" });
+    if (link.email !== req.user.email)
+      return res.status(403).json({ message: "Unauthorized Access" });
+
+    const redirection = link.link;
+    await RedeemLink.deleteMany({ email: link.email });
+
+    return res.redirect(redirection);
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: err.message });
+  }
 };
 
 module.exports = {
