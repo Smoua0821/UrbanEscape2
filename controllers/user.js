@@ -222,7 +222,9 @@ const redeemLinkHandler = async (req, res) => {
   const { id } = req.params;
   if (!id) return res.status(404).json({ message: "Parameters Required!" });
   const link = await RedeemLink.findOne({ id: id });
-  return res.json(link);
+  if (!link || link.email !== req.user.email)
+    return res.status(400).json({ message: "Link Not Found" });
+  return res.status(200).json(link);
 };
 
 module.exports = {
