@@ -92,9 +92,9 @@ const getCaptureImage = async (req, res) => {
 
 const routeRedeem = async (req, res) => {
   try {
-    const { images, secrets, mapId } = req.body;
+    const { images, secrets, mapId, missionId } = req.body;
 
-    if (!images || !secrets) {
+    if (!images || !secrets || !mapId || !missionId) {
       return res
         .status(400)
         .json({ message: "Images and secrets are required" });
@@ -148,7 +148,6 @@ const routeRedeem = async (req, res) => {
         break;
       }
     }
-    let missionId = "6755735aafb9e17ecf3ce275";
     const map = await Map.findOne({ id: mapId });
     const tarObj = map?.missions.find((d) => d._id == missionId);
     if (!tarObj) return res.status(400).json({ message: "No Mission found!" });
@@ -161,12 +160,10 @@ const routeRedeem = async (req, res) => {
     });
     const savedLink = await newRedeemLink.save();
     if (!isOkay) return res.status(405).json({ message: "Invalid Matching!" });
-    return res
-      .status(200)
-      .json({
-        message: "Perfectly Done!",
-        redeemLink: `/user/redeem/route/${savedLink.id}`,
-      });
+    return res.status(200).json({
+      message: "Perfectly Done!",
+      redeemLink: `/user/redeem/route/${savedLink.id}`,
+    });
   } catch (err) {
     console.error(err);
     res

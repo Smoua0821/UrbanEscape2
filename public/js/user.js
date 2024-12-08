@@ -86,6 +86,7 @@ $(document).ready(() => {
           images: targetMission.images,
           secrets: selectedImages,
           mapId: mapParsedId,
+          missionId: targetMission._id,
         })
           .done(function (data, textStatus, xhr) {
             const response = xhr.responseJSON || {};
