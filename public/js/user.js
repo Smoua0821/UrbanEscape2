@@ -544,7 +544,6 @@ function nearestPolygon() {
     polyIndex = tmpaihjhsg.index;
   }
   if (polygonCoordinates.length == 0) return;
-  $(`img.mapPolyImage`).show();
   $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
   return tmpaihjhsg;
 }
