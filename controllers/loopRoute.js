@@ -30,7 +30,7 @@ async function fetchLoopRoutes(req, res) {
         const user = await User.findOne({ email: userO.email });
         if (user) {
           blockedImages = user.blockedImages;
-          if (user.email == process.env.ADMIN_EMAIL) return res.json(data);
+          // if (user.email == process.env.ADMIN_EMAIL) return res.json(data);
           imgexist = user.capturedImages.find((ci) => ci.mapId === map.id);
           if (!imgexist) imgexist = [];
         }
@@ -42,7 +42,6 @@ async function fetchLoopRoutes(req, res) {
   const filteredImages = data.filter(
     (d) => !imgexist.images?.includes(d._id) && !blockedImages.includes(d._id)
   );
-
   res.json(filteredImages);
 }
 
