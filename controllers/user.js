@@ -5,6 +5,11 @@ const mongoose = require("mongoose");
 const PrimaryMap = require("../models/PrimaryMap");
 const RedeemLink = require("../models/RedeemLink");
 const { v4: uuidv4 } = require("uuid");
+
+function findDifference(arr1, arr2) {
+  return arr1.filter((item) => !arr2.includes(item));
+}
+
 function isSubset(smallArray, bigArray) {
   for (let i = 0; i < smallArray.length; i++) {
     const element = smallArray[i];
@@ -84,6 +89,7 @@ const getCaptureImage = async (req, res) => {
   if (user) {
     imgexist = user.capturedImages.filter((ci) => ci.mapId === mapId);
     if (!imgexist) imgexist = [];
+    imgexist = findDifference(imgexist, user.blockedImages);
   }
   return res
     .status(200)
@@ -120,6 +126,7 @@ const routeRedeem = async (req, res) => {
     const imgAvailable = profilePics.capturedImages.find(
       (d) => d.mapId === mapId
     ).images;
+    const blockedImages = profilePics.blockedImages;
     if (!isSubset(secrets, imgAvailable))
       return res
         .status(400)
@@ -140,6 +147,11 @@ const routeRedeem = async (req, res) => {
     let isOkay = 1;
     for (let index = 0; index < data.length; index++) {
       const decimg = data[index].image.split("/");
+      if (blockedImages.includes(secrets[index])) {
+        isOkay = 0;
+        console.log(`Image already Redeemed, Please capture different Images!`);
+        break;
+      }
       if (decimg[decimg.length - 1] !== images[index]) {
         isOkay = 0;
         console.log(
@@ -147,6 +159,7 @@ const routeRedeem = async (req, res) => {
         );
         break;
       }
+      blockedImages.push(secrets[index]);
     }
     const map = await Map.findOne({ id: mapId });
     const tarObj = map?.missions.find((d) => d._id == missionId);
@@ -163,7 +176,12 @@ const routeRedeem = async (req, res) => {
 
     await User.updateOne(
       { email: req.user.email },
-      { $set: { capturedImages: profilePics.capturedImages } }
+      {
+        $set: {
+          capturedImages: profilePics.capturedImages,
+          blockedImages: blockedImages,
+        },
+      }
     );
 
     return res.status(200).json({

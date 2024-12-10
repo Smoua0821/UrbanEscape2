@@ -33,7 +33,7 @@ const UserSchema = new mongoose.Schema(
         ],
       },
     ],
-    blockedImages: [{ type: String }],
+    blockedImages: [{ type: String, default: [] }],
     role: {
       initial: {
         type: String,
