@@ -253,18 +253,27 @@ function initMap() {
           const errorMessage =
             data.message || "It seems You are not logged in, Please login";
           notyf.error(errorMessage);
-          setTimeout(() => {
-            return (window.location.href = "/auth");
-          }, 2000);
         }
       }
     ).fail((xhr, status, error) => {
       if (xhr.status == 302) {
-        // return (window.location.href = "/auth");
+        // No automatic redirect here unless it's specific code
       }
+
       const errorMessage =
         xhr.responseJSON?.message || "An unexpected error occurred.";
-      notyf.error(errorMessage);
+      const errorCode = xhr.responseJSON?.code;
+
+      if (errorCode === YOUR_SPECIFIC_ERROR_CODE) {
+        // Redirect only if specific error code is returned
+        setTimeout(() => {
+          window.location.href = "/auth";
+        }, 2000);
+      } else {
+        // Show server error message
+        notyf.error(errorMessage);
+      }
+
       let dCode = xhr.responseJSON?.code || 0;
       if (dCode == 1) {
         if (polygonCoordinates.length > 0) {
@@ -273,6 +282,7 @@ function initMap() {
         }
       }
     });
+
     nearestPolygon();
     if (!gameStarted) {
       gameStarted = 1;

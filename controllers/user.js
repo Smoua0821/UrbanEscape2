@@ -42,6 +42,9 @@ const captureImage = async (req, res) => {
   });
   if (!user) return res.redirect("/auth");
   let capturedImages = user.capturedImages;
+  let blockedImages = user.blockedImages;
+  if (blockedImages.includes(polyId))
+    return res.json({ message: "Already Redeemed!" });
   if (capturedImages.length == 0) {
     capturedImages.push({ mapId: mapId, images: [polyId] });
   } else {
