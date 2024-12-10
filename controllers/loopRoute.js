@@ -39,16 +39,10 @@ async function fetchLoopRoutes(req, res) {
       console.log(error);
     }
   }
-  const balle = [];
-  data.forEach((d) => {
-    if (!imgexist.images?.includes(d._id)) return balle.push(d);
-  });
-  const filteredImages = [];
-  balle.forEach((b) => {
-    if (!blockedImages.includes(b._id)) {
-      filteredImages.push(b);
-    }
-  });
+  const filteredImages = data.filter(
+    (d) => !imgexist.images?.includes(d._id) && !blockedImages.includes(d._id)
+  );
+
   res.json(filteredImages);
 }
 
