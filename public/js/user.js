@@ -22,7 +22,7 @@ function renderCapturedImage() {
     profileImages.forEach((img) => {
       if (selectedImages.includes(img)) return;
       $("div.captured_image").append(
-        `<div class='capturedUnitImage d-flex m-0 mb-2' data-id='${img}'><img src='/static/image/${img}' alt='${img}' width='100px'><div class="w-100 d-flex align-items-center justify-content-center"><button class='btn btn-primary w-100' data-id='${img}'>Select</button></div></div>`
+        `<div class='capturedUnitImage d-flex m-0 mb-2' data-id='${img}'><img src='/static/image/${img}' alt='${img}' width='100px'><div class="w-100 d-flex align-items-center justify-content-center"><button class='btn btn-primary w-50' data-id='${img}'>Select</button></div></div>`
       );
     });
     if ($(".captured_image")[0].childNodes.length == 0) {
