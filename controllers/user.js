@@ -4,7 +4,6 @@ const LoopRoute = require("../models/LoopRoute");
 const mongoose = require("mongoose");
 const PrimaryMap = require("../models/PrimaryMap");
 const RedeemLink = require("../models/RedeemLink");
-const { v4: uuidv4 } = require("uuid");
 
 function findDifference(arr1, arr2) {
   return arr1.filter((item) => !arr2.includes(item));
@@ -40,7 +39,7 @@ const captureImage = async (req, res) => {
   const user = await User.findOne({
     email: req.user.email,
   });
-  if (!user) return res.redirect("/auth");
+  if (!user) return res.status(369).redirect("/auth");
   let capturedImages = user.capturedImages;
   let blockedImages = user.blockedImages;
   if (blockedImages.includes(polyId))

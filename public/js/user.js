@@ -250,14 +250,17 @@ function initMap() {
             map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
           }
         } else {
-          const errorMessage =
-            data.message || "It seems You are not logged in, Please login";
-          notyf.error(errorMessage);
+          if (xhr.status == 369) {
+            const errorMessage =
+              data.message || "It seems You are not logged in, Please login";
+            notyf.error(errorMessage);
+            window.location.href = "/auth";
+          }
         }
       }
     ).fail((xhr, status, error) => {
-      if (xhr.status == 302) {
-        // No automatic redirect here unless it's specific code
+      if (xhr.status == 369) {
+        window.location.href = "/auth";
       }
 
       const errorMessage =
