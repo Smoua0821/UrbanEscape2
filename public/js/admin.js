@@ -336,6 +336,17 @@ $(document).ready(() => {
     if (linkId == "routes") {
       if (!mapId) return notyf.error("Choose a Valid Map!");
       renderRoutes();
+    } else if (linkId == "setting") {
+      $(".managed-image").empty();
+      const targetImgs = $(".icon-container img");
+      for (let index = 0; index < targetImgs.length; index++) {
+        const img = targetImgs[index];
+        $(".managed-image").append(
+          `<div class='col-md-3 col-sm-4 col-6'><div class='img-thumbnail'><img width='100%' src='${
+            img.src ? img.src : img.getAttribute("data-src")
+          }' alt='Placeholder images'/></div></div>`
+        );
+      }
     }
     $(".vj_dynamic").hide();
     $(`.vj_dynamic.${linkId}`).fadeIn();
