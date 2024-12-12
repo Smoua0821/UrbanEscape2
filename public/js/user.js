@@ -50,6 +50,7 @@ function renderCapturedImage() {
         $(`.image-picker[data-id='${boxIndex}']`).removeClass("image-picker");
         if (targetMission.images.length == selectedImages.length) {
           $(".redeem-action-bar").show();
+          $(".placeholder-div-redeem").hide();
         }
       });
   }
@@ -76,6 +77,7 @@ $(document).ready(() => {
       return $(".mission-interface").hide(() => {
         $(".missions-list").fadeIn();
       });
+    $(".placeholder-div-redeem").show();
     $("button.btn.redeembtn")
       .off("click")
       .on("click", function () {
