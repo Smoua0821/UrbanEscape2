@@ -341,12 +341,21 @@ $(document).ready(() => {
       const targetImgs = $(".icon-container img");
       for (let index = 0; index < targetImgs.length; index++) {
         const img = targetImgs[index];
+        const src = img.getAttribute("data-src");
         $(".managed-image").append(
-          `<div class='col-md-3 col-sm-4 col-6'><div class='img-thumbnail'><img width='100%' src='${
-            img.src ? img.src : img.getAttribute("data-src")
-          }' alt='Placeholder images'/></div></div>`
+          `<div class='col-md-3 col-sm-4 col-6'><div class='img-thumbnail' data-src='${src}'><img width='100%' src='${src}' alt='Placeholder images'/></div></div>`
         );
       }
+      $(".managed-image .img-thumbnail")
+        .off("click")
+        .on("click", function () {
+          const dataSrc = $(this).data("src");
+          if (!dataSrc) return notyf.error("Can't Delete the Image!");
+          if (!confirm("Are you Sure?")) return;
+          mapId = null;
+          notyf.success(dataSrc);
+          $(this).remove();
+        });
     }
     $(".vj_dynamic").hide();
     $(`.vj_dynamic.${linkId}`).fadeIn();
