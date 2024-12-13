@@ -21,6 +21,7 @@ const {
   saveLoopRoutes,
   deleteRoute,
   uploadImage,
+  deleteImage,
   updateLoopRoutes,
 } = require("../controllers/loopRoute");
 
@@ -42,6 +43,7 @@ router.post("/looproute", saveLoopRoutes);
 router.post("/looproute/delete", deleteRoute);
 router.post("/looproute/update", updateLoopRoutes);
 router.post("/looproute/image", upload.single("image"), uploadImage);
+router.post("/looproute/image/delete", deleteImage);
 
 router.post("/delete/:id", deleteUser);
 

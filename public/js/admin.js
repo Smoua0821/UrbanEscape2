@@ -339,23 +339,41 @@ $(document).ready(() => {
     } else if (linkId == "setting") {
       $(".managed-image").empty();
       const targetImgs = $(".icon-container img");
-      for (let index = 0; index < targetImgs.length; index++) {
-        const img = targetImgs[index];
-        const src = img.getAttribute("data-src");
-        $(".managed-image").append(
-          `<div class='col-md-3 col-sm-4 col-6'><div class='img-thumbnail' data-src='${src}'><img width='100%' src='${src}' alt='Placeholder images'/></div></div>`
+      if (targetImgs.length == 0) {
+        $(".managed-image").html(
+          "<div class='alert alert-warning text-center'>No Image exists!</div>"
         );
+      } else {
+        for (let index = 0; index < targetImgs.length; index++) {
+          const img = targetImgs[index];
+          const src = img.getAttribute("data-src");
+          $(".managed-image").append(
+            `<div class='col-md-3 col-sm-4 col-6'><div class='img-thumbnail' data-src='${src}'><img width='100%' src='${src}' alt='Placeholder images'/></div></div>`
+          );
+        }
+        $(".managed-image .img-thumbnail")
+          .off("click")
+          .on("click", function () {
+            const dataSrc = $(this).data("src");
+            if (!dataSrc) return notyf.error("Can't Delete the Image!");
+            if (!confirm("Are you Sure?")) return;
+            $.post(
+              "/admin/looproute/image/delete",
+              { dataImg: dataSrc },
+              (data) => {
+                if (data.status != "success")
+                  return notyf.error("Something went wrong!");
+                mapId = null;
+                notyf.success(data.message);
+                $(this).remove();
+                notyf.success("Refreshing in 3 seconds!");
+                setTimeout(() => {
+                  window.location.reload();
+                }, 3000);
+              }
+            );
+          });
       }
-      $(".managed-image .img-thumbnail")
-        .off("click")
-        .on("click", function () {
-          const dataSrc = $(this).data("src");
-          if (!dataSrc) return notyf.error("Can't Delete the Image!");
-          if (!confirm("Are you Sure?")) return;
-          mapId = null;
-          notyf.success(dataSrc);
-          $(this).remove();
-        });
     }
     $(".vj_dynamic").hide();
     $(`.vj_dynamic.${linkId}`).fadeIn();

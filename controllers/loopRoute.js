@@ -151,10 +151,35 @@ const uploadImage = async (req, res) => {
 
   res.json({ imageName: req.file.filename });
 };
+
+const deleteImage = async (req, res) => {
+  const { dataImg } = req.body;
+  if (!dataImg)
+    return res.status(400).json({ message: "Missing required parameters" });
+
+  try {
+    await LoopRoute.deleteMany({ image: dataImg });
+    const imgLoc = path.join(__dirname, "../public", dataImg);
+    if (fs.existsSync(imgLoc)) {
+      fs.unlinkSync(imgLoc);
+      return res.json({
+        status: "success",
+        message: "Image Deleted Successfully!",
+      });
+    } else {
+      return res.status(404).json({ message: `${imgLoc} File does not exist` });
+    }
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
+
 module.exports = {
   fetchLoopRoutes,
   saveLoopRoutes,
   deleteRoute,
   uploadImage,
+  deleteImage,
   updateLoopRoutes,
 };
