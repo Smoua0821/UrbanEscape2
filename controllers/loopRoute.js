@@ -175,11 +175,36 @@ const deleteImage = async (req, res) => {
   }
 };
 
+const deleteImageAll = async (req, res) => {
+  await LoopRoute.deleteMany({});
+  const imgLoc = path.join(__dirname, "../public/images/mapicons/");
+  fs.rm(imgLoc, { recursive: true, force: true }, (err) => {
+    if (err) {
+      console.error("Error deleting directory:", err);
+      return;
+    }
+
+    console.log("Directory deleted successfully.");
+    fs.mkdir(imgLoc, (err) => {
+      if (err) {
+        console.error("Error creating directory:", err);
+      } else {
+        console.log("Directory recreated successfully.");
+      }
+    });
+  });
+  return res.json({
+    status: "success",
+    message: "Deleted all the Images and Routes Successfully!",
+  });
+};
+
 module.exports = {
   fetchLoopRoutes,
   saveLoopRoutes,
   deleteRoute,
   uploadImage,
   deleteImage,
+  deleteImageAll,
   updateLoopRoutes,
 };

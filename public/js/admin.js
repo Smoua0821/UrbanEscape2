@@ -374,6 +374,30 @@ $(document).ready(() => {
             );
           });
       }
+      if (targetImgs.length > 1) {
+        $(".imageCleanerBtn").show();
+        $(".imageCleanerBtn")
+          .off("click")
+          .on("click", () => {
+            if (
+              !confirm(
+                "All Image and All Routes will be deleted! Are you sure?"
+              )
+            )
+              return;
+
+            $.post("/admin/looproute/image/delete/all", (data) => {
+              if (data.status && data.status == "success") {
+                notyf.success(data.message);
+                notyf.success("Refreshing in 3 seconds!");
+                setTimeout(() => {
+                  window.location.reload();
+                }, 3000);
+                return false;
+              }
+            });
+          });
+      }
     }
     $(".vj_dynamic").hide();
     $(`.vj_dynamic.${linkId}`).fadeIn();
