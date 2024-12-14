@@ -1,6 +1,28 @@
 function voeed() {
   return true;
 }
+
+let checkpoints = JSON.parse(localStorage.getItem("checkpoints")) || [];
+function addCoords(mapId, polyId, coords) {
+  let map = checkpoints.find((m) => m.mapId === mapId);
+  const lat = coords.lat;
+  const lng = coords.lng;
+  if (!map) {
+    map = { mapId, polygons: [] };
+    checkpoints.push(map);
+  }
+
+  let polygon = map.polygons.find((p) => p.polyId === polyId);
+  if (!polygon) {
+    polygon = { polyId, lat, lng };
+    map.polygons.push(polygon);
+  }
+
+  polygon.lat = coords.lat;
+  polygon.lng = coords.lng;
+  localStorage.setItem("checkpoints", JSON.stringify(checkpoints));
+}
+
 let mapParsedId = document.getElementById("mapParsedId").value;
 let notyf;
 let circleOpacity = 100;
@@ -457,6 +479,7 @@ function gameWon() {
   return notyf.success("You Won the Game!");
 }
 function animateMarker() {
+  if (!polygonCoordinates[polyIndex]) return;
   $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
   const urlParsed = new URL(iconMarker.src);
   if (polygonCoordinates.length == 0) return gameWon();
@@ -500,6 +523,11 @@ function animateMarker() {
   if (!speed) {
     clearTimeout(moveTimer);
   }
+  addCoords(
+    mapParsedId,
+    polygonCoordinates[polyIndex]._id,
+    polygonCoordinates[polyIndex].polygonCoords[currentSegment]
+  );
 }
 
 function haversineDistance(coords1, coords2) {
