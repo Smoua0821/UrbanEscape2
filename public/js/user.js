@@ -263,91 +263,98 @@ function initMap() {
       InfoModal(polygonCoordinates[polyIndex]._id);
       return console.log("Your live Location is Outside Circle");
     }
-    console.log(
-      `From You: ${clickDist}   From Click: ${clickDist2}  Radii: ${
-        circle.getRadius() / 1000
-      }`
-    );
-    const ImgPath = iconMarker.src.split("/");
-    $("#CapturedImagePopUp img").attr(
-      "src",
-      `/images/mapicons/${ImgPath[ImgPath.length - 1]}`
-    );
-    const polyId = polygonCoordinates[polyIndex]._id;
-    $.post(
-      "/user/profile/capture",
-      { mapId: mapParsedId, polyId: polyId },
-      (data, status, xhr) => {
-        if (
-          status === "success" &&
-          data.message === "Image Captured successfully!"
-        ) {
-          const checkpointIndex = checkpoints.findIndex(
-            (d) => d.mapId === mapParsedId
-          );
-          if (checkpointIndex !== -1) {
-            const polygonIndex = checkpoints[
-              checkpointIndex
-            ].polygons?.findIndex((d) => d.polyId === polyId);
-            if (polygonIndex !== -1) {
-              checkpoints[checkpointIndex].polygons.splice(polygonIndex, 1);
-              localStorage.setItem("checkpoints", checkpoints);
+    $(".confirmCaptureContainer").show();
+    $(".confirmCaptureContainer button.confirmCapture")
+      .off("click")
+      .on("click", () => {
+        console.log(
+          `From You: ${clickDist}   From Click: ${clickDist2}  Radii: ${
+            circle.getRadius() / 1000
+          }`
+        );
+        const ImgPath = iconMarker.src.split("/");
+        $("#CapturedImagePopUp img").attr(
+          "src",
+          `/images/mapicons/${ImgPath[ImgPath.length - 1]}`
+        );
+        const polyId = polygonCoordinates[polyIndex]._id;
+        $.post(
+          "/user/profile/capture",
+          { mapId: mapParsedId, polyId: polyId },
+          (data, status, xhr) => {
+            if (
+              status === "success" &&
+              data.message === "Image Captured successfully!"
+            ) {
+              $(".confirmCaptureContainer").hide();
+              const checkpointIndex = checkpoints.findIndex(
+                (d) => d.mapId === mapParsedId
+              );
+              if (checkpointIndex !== -1) {
+                const polygonIndex = checkpoints[
+                  checkpointIndex
+                ].polygons?.findIndex((d) => d.polyId === polyId);
+                if (polygonIndex !== -1) {
+                  checkpoints[checkpointIndex].polygons.splice(polygonIndex, 1);
+                  localStorage.setItem("checkpoints", checkpoints);
+                }
+              }
+
+              profileImages.push(polyId);
+              $("#CapturedImagePopUp").fadeIn();
+              $("#bsModalTitle").text(data.title);
+              $("#captureMessage").text(data.message);
+              $("#bsModal").modal("show");
+              if (polygonCoordinates.length > 0) {
+                removeObjectByIndex(polygonCoordinates, polyIndex);
+                if (polygonCoordinates.length == 0) return gameWon();
+                polyIndex = nearestPolygon().index;
+                map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
+              }
+            } else {
+              if (xhr.status == 369) {
+                const errorMessage =
+                  data.message ||
+                  "It seems You are not logged in, Please login";
+                notyf.error(errorMessage);
+                window.location.href = "/auth";
+              }
             }
           }
-
-          profileImages.push(polyId);
-          $("#CapturedImagePopUp").fadeIn();
-          $("#bsModalTitle").text(data.title);
-          $("#captureMessage").text(data.message);
-          $("#bsModal").modal("show");
-          if (polygonCoordinates.length > 0) {
-            removeObjectByIndex(polygonCoordinates, polyIndex);
-            if (polygonCoordinates.length == 0) return gameWon();
-            polyIndex = nearestPolygon().index;
-            map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
-          }
-        } else {
+        ).fail((xhr, status, error) => {
           if (xhr.status == 369) {
-            const errorMessage =
-              data.message || "It seems You are not logged in, Please login";
-            notyf.error(errorMessage);
             window.location.href = "/auth";
           }
+
+          const errorMessage =
+            xhr.responseJSON?.message || "An unexpected error occurred.";
+          const errorCode = xhr.responseJSON?.code;
+
+          if (errorCode === YOUR_SPECIFIC_ERROR_CODE) {
+            // Redirect only if specific error code is returned
+            setTimeout(() => {
+              window.location.href = "/auth";
+            }, 2000);
+          } else {
+            // Show server error message
+            notyf.error(errorMessage);
+          }
+
+          let dCode = xhr.responseJSON?.code || 0;
+          if (dCode == 1) {
+            if (polygonCoordinates.length > 0) {
+              removeObjectByIndex(polygonCoordinates, polyIndex);
+              polyIndex = nearestPolygon().index;
+            }
+          }
+        });
+
+        nearestPolygon();
+        if (!gameStarted) {
+          gameStarted = 1;
+          startGaming();
         }
-      }
-    ).fail((xhr, status, error) => {
-      if (xhr.status == 369) {
-        window.location.href = "/auth";
-      }
-
-      const errorMessage =
-        xhr.responseJSON?.message || "An unexpected error occurred.";
-      const errorCode = xhr.responseJSON?.code;
-
-      if (errorCode === YOUR_SPECIFIC_ERROR_CODE) {
-        // Redirect only if specific error code is returned
-        setTimeout(() => {
-          window.location.href = "/auth";
-        }, 2000);
-      } else {
-        // Show server error message
-        notyf.error(errorMessage);
-      }
-
-      let dCode = xhr.responseJSON?.code || 0;
-      if (dCode == 1) {
-        if (polygonCoordinates.length > 0) {
-          removeObjectByIndex(polygonCoordinates, polyIndex);
-          polyIndex = nearestPolygon().index;
-        }
-      }
-    });
-
-    nearestPolygon();
-    if (!gameStarted) {
-      gameStarted = 1;
-      startGaming();
-    }
+      });
   });
   markerElement = new google.maps.marker.AdvancedMarkerElement({
     position: pos,
