@@ -217,6 +217,13 @@ function saveMission() {
   );
 }
 $(document).ready(() => {
+  $(".deleteNewMapMarker").click(() => {
+    if (!confirm("Are you sure?")) return;
+    $.post("/admin/map/marker/delete", (data) => {
+      notyf.success(data.message);
+      $("img.markerPreview").attr("src", "/images/map_marker.png");
+    });
+  });
   $(".uploadNewMapMarker").click(() => {
     var inputFile = $(
       '<input type="file" accept="image/*" style="display: none;">'

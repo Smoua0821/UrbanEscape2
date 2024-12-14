@@ -17,6 +17,7 @@ const {
   handlePrimaryMap,
   changeMarker,
   getMarkerImage,
+  deleteMarkerImage,
 } = require("../controllers/admin");
 const {
   fetchLoopRoutes,
@@ -64,6 +65,7 @@ const storageMarker = multer.diskStorage({
 const uploadMarker = multer({ storage: storageMarker });
 
 router.post("/map/marker", uploadMarker.single("image"), changeMarker);
+router.post("/map/marker/delete", deleteMarkerImage);
 router.get("/map/marker", getMarkerImage);
 
 router.post("/delete/:id", deleteUser);

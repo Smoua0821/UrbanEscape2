@@ -464,6 +464,13 @@ const getMarkerImage = async (req, res) => {
   );
 };
 
+const deleteMarkerImage = async (req, res) => {
+  const marker = await Setting.findOneAndDelete({ name: "mapMarker" });
+  if (!marker) return res.json({ message: "No Marker Exists" });
+  fs.unlinkSync(path.join(__dirname, "../public/images", marker.content));
+  return res.json({ message: "Marker set to Default!" });
+};
+
 module.exports = {
   adminPage,
   deleteUser,
@@ -479,4 +486,5 @@ module.exports = {
   handlePrimaryMap,
   changeMarker,
   getMarkerImage,
+  deleteMarkerImage,
 };
