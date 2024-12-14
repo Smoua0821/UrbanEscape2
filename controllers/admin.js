@@ -21,7 +21,6 @@ const cleanUp = async (rawId, mapId) => {
       { "capturedImages.mapId": mapId },
       { $pull: { capturedImages: { mapId: mapId } } }
     );
-    console.log(deletionResult);
   } catch (err) {
     console.error("Error Cleanup: ", err);
   }
