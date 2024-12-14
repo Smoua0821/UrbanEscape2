@@ -547,6 +547,7 @@ function nearestPolygon() {
   }
   if (polygonCoordinates.length == 0) return;
   $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
+  speed = polygonCoordinates[polyIndex].speed;
   return tmpaihjhsg;
 }
 function startGaming() {
