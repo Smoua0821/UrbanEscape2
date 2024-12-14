@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const PrimaryMap = require("./PrimaryMap");
 
 const mapSchema = new mongoose.Schema(
   {
@@ -44,18 +43,6 @@ const mapSchema = new mongoose.Schema(
 );
 
 mapSchema.index({ id: 1 });
-mapSchema.post("deleteOne", async function (doc) {
-  try {
-    const primaryMap = await PrimaryMap.findOne({ map: doc._id });
-
-    if (primaryMap) {
-      await primaryMap.deleteOne();
-      console.log(`PrimaryMap deleted because the associated Map was deleted.`);
-    }
-  } catch (err) {
-    console.error("Error deleting PrimaryMap:", err);
-  }
-});
 
 const Map = mongoose.model("Map", mapSchema);
 

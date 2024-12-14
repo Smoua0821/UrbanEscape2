@@ -25,8 +25,10 @@ const userProfile = async (req, res) => {
   const user = await User.findOne({ email: req.user.email });
   if (!user) return res.redirect("/logout");
   const primaryMapdata = await PrimaryMap.findOne().populate("map");
+  const capturedImages = user.capturedImages;
   return res.render("pages/profile", {
     user: user,
+    capturedImages: capturedImages,
     primaryMap: primaryMapdata,
   });
 };

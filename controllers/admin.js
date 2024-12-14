@@ -8,6 +8,25 @@ const LoopRoute = require("../models/LoopRoute");
 const Map = require("../models/Map");
 const PrimaryMap = require("../models/PrimaryMap");
 
+const cleanUp = async (rawId, mapId) => {
+  try {
+    const primaryMap = await PrimaryMap.findOne({ map: rawId });
+
+    if (primaryMap) {
+      await primaryMap.deleteOne();
+      console.log(`PrimaryMap deleted because the associated Map was deleted.`);
+    }
+
+    const deletionResult = await User.updateMany(
+      { "capturedImages.mapId": mapId },
+      { $pull: { capturedImages: { mapId: mapId } } }
+    );
+    console.log(deletionResult);
+  } catch (err) {
+    console.error("Error Cleanup: ", err);
+  }
+};
+
 async function adminPage(req, res) {
   const user = req.user;
   if (user.role.current !== "admin") return res.end("Unauthorized!");
@@ -117,6 +136,7 @@ const deleteMap = async (req, res) => {
       return res.status(404).json({ status: "error", message: "No Map Found" });
     await Map.deleteOne({ id: mapId });
     await LoopRoute.deleteMany({ mapId: map._id });
+    cleanUp(map._id, mapId);
     return res
       .status(200)
       .status(200)
