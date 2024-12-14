@@ -2,11 +2,13 @@ function voeed() {
   return true;
 }
 
+if (localStorage.checkpoints == "[object Object]")
+  localStorage.checkpoints = "[]";
+
 let checkpoints = JSON.parse(localStorage.getItem("checkpoints")) || [];
-function addCoords(mapId, polyId, coords) {
+
+function addCoords(mapId, polyId, segment) {
   let map = checkpoints.find((m) => m.mapId === mapId);
-  const lat = coords.lat;
-  const lng = coords.lng;
   if (!map) {
     map = { mapId, polygons: [] };
     checkpoints.push(map);
@@ -14,13 +16,26 @@ function addCoords(mapId, polyId, coords) {
 
   let polygon = map.polygons.find((p) => p.polyId === polyId);
   if (!polygon) {
-    polygon = { polyId, lat, lng };
+    polygon = { polyId, segment };
     map.polygons.push(polygon);
   }
 
-  polygon.lat = coords.lat;
-  polygon.lng = coords.lng;
+  polygon.segment = segment;
   localStorage.setItem("checkpoints", JSON.stringify(checkpoints));
+}
+
+function getLastCoords() {
+  if (!localStorage.checkpoints) return 0;
+  const checkpoints = JSON.parse(localStorage.checkpoints);
+  if (!checkpoints || checkpoints.length == 0) return 0;
+
+  const maps = checkpoints.find((d) => d.mapId === mapParsedId);
+  if (!maps) return 0;
+  const polygon = maps.polygons.find(
+    (p) => p.polyId === polygonCoordinates[polyIndex]._id
+  );
+  if (!polygon) return 0;
+  return polygon.segment;
 }
 
 let mapParsedId = document.getElementById("mapParsedId").value;
@@ -29,6 +44,7 @@ let circleOpacity = 100;
 let selectedImages = [];
 let targetMission = [];
 let boxIndex = 0;
+readyToSaveCheckpoint = 0;
 let profileImages = [];
 let isFirstTimeFetchProfilePicture = 1;
 const capturedPolygons = [];
@@ -262,6 +278,19 @@ function initMap() {
           status === "success" &&
           data.message === "Image Captured successfully!"
         ) {
+          const checkpointIndex = checkpoints.findIndex(
+            (d) => d.mapId === mapParsedId
+          );
+          if (checkpointIndex !== -1) {
+            const polygonIndex = checkpoints[
+              checkpointIndex
+            ].polygons?.findIndex((d) => d.polyId === polyId);
+            if (polygonIndex !== -1) {
+              checkpoints[checkpointIndex].polygons.splice(polygonIndex, 1);
+              localStorage.setItem("checkpoints", checkpoints);
+            }
+          }
+
           profileImages.push(polyId);
           $("#CapturedImagePopUp").fadeIn();
           $("#bsModalTitle").text(data.title);
@@ -523,11 +552,9 @@ function animateMarker() {
   if (!speed) {
     clearTimeout(moveTimer);
   }
-  addCoords(
-    mapParsedId,
-    polygonCoordinates[polyIndex]._id,
-    polygonCoordinates[polyIndex].polygonCoords[currentSegment]
-  );
+  if (readyToSaveCheckpoint) {
+    addCoords(mapParsedId, polygonCoordinates[polyIndex]._id, currentSegment);
+  }
 }
 
 function haversineDistance(coords1, coords2) {
@@ -570,8 +597,13 @@ function nearestPolygon() {
       }
     });
   }
+  if (!readyToSaveCheckpoint) {
+    currentSegment = getLastCoords();
+    readyToSaveCheckpoint = 1;
+  }
   if (polyIndex != tmpaihjhsg.index) {
     polyIndex = tmpaihjhsg.index;
+    currentSegment = getLastCoords();
   }
   if (polygonCoordinates.length == 0) return;
   $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
@@ -579,6 +611,7 @@ function nearestPolygon() {
   return tmpaihjhsg;
 }
 function startGaming() {
+  if (!polygonCoordinates[polyIndex]?._id) return;
   $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
   if (polygonCoordinates && polygonCoordinates.length == 0) {
     notyf.error("No Route Found!");
