@@ -15,6 +15,7 @@ const {
   exportExcel,
   fetchPrimaryMap,
   handlePrimaryMap,
+  changeMarker,
 } = require("../controllers/admin");
 const {
   fetchLoopRoutes,
@@ -46,6 +47,22 @@ router.post("/looproute/update", updateLoopRoutes);
 router.post("/looproute/image", upload.single("image"), uploadImage);
 router.post("/looproute/image/delete", deleteImage);
 router.post("/looproute/image/delete/all", deleteImageAll);
+
+const storageMarker = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./public/images");
+  },
+  filename: function (req, file, cb) {
+    const randomName = "marker_" + Date.now();
+    const extname = path.extname(file.originalname);
+    const newFilename = randomName + extname;
+
+    cb(null, newFilename);
+  },
+});
+const uploadMarker = multer({ storage: storageMarker });
+
+router.post("/map/marker", uploadMarker.single("image"), changeMarker);
 
 router.post("/delete/:id", deleteUser);
 

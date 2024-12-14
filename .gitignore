@@ -1,5 +1,5 @@
 public/images/mapicons/
-
+marker_*.*
 # Node modules
 node_modules/
 

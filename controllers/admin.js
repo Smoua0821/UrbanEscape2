@@ -7,6 +7,7 @@ const User = require("../models/User");
 const LoopRoute = require("../models/LoopRoute");
 const Map = require("../models/Map");
 const PrimaryMap = require("../models/PrimaryMap");
+const Setting = require("../models/Settings");
 
 const cleanUp = async (rawId, mapId) => {
   try {
@@ -410,6 +411,44 @@ const handlePrimaryMap = async (req, res) => {
   }
 };
 
+const changeMarker = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        status: "error",
+        message: "No file uploaded",
+      });
+    }
+
+    const randomFilename = req.file.filename;
+    const marker = await Setting.findOneAndDelete({ name: "mapMarker" });
+
+    if (marker) {
+      const filePath = path.join(
+        __dirname,
+        "../public",
+        "images",
+        marker.content
+      );
+      fs.unlinkSync(filePath);
+    }
+    await Setting.create({ name: "mapMarker", content: randomFilename });
+
+    return res.json({
+      status: "success",
+      filename: randomFilename,
+      message: "Marker Updated Successfully!",
+    });
+  } catch (err) {
+    console.error("Error updating marker:", err);
+    return res.status(500).json({
+      status: "error",
+      message: "An error occurred while updating the marker.",
+      error: err.message,
+    });
+  }
+};
+
 module.exports = {
   adminPage,
   deleteUser,
@@ -423,4 +462,5 @@ module.exports = {
   exportExcel,
   fetchPrimaryMap,
   handlePrimaryMap,
+  changeMarker,
 };

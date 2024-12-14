@@ -217,6 +217,43 @@ function saveMission() {
   );
 }
 $(document).ready(() => {
+  $(".uploadNewMapMarker").click(() => {
+    var inputFile = $(
+      '<input type="file" accept="image/*" style="display: none;">'
+    );
+    $("body").append(inputFile);
+
+    inputFile.click();
+    inputFile.on("change", function (event) {
+      var file = event.target.files[0];
+
+      if (!file) {
+        console.log("No file selected");
+        return;
+      }
+
+      var formData = new FormData();
+      formData.append("image", file);
+
+      $.ajax({
+        url: "/admin/map/marker",
+        type: "POST",
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function (response) {
+          notyf.success("Marker Changed");
+          $("img.markerPreview").attr("src", "/images/" + response.filename);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.error("Error uploading file: ", errorThrown);
+        },
+        complete: function () {
+          inputFile.remove();
+        },
+      });
+    });
+  });
   fetchMaps();
   renderProvince();
   fetchPrimaryMap();
