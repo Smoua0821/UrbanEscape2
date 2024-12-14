@@ -449,6 +449,21 @@ const changeMarker = async (req, res) => {
   }
 };
 
+const getMarkerImage = async (req, res) => {
+  const defaultImage = path.join(
+    __dirname,
+    "..",
+    "public",
+    "images",
+    "map_marker.png"
+  );
+  const MapMarker = await Setting.findOne({ name: "mapMarker" });
+  if (!MapMarker) return res.sendFile(defaultImage);
+  return res.sendFile(
+    path.join(__dirname, "../public/images", MapMarker.content)
+  );
+};
+
 module.exports = {
   adminPage,
   deleteUser,
@@ -463,4 +478,5 @@ module.exports = {
   fetchPrimaryMap,
   handlePrimaryMap,
   changeMarker,
+  getMarkerImage,
 };
