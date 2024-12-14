@@ -219,9 +219,13 @@ function initMap() {
       mapTypeIds: ["roadmap", "satellite", "terrain"], // Specify map types
     },
   });
+  const defaultMarkerIcon = document.createElement("img");
+  defaultMarkerIcon.src = "/admin/map/marker";
+  defaultMarkerIcon.width = "50";
 
   marker = new google.maps.marker.AdvancedMarkerElement({
     position: pos,
+    content: defaultMarkerIcon,
   });
 
   $.get("/user/profile/capture", { mapId: mapParsedId }, (data) => {
