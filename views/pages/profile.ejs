@@ -40,6 +40,65 @@
         width: 100%;
       }
 
+      .logoutContainer {
+        position: fixed;
+        bottom: 10px;
+        text-align: center;
+      }
+
+      .vjBtn {
+        width: min-content;
+        text-decoration: none;
+        overflow: hidden;
+        color: white;
+        display: block;
+        padding: 5px 10px;
+        border-radius: 5px;
+        text-transform: uppercase;
+        background: #a70000;
+        border: 2px solid red;
+        transition: 0.2s;
+        position: relative;
+      }
+
+      .vjBtn:hover {
+        padding: 10px 20px;
+      }
+
+      .vjBtn.rlc:before,
+      .vjBtn.rlc:after {
+        content: "Are you Sure?";
+        position: absolute;
+        font-size: 10px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        background: #ffffff;
+        color: red;
+        top: 0;
+        width: 200%;
+        height: 100%;
+        border-radius: 50px;
+        transition: 0.5s;
+      }
+
+      .vjBtn.rlc:before {
+        left: -200%;
+        content: "";
+      }
+
+      .vjBtn.rlc:after {
+        left: 100%;
+      }
+
+      .vjBtn.rlc:hover:before {
+        left: -50%;
+      }
+
+      .vjBtn.rlc:hover:after {
+        left: -50%;
+      }
+
       @keyframes circularShadow {
         0%,
         100% {
@@ -86,7 +145,6 @@
             </table>
             <div class="link-container mt-3 text-center">
               <a href="/" class="btn btn-primary">Home</a>
-              <a href="/logout" class="btn ms-2 btn-danger">Logout</a>
               <% if (locals.primaryMap && primaryMap.map && primaryMap.map.id) {
               %>
               <a
@@ -119,6 +177,9 @@
           </form>
         </div>
       </div>
+    </div>
+    <div class="logoutContainer w-100">
+      <a href="/logout" class="vjBtn m-auto rlc">Logout</a>
     </div>
   </body>
 </html>
