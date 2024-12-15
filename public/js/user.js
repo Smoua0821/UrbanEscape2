@@ -26,6 +26,8 @@ function addCoords(mapId, polyId, segment) {
 
 function getLastCoords() {
   if (!localStorage.checkpoints) return 0;
+  if (localStorage.checkpoints == "[object Object]")
+    localStorage.checkpoints = "[]";
   const checkpoints = JSON.parse(localStorage.checkpoints);
   if (!checkpoints || checkpoints.length == 0) return 0;
 
