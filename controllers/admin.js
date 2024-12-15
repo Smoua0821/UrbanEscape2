@@ -465,10 +465,34 @@ const getMarkerImage = async (req, res) => {
 };
 
 const deleteMarkerImage = async (req, res) => {
-  const marker = await Setting.findOneAndDelete({ name: "mapMarker" });
-  if (!marker) return res.json({ message: "No Marker Exists" });
-  fs.unlinkSync(path.join(__dirname, "../public/images", marker.content));
-  return res.json({ message: "Marker set to Default!" });
+  try {
+    const marker = await Setting.findOneAndDelete({ name: "mapMarker" });
+
+    if (!marker) {
+      return res.json({ message: "No Marker Exists" });
+    }
+
+    const markerImagePath = path.join(
+      __dirname,
+      "../public/images",
+      marker.content
+    );
+
+    // Check if the file exists before attempting to delete it
+    if (fs.existsSync(markerImagePath)) {
+      fs.unlinkSync(markerImagePath);
+      return res.json({ message: "Marker set to Default!" });
+    } else {
+      return res.json({
+        message: "Marker image not found, skipping deletion.",
+      });
+    }
+  } catch (error) {
+    console.error("Error deleting marker image:", error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred while deleting the marker image." });
+  }
 };
 
 module.exports = {
