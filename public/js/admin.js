@@ -604,6 +604,8 @@ function renderRoutes() {
         map: map,
         radius: path.radius,
         center: cco,
+        fillOpacity: path.opacity / 200,
+        strokeOpacity: path.opacity / 100,
       });
       tmpImg = document.createElement("img");
       tmpImg.src = path.image;

@@ -402,22 +402,6 @@ function showAllPolygons() {
     updateCurrentLocation();
   });
 }
-
-function moveMarker(imageSrc, coordinates) {
-  if (!iconMarker.src.match(imageSrc)) {
-    iconMarker.src = imageSrc;
-  }
-  if (circleOpacity != polygonCoordinates[polyIndex].circleOpacity) {
-    circleOpacity = polygonCoordinates[polyIndex].opacity;
-    circle.setValues({
-      fillOpacity: circleOpacity / 200,
-      strokeOpacity: circleOpacity / 100,
-    });
-  }
-  iconMarker.width = polygonCoordinates[polyIndex].size * 10;
-  markerElement.position = coordinates[polyIndex];
-  circle.setRadius(polygonCoordinates[polyIndex].radius);
-}
 function removeObjectByIndex(arr, index) {
   if (index > -1 && index < arr.length) {
     arr.splice(index, 1);
@@ -620,9 +604,23 @@ function nearestPolygon() {
     currentSegment = getLastCoords();
   }
   if (polygonCoordinates.length == 0) return;
-  $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
-  speed = polygonCoordinates[polyIndex].speed;
+  moveMarker(polygonCoordinates[polyIndex]);
   return tmpaihjhsg;
+}
+function moveMarker(data) {
+  if (!iconMarker.src.match(data.image)) {
+    iconMarker.src = data.image;
+  }
+  if (circleOpacity != data.circleOpacity) {
+    circleOpacity = data.opacity;
+    circle.setValues({
+      fillOpacity: circleOpacity / 200,
+      strokeOpacity: circleOpacity / 100,
+    });
+  }
+  iconMarker.width = data.size * 10;
+  markerElement.position = data.polygonCoords[polyIndex];
+  circle.setRadius(data.radius);
 }
 function startGaming() {
   if (!polygonCoordinates[polyIndex]?._id) return;
@@ -640,10 +638,7 @@ function startGaming() {
       polygonCoordinates[polyIndex].polygonCoords[0],
       polygonCoordinates[polyIndex].polygonCoords[1]
     ) * 500;
-  moveMarker(
-    polygonCoordinates[polyIndex].image,
-    polygonCoordinates[polyIndex].polygonCoords
-  );
+  moveMarker(polygonCoordinates[polyIndex]);
   animateMarker();
   gameStarted = 1;
 }
