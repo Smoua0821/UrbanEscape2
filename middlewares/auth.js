@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const publicRoutes = ["/", "/home", "/privacy-policy"];
+const publicRoutes = ["/", "/home", "/privacy-policy", "/marker"];
 
 const authMiddleware = (req, res, next) => {
   if (publicRoutes.includes(req.path) || req.path.startsWith("/map/")) {

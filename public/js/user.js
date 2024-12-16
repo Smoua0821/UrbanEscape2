@@ -222,7 +222,7 @@ function initMap() {
     },
   });
   const defaultMarkerIcon = document.createElement("img");
-  defaultMarkerIcon.src = "/admin/map/marker";
+  defaultMarkerIcon.src = "/api/marker";
   defaultMarkerIcon.width = "50";
 
   marker = new google.maps.marker.AdvancedMarkerElement({
