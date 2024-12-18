@@ -18,6 +18,8 @@ const {
   changeMarker,
   getMarkerImage,
   deleteMarkerImage,
+  exportImages,
+  importImages,
 } = require("../controllers/admin");
 const {
   fetchLoopRoutes,
@@ -84,5 +86,27 @@ router.post("/map/missions", newMapMission);
 router.post("/map/missions/remove", removeMapMission);
 
 router.get("/export/users", exportExcel);
+router.get("/export/images", exportImages);
+
+const storageImportImage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./");
+  },
+  filename: function (req, file, cb) {
+    const randomName = "import_image_" + Date.now();
+    const extname = path.extname(file.originalname);
+    const newFilename = randomName + extname;
+
+    cb(null, newFilename);
+  },
+});
+
+const uploadImportImage = multer({ storage: storageImportImage });
+
+router.post(
+  "/import/images",
+  uploadImportImage.single("zipFile"),
+  importImages
+);
 
 module.exports = router;

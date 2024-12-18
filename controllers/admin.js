@@ -1,8 +1,12 @@
 const ExcelJS = require("exceljs");
 const moment = require("moment");
 const { v4: uuidv4 } = require("uuid");
-const fs = require("fs");
+const archiver = require("archiver");
+const unzipper = require("unzipper");
+const fsExtra = require("fs-extra");
 const path = require("path");
+
+const fs = require("fs");
 const User = require("../models/User");
 const LoopRoute = require("../models/LoopRoute");
 const Map = require("../models/Map");
@@ -495,6 +499,105 @@ const deleteMarkerImage = async (req, res) => {
   }
 };
 
+const exportImages = (req, res) => {
+  const folderPath = path.join(__dirname, "../public/images/mapicons/");
+  if (!fs.existsSync(folderPath)) {
+    return res.status(404).send("Folder not found");
+  }
+  const zipFileName = "imagesBackup_" + Date.now() + ".zip";
+  const archive = archiver("zip", {
+    zlib: { level: 9 },
+  });
+
+  res.attachment(zipFileName);
+
+  archive.pipe(res);
+
+  fs.readdir(folderPath, (err, files) => {
+    if (err) {
+      return res.status(500).send("Error reading folder");
+    }
+
+    files.forEach((file) => {
+      const filePath = path.join(folderPath, file);
+      // Check if it's a file and not a directory
+      if (fs.statSync(filePath).isFile()) {
+        archive.file(filePath, { name: file });
+      }
+    });
+
+    // Finalize the archive (close it)
+    archive.finalize();
+  });
+};
+
+const importImages = (req, res) => {
+  const filename = req.file.filename;
+  const zipFilePath = path.join(__dirname, "../", filename);
+  const destinationDir = path.join(__dirname, "../public/images/mapicons");
+
+  // Check if the ZIP file exists
+  if (!fs.existsSync(zipFilePath)) {
+    return res.status(404).send("ZIP file not found");
+  }
+
+  // Ensure the destination directory exists, create it if it doesn't
+  try {
+    fsExtra.ensureDirSync(destinationDir);
+  } catch (err) {
+    return res
+      .status(500)
+      .send(`Error ensuring destination directory: ${err.message}`);
+  }
+
+  // Create a stream to decompress the ZIP file
+  const zipStream = fs.createReadStream(zipFilePath).pipe(unzipper.Parse()); // Use Parse() to handle individual files during decompression
+
+  zipStream.on("entry", (entry) => {
+    const entryPath = path.join(destinationDir, entry.path);
+
+    // Check if the file already exists in the destination folder
+    fsExtra.exists(entryPath, (exists) => {
+      if (exists) {
+        console.log(`Skipping existing file: ${entry.path}`);
+        entry.autodrain(); // Skip the file if it already exists
+      } else {
+        // If the file does not exist, extract it
+        entry
+          .pipe(fs.createWriteStream(entryPath))
+          .on("finish", () => {
+            console.log(`Successfully extracted: ${entry.path}`);
+          })
+          .on("error", (err) => {
+            console.error(
+              `Error extracting file ${entry.path}: ${err.message}`
+            );
+          });
+      }
+    });
+  });
+
+  zipStream.on("close", () => {
+    // Delete the original zip file after extraction
+    try {
+      fs.unlinkSync(zipFilePath); // Remove the zip file after extraction
+      console.log(`Successfully deleted the zip file: ${zipFilePath}`);
+    } catch (err) {
+      console.error(`Error deleting zip file: ${err.message}`);
+    }
+
+    // Send a success response
+    res.json({
+      message:
+        "Files have been successfully decompressed and copied to the destination folder",
+    });
+  });
+
+  zipStream.on("error", (err) => {
+    console.error(`Error during decompression: ${err.message}`);
+    res.status(500).send(`Error during extraction: ${err.message}`);
+  });
+};
 module.exports = {
   adminPage,
   deleteUser,
@@ -511,4 +614,6 @@ module.exports = {
   changeMarker,
   getMarkerImage,
   deleteMarkerImage,
+  exportImages,
+  importImages,
 };

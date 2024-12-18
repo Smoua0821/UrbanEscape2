@@ -482,6 +482,55 @@ $(document).ready(() => {
   } else {
     notyf.error("Geolocation is not supported by this browser.");
   }
+
+  $(".importBTN").click(function () {
+    // Dynamically create a hidden file input
+    var fileInput = $("<input>", {
+      type: "file",
+      accept: ".zip", // Only allow ZIP files
+      style: "display: none;", // Hide the input
+    });
+
+    // Append the file input to the body (it won't be visible)
+    $("body").append(fileInput);
+
+    // Trigger the file input click event to open the file explorer
+    fileInput.click();
+
+    // When a file is selected, send it via POST request
+    fileInput.change(function (event) {
+      var file = event.target.files[0]; // Get the selected file
+
+      // Check if a file is selected and if it's a ZIP file
+      if (file) {
+        var formData = new FormData();
+        formData.append("zipFile", file); // Append the file to FormData
+
+        // Send a POST request to /admin/import/images
+        $.ajax({
+          url: "/admin/import/images", // The server endpoint
+          type: "POST",
+          data: formData,
+          contentType: false, // Don't set the content type, FormData will do that
+          processData: false, // Don't process the data
+          success: function (response) {
+            alert("File uploaded successfully!");
+          },
+          error: function (xhr, status, error) {
+            alert("Error: " + error);
+          },
+          complete: function () {
+            // Clean up: remove the file input from the DOM
+            fileInput.remove();
+          },
+        });
+      } else {
+        alert("Please select a valid ZIP file.");
+        console.log(file.type);
+        fileInput.remove(); // Clean up if no valid file is selected
+      }
+    });
+  });
 });
 let bulkPolyLine, bulkCircle, bulkMarker;
 function renderMapMissions() {

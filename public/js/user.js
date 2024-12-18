@@ -285,6 +285,7 @@ function initMap() {
           "/user/profile/capture",
           { mapId: mapParsedId, polyId: polyId },
           (data, status, xhr) => {
+            console.log(xhr);
             if (
               status === "success" &&
               data.message === "Image Captured successfully!"
@@ -374,9 +375,7 @@ function initMap() {
 }
 function markerClickTrack(event) {
   const tarId = event.target.id;
-  if (!tarId) {
-    return notyf.error("No Information");
-  }
+  if (!tarId) return notyf.error("No Information");
   InfoModal(tarId);
   event.preventDefault();
   return false;
@@ -391,8 +390,7 @@ function showAllPolygons() {
       img.width = 10 * pl.size;
       img.id = pl._id;
       img.className = "mapPolyImage";
-      img.addEventListener("click", markerClickTrack);
-      img.addEventListener("touchstart", markerClickTrack);
+      img.addEventListener("touchend", markerClickTrack);
       new google.maps.marker.AdvancedMarkerElement({
         position: pl.polygonCoords[0],
         content: img,
