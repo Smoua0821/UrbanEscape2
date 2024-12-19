@@ -371,6 +371,7 @@ function initMap() {
   showAllPolygons();
 }
 function markerClickTrack(event) {
+  alert("clicked");
   const tarId = event.target.id;
   if (!tarId) return notyf.error("No Information");
   InfoModal(tarId);

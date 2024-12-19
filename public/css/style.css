@@ -257,3 +257,7 @@ body {
   right: 12.5px;
   filter: invert(1);
 }
+
+img {
+  pointer-events: auto;
+}
