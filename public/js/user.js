@@ -285,7 +285,7 @@ function initMap() {
           "/user/profile/capture",
           { mapId: mapParsedId, polyId: polyId },
           (data, status, xhr) => {
-            console.log(xhr);
+            console.log(status);
             if (
               status === "success" &&
               data.message === "Image Captured successfully!"
@@ -316,13 +316,10 @@ function initMap() {
                 map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
               }
             } else {
-              if (xhr.status == 369) {
-                const errorMessage =
-                  data.message ||
-                  "It seems You are not logged in, Please login";
-                notyf.error(errorMessage);
-                window.location.href = "/auth";
-              }
+              const errorMessage =
+                data.message || "It seems You are not logged in, Please login";
+              notyf.error(errorMessage);
+              window.location.href = "/auth";
             }
           }
         ).fail((xhr, status, error) => {
