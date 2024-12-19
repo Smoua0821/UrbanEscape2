@@ -250,22 +250,31 @@ function initMap() {
         lat: pos.lat,
         lng: pos.lng,
       },
-      markerElement.position
+      {
+        lat: circleLocation.lat(),
+        lng: circleLocation.lng(),
+      }
     );
     const clickDist2 = haversineDistance(
       {
         lat: clickedLocation.lat(),
         lng: clickedLocation.lng(),
       },
-      markerElement.position
+      {
+        lat: circleLocation.lat(),
+        lng: circleLocation.lng(),
+      }
     );
+
     $(".confirmCaptureContainer").hide();
-    if (clickDist2 > circle.getRadius() / 1000)
-      return console.log("Clicked Outside Circle");
     if (clickDist > circle.getRadius() / 1000) {
-      InfoModal(polygonCoordinates[polyIndex]._id);
       return console.log("Your live Location is Outside Circle");
     }
+    if (clickDist2 > circle.getRadius() / 1000)
+      return console.log("Clicked Outside Circle");
+
+    InfoModal(polygonCoordinates[polyIndex]._id);
+
     $(".confirmCaptureContainer").show();
     $(".confirmCaptureContainer button.confirmCapture")
       .off("click")
@@ -371,7 +380,6 @@ function initMap() {
   showAllPolygons();
 }
 function markerClickTrack(event) {
-  alert("clicked");
   const tarId = event.target.id;
   if (!tarId) return notyf.error("No Information");
   InfoModal(tarId);
