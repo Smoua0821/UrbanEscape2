@@ -2,10 +2,24 @@ function voeed() {
   return true;
 }
 
-if (localStorage.checkpoints == "[object Object]")
+if (localStorage.checkpoints && localStorage.checkpoints !== "[]") {
+  try {
+    const parsedCheckpoints = JSON.parse(localStorage.checkpoints);
+    if (
+      typeof parsedCheckpoints === "object" &&
+      !Array.isArray(parsedCheckpoints)
+    ) {
+      localStorage.checkpoints = "[]";
+    }
+  } catch (e) {
+    localStorage.checkpoints = "[]";
+  }
+} else {
   localStorage.checkpoints = "[]";
-
+}
 let checkpoints = JSON.parse(localStorage.getItem("checkpoints")) || [];
+
+console.log(checkpoints);
 
 function addCoords(mapId, polyId, segment) {
   let map = checkpoints.find((m) => m.mapId === mapId);
