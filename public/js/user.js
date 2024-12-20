@@ -547,11 +547,14 @@ function animateMarker() {
   if (polygonCoordinates[polyIndex].polygonCoords.length < currentSegment + 1) {
     currentSegment = 0;
   }
-  stepsPerSegment =
+  stepsPerSegment = parseInt(
     haversineDistance(
       polygonCoordinates[polyIndex].polygonCoords[currentSegment],
       polygonCoordinates[polyIndex].polygonCoords[currentSegment + 1]
-    ) * 500;
+    ) *
+      500 *
+      (100 / speed)
+  );
   currentStep++;
 
   // Move to next segment if current segment is done
@@ -569,7 +572,7 @@ function animateMarker() {
   // Repeat animation
   if (speed > 100) speed = 100;
   if (speed < 0) speed = 0;
-  if (speed > 0 && speed < 5) speed = 5;
+  if (speed > 0 && speed < 10) speed = 10;
   const moveTimer = setTimeout(animateMarker, 1000 / speed);
   if (!speed) {
     clearTimeout(moveTimer);
@@ -626,6 +629,7 @@ function nearestPolygon() {
   if (polyIndex != tmpaihjhsg.index) {
     polyIndex = tmpaihjhsg.index;
     currentSegment = getLastCoords();
+    speed = polygonCoordinates[polyIndex].speed;
   }
   if (polygonCoordinates.length == 0) return;
   moveMarker(polygonCoordinates[polyIndex]);
