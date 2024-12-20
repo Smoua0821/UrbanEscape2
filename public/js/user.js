@@ -271,7 +271,7 @@ function initMap() {
       return console.log("Your live Location is Outside Circle");
     }
     if (clickDist2 < circle.getRadius())
-      return InfoModal(polygonCoordinates[polyIndex]._id);
+      InfoModal(polygonCoordinates[polyIndex]._id);
 
     if (clickDist2 > circle.getRadius() / 1000)
       return console.log("Clicked Outside Circle");
@@ -383,6 +383,7 @@ function initMap() {
   showAllPolygons();
 }
 function markerClickTrack(event) {
+  console.log("Clicked");
   const tarId = event.target.id;
   if (!tarId) return notyf.error("No Information");
   InfoModal(tarId);
@@ -399,7 +400,8 @@ function showAllPolygons() {
       img.width = 10 * pl.size;
       img.id = pl._id;
       img.className = "mapPolyImage";
-      img.addEventListener("touchend", markerClickTrack);
+      img.addEventListener("click", markerClickTrack);
+      img.addEventListener("touchstart", markerClickTrack);
       new google.maps.marker.AdvancedMarkerElement({
         position: pl.polygonCoords[0],
         content: img,
