@@ -281,14 +281,15 @@ function initMap() {
     );
 
     $(".confirmCaptureContainer").hide();
-    if (clickDist > circle.getRadius() / 1000) {
-      return console.log("Your live Location is Outside Circle");
-    }
-    if (clickDist2 < circle.getRadius())
-      InfoModal(polygonCoordinates[polyIndex]._id);
 
     if (clickDist2 > circle.getRadius() / 1000)
       return console.log("Clicked Outside Circle");
+
+    if (clickDist2 < circle.getRadius())
+      InfoModal(polygonCoordinates[polyIndex]._id);
+
+    if (clickDist > circle.getRadius() / 1000)
+      return console.log("Your live Location is Outside Circle");
 
     InfoModal(polygonCoordinates[polyIndex]._id);
 
