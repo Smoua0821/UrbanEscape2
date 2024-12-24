@@ -556,6 +556,7 @@ function animateMarker() {
       500 *
       (100 / speed)
   );
+  if (stepsPerSegment < 30) stepsPerSegment = 30;
   currentStep++;
 
   // Move to next segment if current segment is done
