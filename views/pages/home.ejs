@@ -169,15 +169,30 @@
                 class="my-2 col-sm-6 confirmCaptureContainer"
                 style="display: none"
               >
+                <% if(user){ %>
                 <button class="btn w-100 btn-success confirmCapture">
                   Capture
                 </button>
+                <%}else{%>
+                <button class="btn w-100 btn-secondary" disabled>
+                  Capture
+                </button>
+                <%}%>
               </div>
               <div class="col-sm-6 my-2">
                 <button class="btn w-100 btn-danger infodiscart">
                   Back to Map
                 </button>
               </div>
+              <% if(!user){ %>
+              <div class="unauthinfo col-sm-12 my-2">
+                <div class="m-0 text-center text-danger">
+                  To activate the capture feature and join the game,
+                  <a href="/auth#register">REGISTER</a> or
+                  <a href="/auth#login">LOGIN</a>
+                </div>
+              </div>
+              <% } %>
             </div>
           </div>
         </div>

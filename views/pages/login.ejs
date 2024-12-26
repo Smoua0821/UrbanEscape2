@@ -198,6 +198,9 @@
         }
       }
       $(document).ready(() => {
+        if (window.location.hash == "#register") {
+          toggleForm();
+        }
         $.get("/auth/countries", (data) => {
           if (data.status == "success") {
             const countries = data.countries;
