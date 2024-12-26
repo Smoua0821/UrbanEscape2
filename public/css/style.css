@@ -238,7 +238,7 @@ body {
   position: fixed;
   z-index: 99;
   right: 10px;
-  top: 10px;
+  bottom: 10px;
   background: #ffffff;
   border: 2px solid #000000;
   padding: 10px;
@@ -253,7 +253,7 @@ body {
 
 .currentLocationBtn:hover {
   padding: 5px;
-  top: 12.5px;
+  bottom: 12.5px;
   right: 12.5px;
   filter: invert(1);
 }

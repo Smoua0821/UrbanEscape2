@@ -227,7 +227,7 @@ function initMap() {
     zoom: 15,
     center: pos,
     mapId: "f543ed7dd1b2a7e2",
-    fullscreenControl: false,
+    fullscreenControl: true,
     disableDefaultUI: true, // Hides all default controls
     mapTypeControl: true, // Enables the map type toggle control
     mapTypeControlOptions: {
