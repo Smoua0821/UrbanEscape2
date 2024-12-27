@@ -7,11 +7,11 @@ const fsExtra = require("fs-extra");
 const path = require("path");
 
 const fs = require("fs");
-const User = require("../models/User");
-const LoopRoute = require("../models/LoopRoute");
-const Map = require("../models/Map");
-const PrimaryMap = require("../models/PrimaryMap");
-const Setting = require("../models/Settings");
+const User = require("../../models/User");
+const LoopRoute = require("../../models/LoopRoute");
+const Map = require("../../models/Map");
+const PrimaryMap = require("../../models/PrimaryMap");
+const Setting = require("../../models/Settings");
 
 const cleanUp = async (rawId, mapId) => {
   try {
@@ -35,7 +35,7 @@ async function adminPage(req, res) {
   const user = req.user;
   if (user.role.current !== "admin") return res.end("Unauthorized!");
 
-  const dirPath = "./public/images/mapicons/";
+  const dirPath = "../../public/images/mapicons/";
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
@@ -430,7 +430,7 @@ const changeMarker = async (req, res) => {
     if (marker) {
       const filePath = path.join(
         __dirname,
-        "../public",
+        "../../public",
         "images",
         marker.content
       );
@@ -456,7 +456,7 @@ const changeMarker = async (req, res) => {
 const getMarkerImage = async (req, res) => {
   const defaultImage = path.join(
     __dirname,
-    "..",
+    "../..",
     "public",
     "images",
     "map_marker.png"
@@ -464,7 +464,7 @@ const getMarkerImage = async (req, res) => {
   const MapMarker = await Setting.findOne({ name: "mapMarker" });
   if (!MapMarker) return res.sendFile(defaultImage);
   return res.sendFile(
-    path.join(__dirname, "../public/images", MapMarker.content)
+    path.join(__dirname, "../../public/images", MapMarker.content)
   );
 };
 
@@ -500,7 +500,7 @@ const deleteMarkerImage = async (req, res) => {
 };
 
 const exportImages = (req, res) => {
-  const folderPath = path.join(__dirname, "../public/images/mapicons/");
+  const folderPath = path.join(__dirname, "../../public/images/mapicons/");
   if (!fs.existsSync(folderPath)) {
     return res.status(404).send("Folder not found");
   }
@@ -533,8 +533,8 @@ const exportImages = (req, res) => {
 
 const importImages = (req, res) => {
   const filename = req.file.filename;
-  const zipFilePath = path.join(__dirname, "../", filename);
-  const destinationDir = path.join(__dirname, "../public/images/mapicons");
+  const zipFilePath = path.join(__dirname, "../../", filename);
+  const destinationDir = path.join(__dirname, "../../public/images/mapicons");
 
   // Check if the ZIP file exists
   if (!fs.existsSync(zipFilePath)) {

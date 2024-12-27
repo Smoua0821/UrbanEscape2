@@ -6,6 +6,7 @@ const LoopRoute = require("../models/LoopRoute");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
+const Buttons = require("../models/Buttons");
 
 router.get("/", async (req, res) => {
   const user = await User.findOne({ email: req.user?.email });
@@ -36,6 +37,7 @@ router.get("/map/:mapId", async (req, res) => {
     });
   }
   const user = req.user;
+  let howToPlayBtn = JSON.stringify("{}");
 
   let imgexist = [];
   const token = req.cookies.sessionId;
@@ -51,6 +53,7 @@ router.get("/map/:mapId", async (req, res) => {
           if (!imgexist) imgexist = [];
         }
       }
+      howToPlayBtn = await Buttons.findOne({ name: "howToPlayBtn" });
     } catch (error) {
       console.log(error);
     }
@@ -64,6 +67,7 @@ router.get("/map/:mapId", async (req, res) => {
     title: map.name,
     missions: map.missions,
     imageExist: imgexist,
+    howToPlayBtn: howToPlayBtn?.content,
   });
 });
 

@@ -19,6 +19,9 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   </head>
   <body style="margin: 0">
+    <%if(howToPlayBtn){%>
+    <input value="<%=howToPlayBtn%>" />
+    <%}%>
     <div id="map" style="height: 100vh; width: 100vw"></div>
     <div class="simpleLoading">
       <div class="loadingAnime"></div>

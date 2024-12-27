@@ -10,6 +10,7 @@ let pos = { lat: 55.5, lng: 254.7 };
 let mapId = 0;
 let circleOpacity = 100;
 const missions = { redeemLink: "", name: "", images: [] };
+let customButtons = [];
 let loopRouteOptions = {
   url: "/admin/looproute",
   smessage: "New Route added successfully!",
@@ -217,6 +218,67 @@ function saveMission() {
   );
 }
 $(document).ready(() => {
+  $("#custombuttoncreator_name").on("input", (event) => {
+    let cstbtntext = event.target.value.toLowerCase();
+    cstbtntext = cstbtntext.replace(" ", "_");
+    $(event.target).val(cstbtntext);
+  });
+  $(".customButtonCreator").submit((event) => {
+    // Prevent the form from submitting
+    event.preventDefault();
+
+    // Gather input values
+    const customBtndata = {};
+    customBtndata.name = $("#custombuttoncreator_name").val();
+    customBtndata.text = $("#custombuttoncreator_text").val();
+    customBtndata.link = $("#custombuttoncreator_url").val();
+
+    // Validate that all fields are filled
+    if (!customBtndata.name || !customBtndata.text || !customBtndata.link) {
+      notyf.error("All Fields are required!");
+      return false;
+    }
+
+    const findExist = customButtons.find((d) => d.name === customBtndata.name);
+    let updated = 0;
+    if (
+      findExist.text == customBtndata.text &&
+      findExist.link == customBtndata.link
+    ) {
+      return notyf.success("Already Exists!");
+    }
+    if (findExist) {
+      findExist.text = customBtndata.text;
+      findExist.link = customBtndata.link;
+      updated = 1;
+    }
+    $.post("/admin/button/new", customBtndata, (data) => {
+      if (data.status === "success") {
+        notyf.success(data.message);
+        if (!updated) {
+          customButtons.push(customBtndata);
+        }
+      }
+    });
+
+    return false;
+  });
+
+  $.get("/api/buttons", (data) => {
+    if (!data) return notyf.error("Buttons Not Found!");
+    customButtons = data;
+    data.forEach((d) => {
+      $(".customButtonList").append(`<tr data-id='${d._id}'>
+          <td>${d.name}</td>
+          <td>${d.text}</td>
+          <td>${d.link}</td>
+          <td>
+            <button class='btn btn-info edit' data-id='${d._id}'><span class='fa fa-pencil'></span></button>
+            <button class='btn btn-danger delete' data-id='${d._id}'><span class='fa fa-trash'></span></button>
+          </td>
+        </tr>`);
+    });
+  });
   $(".deleteNewMapMarker").click(() => {
     if (!confirm("Are you sure?")) return;
     $.post("/admin/map/marker/delete", (data) => {

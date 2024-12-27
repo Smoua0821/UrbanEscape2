@@ -20,7 +20,7 @@ const {
   deleteMarkerImage,
   exportImages,
   importImages,
-} = require("../controllers/admin");
+} = require("../../controllers/Admin/admin");
 const {
   fetchLoopRoutes,
   saveLoopRoutes,
@@ -29,7 +29,7 @@ const {
   deleteImage,
   deleteImageAll,
   updateLoopRoutes,
-} = require("../controllers/loopRoute");
+} = require("../../controllers/loopRoute");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {

@@ -9,6 +9,10 @@
       rel="stylesheet"
       crossorigin="anonymous"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
     <link rel="stylesheet" href="/css/admin.css" />
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <link
@@ -335,6 +339,60 @@
                           >Export</a
                         >
                         <button class="btn btn-info importBTN">Import</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-xl-6 my-2">
+                    <div class="card">
+                      <div class="card-header">
+                        <h3 class="m-0 text-center">Button Center</h3>
+                      </div>
+                      <div class="card-body">
+                        <form class="m-0 p-0 customButtonCreator">
+                          <div class="row">
+                            <div class="col-xl-6">
+                              <input
+                                class="form-control my-1"
+                                placeholder="learn_more_btn"
+                                type="text"
+                                id="custombuttoncreator_name"
+                              />
+                            </div>
+                            <div class="col-xl-6">
+                              <input
+                                class="form-control my-1"
+                                placeholder="Learn More"
+                                type="text"
+                                id="custombuttoncreator_text"
+                              />
+                            </div>
+                            <div class="col-xl-6">
+                              <input
+                                class="form-control my-1"
+                                placeholder="https://google.com/"
+                                type="url"
+                                id="custombuttoncreator_url"
+                              />
+                            </div>
+                            <div class="col-xl-6">
+                              <button class="btn btn-success w-100 my-1">
+                                <span class="fa fa-save"></span>
+                              </button>
+                            </div>
+                          </div>
+                        </form>
+                        <table class="table">
+                          <thead>
+                            <tr>
+                              <th>Name</th>
+                              <th>Text</th>
+                              <th>Link</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tbody class="customButtonList"></tbody>
+                        </table>
                       </div>
                     </div>
                   </div>
