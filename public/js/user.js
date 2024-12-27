@@ -111,6 +111,21 @@ function renderCapturedImage() {
 }
 
 $(document).ready(() => {
+  $.get("/api/buttons", { name: "learn_more_btn" }, (data) => {
+    $(".user-navbar").fadeIn();
+    if (data && data.length > 0) {
+      const cstdta = data[0];
+      $(".user-navbar ul").prepend(
+        `<li data-id="${cstdta.link}">${cstdta.text}</li>`
+      );
+    }
+    $(".user-navbar .navbar-container ul li").click(function () {
+      const target = $(this).data("id");
+      if (!target) return;
+      if (target == "/missions") return $(".mission-popup").fadeIn();
+      window.location.href = target;
+    });
+  });
   let index = 0;
   let redeemReady = 1;
   $(".simpleLoading").show();
@@ -200,12 +215,6 @@ $(document).ready(() => {
   });
   if (!mapParsedId) return false;
   notyf = new Notyf();
-  $(".user-navbar .navbar-container ul li").click(function () {
-    const target = $(this).data("id");
-    if (!target) return;
-    if (target == "/missions") return $(".mission-popup").fadeIn();
-    window.location.href = target;
-  });
 });
 let polygonCoordinates = [];
 let map, markerElement, circle, marker;
@@ -228,11 +237,11 @@ function initMap() {
     center: pos,
     mapId: "f543ed7dd1b2a7e2",
     fullscreenControl: true,
-    disableDefaultUI: true, // Hides all default controls
-    mapTypeControl: true, // Enables the map type toggle control
+    disableDefaultUI: true,
+    mapTypeControl: true,
     mapTypeControlOptions: {
-      style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR, // Options: DEFAULT, DROPDOWN_MENU, HORIZONTAL_BAR
-      mapTypeIds: ["roadmap", "satellite", "terrain"], // Specify map types
+      style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+      mapTypeIds: ["roadmap", "satellite", "terrain"],
     },
   });
   const defaultMarkerIcon = document.createElement("img");
