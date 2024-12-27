@@ -32,29 +32,45 @@ const cleanUp = async (rawId, mapId) => {
 };
 
 async function adminPage(req, res) {
-  const user = req.user;
-  if (user.role.current !== "admin") return res.end("Unauthorized!");
+  try {
+    const user = req.user;
+    if (user.role.current !== "admin")
+      return res.status(403).end("Unauthorized!");
 
-  const dirPath = "../../public/images/mapicons/";
-  if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true });
+    const dirPath = "../../public/images/mapicons/";
+    if (!fs.existsSync(dirPath)) {
+      try {
+        fs.mkdirSync(dirPath, { recursive: true });
+      } catch (err) {
+        return res.status(500).end("Failed to create directory.");
+      }
+    }
+
+    let icons = [];
+    try {
+      icons = fs
+        .readdirSync(dirPath)
+        .filter((file) => fs.statSync(path.join(dirPath, file)).isFile())
+        .map((file) => path.join(file));
+    } catch (err) {
+      return res.status(500).end("Failed to read directory.");
+    }
+
+    let users = [];
+    try {
+      users = await User.find();
+    } catch (err) {
+      return res.status(500).end("Failed to fetch users from the database.");
+    }
+
+    return res.render("pages/admin", {
+      apiKey: "AIzaSyBaQ334LSpDNZXU8flkT1VjGpdj7f3_BZI",
+      users: users,
+      icons: icons,
+    });
+  } catch (err) {
+    return res.status(500).end("An unexpected error occurred.");
   }
-
-  // Read the icons in the directory
-  const icons = fs
-    .readdirSync(dirPath)
-    .filter((file) => fs.statSync(path.join(dirPath, file)).isFile())
-    .map((file) => path.join(file));
-
-  // Fetch users from the database
-  const users = await User.find();
-
-  // Render the admin page with the necessary data
-  res.render("pages/admin", {
-    apiKey: "AIzaSyBaQ334LSpDNZXU8flkT1VjGpdj7f3_BZI",
-    users: users,
-    icons: icons,
-  });
 }
 
 const mongoose = require("mongoose");
