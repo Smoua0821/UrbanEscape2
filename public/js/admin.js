@@ -230,6 +230,32 @@ const updateCustomBtnList = () => {
         </td>
       </tr>`);
   });
+
+  $(".customButtonList .edit")
+    .off("click")
+    .on("click", function () {
+      const tarObj = customButtons.find((d) => d._id === $(this).data("id"));
+      if (!tarObj) return notyf.error("No Button Found!");
+      $("#custombuttoncreator_name").val(tarObj.name);
+      $("#custombuttoncreator_text").val(tarObj.text);
+      $("#custombuttoncreator_url").val(tarObj.link);
+    });
+
+  $(".customButtonList .delete")
+    .off("click")
+    .on("click", function () {
+      const tarObj = customButtons.find((d) => d._id === $(this).data("id"));
+      if (!tarObj) return notyf.error("No Button Found!");
+      const cnfrm = confirm(`Are you sure to delete "${tarObj.name}"?`);
+      if (!cnfrm) return;
+      $.post("/admin/button/delete", { name: tarObj.name }, (data) => {
+        if (data.status == "success") {
+          notyf.success(data.message);
+          customButtons = customButtons.filter((d) => d._id != tarObj._id);
+          updateCustomBtnList();
+        }
+      });
+    });
 };
 $(document).ready(() => {
   $("#custombuttoncreator_name").on("input", (event) => {
@@ -277,6 +303,9 @@ $(document).ready(() => {
         }
       }
     });
+    $("#custombuttoncreator_name").val("");
+    $("#custombuttoncreator_text").val("");
+    $("#custombuttoncreator_url").val("");
     return false;
   });
 
