@@ -217,6 +217,20 @@ function saveMission() {
     }
   );
 }
+const updateCustomBtnList = () => {
+  $(".customButtonList").empty();
+  customButtons.forEach((d) => {
+    $(".customButtonList").append(`<tr data-id='${d._id}'>
+        <td>${d.name}</td>
+        <td>${d.text}</td>
+        <td>${d.link}</td>
+        <td>
+          <button class='btn btn-info edit' data-id='${d._id}'><span class='fa fa-pencil'></span></button>
+          <button class='btn btn-danger delete' data-id='${d._id}'><span class='fa fa-trash'></span></button>
+        </td>
+      </tr>`);
+  });
+};
 $(document).ready(() => {
   $("#custombuttoncreator_name").on("input", (event) => {
     let cstbtntext = event.target.value.toLowerCase();
@@ -242,6 +256,7 @@ $(document).ready(() => {
     const findExist = customButtons.find((d) => d.name === customBtndata.name);
     let updated = 0;
     if (
+      findExist &&
       findExist.text == customBtndata.text &&
       findExist.link == customBtndata.link
     ) {
@@ -251,33 +266,24 @@ $(document).ready(() => {
       findExist.text = customBtndata.text;
       findExist.link = customBtndata.link;
       updated = 1;
+      updateCustomBtnList();
     }
     $.post("/admin/button/new", customBtndata, (data) => {
       if (data.status === "success") {
         notyf.success(data.message);
         if (!updated) {
           customButtons.push(customBtndata);
+          updateCustomBtnList();
         }
       }
     });
-
     return false;
   });
 
   $.get("/api/buttons", (data) => {
     if (!data) return notyf.error("Buttons Not Found!");
     customButtons = data;
-    data.forEach((d) => {
-      $(".customButtonList").append(`<tr data-id='${d._id}'>
-          <td>${d.name}</td>
-          <td>${d.text}</td>
-          <td>${d.link}</td>
-          <td>
-            <button class='btn btn-info edit' data-id='${d._id}'><span class='fa fa-pencil'></span></button>
-            <button class='btn btn-danger delete' data-id='${d._id}'><span class='fa fa-trash'></span></button>
-          </td>
-        </tr>`);
-    });
+    updateCustomBtnList();
   });
   $(".deleteNewMapMarker").click(() => {
     if (!confirm("Are you sure?")) return;
