@@ -241,18 +241,18 @@ body {
   bottom: 10px;
   background: #ffffff;
   border: 2px solid #000000;
-  padding: 10px;
+  padding: 5px;
   border-radius: 50%;
   cursor: pointer;
   transition: 0.2s;
 }
 
 .currentLocationBtn img {
-  width: 50px;
+  width: 30px;
 }
 
 .currentLocationBtn:hover {
-  padding: 5px;
+  padding: 2px;
   bottom: 12.5px;
   right: 12.5px;
   filter: invert(1);
