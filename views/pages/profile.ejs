@@ -181,5 +181,19 @@
     <div class="logoutContainer w-100">
       <a href="/logout" class="vjBtn m-auto rlc">Logout</a>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+      $(document).ready(() => {
+        $.get("/api/buttons", { name: "learn_more_btn" }, (data) => {
+          $(".user-navbar").fadeIn();
+          if (data && data.length > 0) {
+            const cstdta = data[0];
+            $(".link-container").append(
+              `<a class='btn btn-warning ms-2' href='${cstdta.link}' target='_blank'>${cstdta.text}</a>`
+            );
+          }
+        });
+      });
+    </script>
   </body>
 </html>
