@@ -114,8 +114,10 @@ $(document).ready(() => {
   $(".fullscreen-toggle").click(() => {
     if (document.fullscreenElement) {
       document.exitFullscreen();
+      $("#fullscreenicon").attr("src", "/images/fullscreen.svg");
     } else {
       document.documentElement.requestFullscreen();
+      $("#fullscreenicon").attr("src", "/images/normalscreen.svg");
     }
   });
 
