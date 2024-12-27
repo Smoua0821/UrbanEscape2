@@ -37,11 +37,12 @@ async function adminPage(req, res) {
     if (user.role.current !== "admin")
       return res.status(403).end("Unauthorized!");
 
-    const dirPath = "../../public/images/mapicons/";
+    const dirPath = path.join(__dirname, "../../public/images/mapicons/");
     if (!fs.existsSync(dirPath)) {
       try {
         fs.mkdirSync(dirPath, { recursive: true });
       } catch (err) {
+        console.log(err);
         return res.status(500).end("Failed to create directory.");
       }
     }
