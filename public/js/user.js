@@ -111,10 +111,10 @@ function renderCapturedImage() {
 }
 
 $(document).ready(() => {
-  $.get("/api/buttons", { name: "how_to_play" }, (data) => {
+  $.post("/api/buttons", { name: "how_to_play" }, (data) => {
     $(".user-navbar").fadeIn();
-    if (data && data.length > 0) {
-      const cstdta = data[0];
+    if (data) {
+      const cstdta = data;
       $(".user-navbar ul").prepend(
         `<li data-id="${cstdta.link}">${cstdta.text}</li>`
       );
