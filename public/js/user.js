@@ -111,6 +111,14 @@ function renderCapturedImage() {
 }
 
 $(document).ready(() => {
+  $(".fullscreen-toggle").click(() => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      document.documentElement.requestFullscreen();
+    }
+  });
+
   $.post("/api/buttons", { name: "how_to_play" }, (data) => {
     $(".user-navbar").fadeIn();
     if (data) {
@@ -226,6 +234,7 @@ let stepsPerSegment = 100;
 let speed = 10;
 let gameStarted = 0;
 iconMarker.width = 50;
+let isFullScreen = 0;
 iconMarker.addEventListener("click", () => {
   InfoModal(polygonCoordinates[polyIndex]._id);
 });
@@ -236,7 +245,7 @@ function initMap() {
     zoom: 15,
     center: pos,
     mapId: "f543ed7dd1b2a7e2",
-    fullscreenControl: true,
+    fullscreenControl: false,
     disableDefaultUI: true,
     mapTypeControl: true,
     mapTypeControlOptions: {
