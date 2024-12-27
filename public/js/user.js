@@ -111,7 +111,7 @@ function renderCapturedImage() {
 }
 
 $(document).ready(() => {
-  $.get("/api/buttons", { name: "learn_more_btn" }, (data) => {
+  $.get("/api/buttons", { name: "how_to_play" }, (data) => {
     $(".user-navbar").fadeIn();
     if (data && data.length > 0) {
       const cstdta = data[0];
