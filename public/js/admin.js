@@ -546,9 +546,8 @@ $(document).ready(() => {
         return;
       }
 
-      const formData = new FormData();
-      formData.append("dirName", badgeDirName);
-      formData.append("file", $("#fileInput")[0].files[0]);
+      var formData = new FormData();
+      formData.append("image", file);
       $.ajax({
         url: "/admin/map/marker",
         type: "POST",
