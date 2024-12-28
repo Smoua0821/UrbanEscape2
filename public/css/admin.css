@@ -196,7 +196,9 @@
   height: 100%;
 }
 
-.fileManagerBody .folderUnit {
+.fileManagerBody .folderUnit,
+.fileManagerBody .fileUnit {
+  overflow: hidden;
   text-align: center;
   box-shadow: 0 0 0 0 #ebebeb;
   transition: 0.1s;
@@ -205,10 +207,20 @@
   padding: 5px 10px;
 }
 
-.fileManagerBody .folderUnit:hover {
+.fileManagerBody .folderUnit:hover,
+.fileManagerBody .fileUnit:hover {
   box-shadow: 0 0 5px 0 #ebebeb;
 }
 
-.fileManagerBody .folderUnit:active {
+.fileManagerBody .folderUnit:active,
+.fileManagerBody .fileUnit:active {
   border: 1px solid #b1b1b1;
+}
+
+.fileManagerBody .folderUnit p,
+.fileManagerBody .fileUnit p {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 100%;
 }

@@ -260,7 +260,21 @@ const updateCustomBtnList = () => {
       });
     });
 };
-const renderBadgeFiles = () => {};
+const renderBadgeFiles = () => {
+  if (badgeFiles.length === 0) return notyf.error("No Files found!");
+  $(".fileManagerBody .files").show();
+  $(".fileManagerBody .dirs").hide();
+  $(".fileManagerBody .files .file-container").empty();
+  badgeFiles.forEach((d) => {
+    $(".fileManagerBody .files .file-container").append(`
+      <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+        <div class="fileUnit" data-id="${d}">
+          <img src="/badges/${badgeDirName}/${d}" width="100%">
+        </div>
+      </div>
+    `);
+  });
+};
 const renderBadgeDirs = () => {
   $(".fileManagerBody .dirs").show();
   $(".fileManagerBody .files").hide();
@@ -278,15 +292,37 @@ const renderBadgeDirs = () => {
   $(".dir-container .folderUnit")
     .off("click")
     .on("click", function () {
+      $(".fileManagerBody .loader").show();
       badgeDirName = $(this).data("id");
       if (!badgeDirName) return;
       $.post("/admin/badges/file/get", { dirName: badgeDirName }, (data) => {
-        badgeFiles = data;
+        $(".fileManagerBody .loader").hide();
+        if (data.status != "success" || !data.files)
+          return notyf.error(`No File found in ${badgeDirName}`);
+        badgeFiles = data.files;
         renderBadgeFiles();
       });
     });
 };
 $(document).ready(() => {
+  $(".fileManagerBody .files .controllers .btn-danger").click(() => {
+    $(".fileManagerBody .loader").show();
+    if (!badgeDirName) return;
+    const cnfrm = confirm(`Are you sure to delete "${badgeDirName}"`);
+    if (!cnfrm) return;
+    $.post("/admin/badges/delete", { name: badgeDirName }, (data) => {
+      $(".fileManagerBody .loader").hide();
+      if (!data || data.status !== "success")
+        return notyf.error("Can't Delete");
+      badgeDirs = badgeDirs.filter((d) => d !== badgeDirName);
+      badgeDirName = "";
+      renderBadgeDirs();
+    });
+  });
+  $(".fileManagerBody .files .controllers .btn-info").click(() => {
+    $(".fileManagerBody .dirs").fadeIn();
+    $(".fileManagerBody .files").hide();
+  });
   $(".fileManagerBody form.new-dir").submit(function () {
     $(".fileManagerBody .loader").show();
     $(".fileManagerBody .dirs").hide();
