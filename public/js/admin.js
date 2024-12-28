@@ -19,6 +19,7 @@ let loopRouteOptions = {
 let primaryMap = [];
 let badgeDirs = [];
 let badgeDirName = "";
+let badgeDirFileName = "";
 let badgeFiles = [];
 $(".mission-icons div.mission-icon-select").click(function () {
   const imgSrc = $(this).data("src");
@@ -273,6 +274,16 @@ const renderBadgeFiles = () => {
       </div>
     `);
   });
+  $(".fileManagerBody .files .file-container .fileUnit")
+    .off("click")
+    .on("click", function () {
+      $(".fileManagerBody .files .file-container .fileUnit").removeClass(
+        "selected"
+      );
+      $(this).addClass("selected");
+      notyf.success("File Selected");
+      badgeDirFileName = $(this).data("id");
+    });
 };
 const renderBadgeDirs = () => {
   $(".fileManagerBody .dirs").show();

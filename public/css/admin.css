@@ -224,3 +224,8 @@
   overflow: hidden;
   width: 100%;
 }
+
+.fileManagerBody .files .file-container .fileUnit.selected {
+  border: 2px solid lime;
+  background: rgb(230, 255, 230);
+}
