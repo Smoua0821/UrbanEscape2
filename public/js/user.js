@@ -111,6 +111,10 @@ function renderCapturedImage() {
 }
 
 $(document).ready(() => {
+  $(".hideAllPopups").click(() => {
+    $("#bsModal").modal("hide");
+    $(".informationWindow").hide();
+  });
   $(".fullscreen-toggle").click(() => {
     if (document.fullscreenElement) {
       document.exitFullscreen();
