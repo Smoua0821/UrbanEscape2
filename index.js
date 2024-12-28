@@ -13,6 +13,7 @@ const adminProvinceRoutes = require("./routes/province");
 const staticRoutes = require("./routes/static");
 const adminRoutes = require("./routes/Admin/admin");
 const adminButtonRoutes = require("./routes/Admin/buttons");
+const adminBadgeRoutes = require("./routes/Admin/badgeFile");
 const loginRoutes = require("./routes/login");
 const userRoutes = require("./routes/user");
 const apiRoutes = require("./routes/api");
@@ -32,6 +33,7 @@ app.use("/", authMiddleware, staticRoutes);
 app.use("/user", userRoutes);
 app.use("/admin", adminMiddleware, adminRoutes);
 app.use("/admin/button", adminMiddleware, adminButtonRoutes);
+app.use("/admin/badges", adminMiddleware, adminBadgeRoutes);
 app.use("/admin/province", adminMiddleware, adminProvinceRoutes);
 
 app.listen(port, () => {

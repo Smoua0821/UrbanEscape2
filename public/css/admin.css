@@ -195,3 +195,20 @@
   letter-spacing: 2px;
   height: 100%;
 }
+
+.fileManagerBody .folderUnit {
+  text-align: center;
+  box-shadow: 0 0 0 0 #ebebeb;
+  transition: 0.1s;
+  cursor: pointer;
+  border: 1px solid transparent;
+  padding: 5px 10px;
+}
+
+.fileManagerBody .folderUnit:hover {
+  box-shadow: 0 0 5px 0 #ebebeb;
+}
+
+.fileManagerBody .folderUnit:active {
+  border: 1px solid #b1b1b1;
+}

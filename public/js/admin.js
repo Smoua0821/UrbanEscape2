@@ -17,6 +17,9 @@ let loopRouteOptions = {
   mode: "new",
 };
 let primaryMap = [];
+let badgeDirs = [];
+let badgeDirName = "";
+let badgeFiles = [];
 $(".mission-icons div.mission-icon-select").click(function () {
   const imgSrc = $(this).data("src");
   if (!imgSrc) return;
@@ -257,7 +260,67 @@ const updateCustomBtnList = () => {
       });
     });
 };
+const renderBadgeFiles = () => {};
+const renderBadgeDirs = () => {
+  $(".fileManagerBody .dirs").show();
+  $(".fileManagerBody .files").hide();
+  $(".dir-container .row").empty();
+  badgeDirs.forEach((d) => {
+    $(".dir-container .row").append(`
+      <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+        <div class="folderUnit" data-id="${d}">
+          <span class="fa fa-folder fa-3x"></span>
+          <p class="dirname">${d}</p>
+        </div>
+      </div>
+    `);
+  });
+  $(".dir-container .folderUnit")
+    .off("click")
+    .on("click", function () {
+      badgeDirName = $(this).data("id");
+      if (!badgeDirName) return;
+      $.post("/admin/badges/file/get", { dirName: badgeDirName }, (data) => {
+        badgeFiles = data;
+        renderBadgeFiles();
+      });
+    });
+};
 $(document).ready(() => {
+  $(".fileManagerBody form.new-dir").submit(function () {
+    $(".fileManagerBody .loader").show();
+    $(".fileManagerBody .dirs").hide();
+    const dirName = $(".fileManagerBody form.new-dir #dirName").val();
+    if (dirName) {
+      $.post("/admin/badges/create", { name: dirName }, (data) => {
+        $(".fileManagerBody .loader").hide();
+        $(".fileManagerBody .dirs").show();
+        if (data.status == "success") {
+          notyf.success(`${dirName} created successfully!`);
+          badgeDirs.push(dirName.toUpperCase());
+          renderBadgeDirs();
+          $(".fileManagerBody form.new-dir #dirName").val("");
+        }
+      });
+    } else {
+      notyf.error("Enter Valid Name");
+    }
+    return false;
+  });
+  $(".fileManagerBody .loader").show();
+  $.get("/admin/badges/fetch", (data) => {
+    $(".fileManagerBody .loader").hide();
+    $(".fileManagerBody .dirs").show();
+    if (
+      !data ||
+      data.status != "success" ||
+      !data.directories ||
+      data.directories.length == 0
+    )
+      return;
+    badgeDirs = data.directories;
+    renderBadgeDirs();
+  });
   $("#custombuttoncreator_name").on("input", (event) => {
     let cstbtntext = event.target.value.toLowerCase();
     cstbtntext = cstbtntext.replace(" ", "_");
