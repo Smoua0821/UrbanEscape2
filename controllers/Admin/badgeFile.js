@@ -67,6 +67,8 @@ const deleteDir = async (req, res) => {
       return res.json({ status: "error", message: "Directory does not exist" });
 
     fs.promises.rm(dirPath, { recursive: true });
+
+    await Badge.deleteMany({ dir: name });
     return res.json({
       status: "success",
       message: "Directory deleted successfully",

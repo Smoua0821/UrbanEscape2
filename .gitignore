@@ -1,4 +1,5 @@
 public/images/mapicons/
+public/badges
 marker_*.*
 # Node modules
 node_modules/
