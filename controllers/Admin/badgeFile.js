@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const Badge = require("../../models/Badges");
 
 const dirCreate = async (req, res) => {
   let { name } = req.body;
@@ -135,4 +136,83 @@ const deleteFile = async (req, res) => {
   }
 };
 
-module.exports = { dirCreate, getDirs, deleteDir, getFiles, deleteFile };
+const setDescription = async (req, res) => {
+  try {
+    const { dir, file, description } = req.body;
+
+    // Check if the necessary parameters are provided
+    if (!dir || !file || !description) {
+      return res.status(400).json({
+        status: "error",
+        message: "Missing required arguments: 'dir', 'file', or 'description'",
+      });
+    }
+
+    // Define the pathname (although it's not used in the update, it's included for context)
+    const pathname = `${dir}/${file}`;
+
+    // Attempt to update the badge description in the database
+    const updateResult = await Badge.updateOne(
+      { dir, file },
+      { $set: { description } },
+      { upsert: true }
+    );
+
+    // Successfully updated or created a new document
+    return res.status(200).json({
+      status: "success",
+      message: "Description updated successfully.",
+      data: updateResult,
+    });
+  } catch (error) {
+    console.error("Error updating description:", error);
+
+    // Catch any other unexpected errors
+    return res.status(500).json({
+      status: "error",
+      message: "Internal Server Error. Please try again later.",
+      error: error.message,
+    });
+  }
+};
+
+const getDescription = async (req, res) => {
+  try {
+    const { dir, file } = req.query;
+    if (!dir || !file) {
+      return res.status(400).json({
+        status: "error",
+        message: "Missing required query parameters: 'dir' and 'file'",
+      });
+    }
+    const data = await Badge.findOne({ dir, file });
+
+    if (!data) {
+      return res.status(404).json({
+        status: "error",
+        message: `No badge found for dir: ${dir} and file: ${file}`,
+      });
+    }
+    return res.status(200).json({
+      status: "success",
+      description: data.description,
+    });
+  } catch (error) {
+    console.error("Error fetching description:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Internal Server Error. Please try again later.",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = {
+  dirCreate,
+  getDirs,
+  deleteDir,
+  getFiles,
+  deleteFile,
+  getDescription,
+  setDescription,
+};

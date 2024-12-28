@@ -21,6 +21,14 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: "other",
     },
+    badges: [
+      {
+        type: String,
+        default: function () {
+          return [];
+        },
+      },
+    ],
     capturedImages: [
       {
         mapId: {

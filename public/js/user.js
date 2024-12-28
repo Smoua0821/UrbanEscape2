@@ -177,9 +177,14 @@ $(document).ready(() => {
         })
           .done(function (data, textStatus, xhr) {
             const response = xhr.responseJSON || {};
-            window.location.href = response.redeemLink;
-            if (xhr.status === 200) {
-              notyf.success(response.message);
+            if (response.type == "badge") {
+              $(".hideMissionsPopup").click();
+              notyf.success("Badge Saved Successfully!");
+            } else {
+              window.location.href = response.redeemLink;
+              if (xhr.status === 200) {
+                notyf.success(response.message);
+              }
             }
           })
           .fail(function (xhr, textStatus, errorThrown) {

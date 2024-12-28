@@ -4,6 +4,7 @@ const LoopRoute = require("../models/LoopRoute");
 const mongoose = require("mongoose");
 const PrimaryMap = require("../models/PrimaryMap");
 const RedeemLink = require("../models/RedeemLink");
+const Badge = require("../models/Badges");
 
 function findDifference(arr1, arr2) {
   return arr1.filter((item) => !arr2.includes(item));
@@ -22,15 +23,40 @@ function isSubset(smallArray, bigArray) {
 }
 
 const userProfile = async (req, res) => {
-  const user = await User.findOne({ email: req.user.email });
-  if (!user) return res.redirect("/logout");
-  const primaryMapdata = await PrimaryMap.findOne().populate("map");
-  const capturedImages = user.capturedImages;
-  return res.render("pages/profile", {
-    user: user,
-    capturedImages: capturedImages,
-    primaryMap: primaryMapdata,
-  });
+  try {
+    const user = await User.findOne({ email: req.user.email });
+    if (!user) return res.redirect("/logout");
+
+    const primaryMapData = await PrimaryMap.findOne().populate("map");
+    const capturedImages = user.capturedImages;
+    const userBadges = user.badges;
+    const allBadges = await Badge.find({});
+
+    // Create an array of { filename, description } for the user's badges
+    const userBadgeDetails = userBadges.map((badge) => {
+      const filename = badge.split("/").pop();
+      const badgeInfo = allBadges.find((b) => b.file === filename);
+      return {
+        badge,
+        description: badgeInfo
+          ? badgeInfo.description
+          : "No description available",
+      };
+    });
+    return res.render("pages/profile", {
+      user,
+      capturedImages,
+      userBadgeDetails,
+      primaryMap: primaryMapData,
+    });
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Internal Server Error. Could not load the user profile.",
+      error: error.message,
+    });
+  }
 };
 
 const captureImage = async (req, res) => {
@@ -187,6 +213,21 @@ const routeRedeem = async (req, res) => {
         },
       }
     );
+
+    if (tarObj.mtype == "badge") {
+      try {
+        const result = await User.updateOne(
+          { email: req.user.email },
+          { $push: { badges: tarObj.redeemLink } }
+        );
+        return res.status(200).json({
+          status: "success",
+          type: "badge",
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }
 
     return res.status(200).json({
       message: "Perfectly Done!",

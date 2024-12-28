@@ -29,6 +29,12 @@ const mapSchema = new mongoose.Schema(
         name: {
           type: String,
         },
+        mtype: {
+          type: String,
+          enum: ["badge", "url"],
+          default: "url",
+          required: true,
+        },
         images: [
           {
             type: String,

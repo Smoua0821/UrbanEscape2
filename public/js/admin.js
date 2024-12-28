@@ -21,6 +21,7 @@ let badgeDirs = [];
 let badgeDirName = "";
 let badgeDirFileName = "";
 let badgeFiles = [];
+let usingBadgeReward = 0;
 $(".mission-icons div.mission-icon-select").click(function () {
   const imgSrc = $(this).data("src");
   if (!imgSrc) return;
@@ -198,11 +199,20 @@ function saveMission() {
   if (!mapId) return notyf.error("Invalid MapId");
   const missionName = $("#missionname").val();
   const missionUrl = $("#missionurl").val();
-  if (!missionName || !missionUrl || missions.images.length == 0)
+  if (
+    !missionName ||
+    missions.images.length == 0 ||
+    (!usingBadgeReward && !missionUrl)
+  )
     return notyf.error("Name or URL can't be Empty");
 
   missions.redeemLink = missionUrl;
   missions.name = missionName;
+  missions.type = "url";
+  if (usingBadgeReward) {
+    missions.mtype = "badge";
+    missions.redeemLink = `/badges/${badgeDirName}/${badgeDirFileName}`;
+  }
   $.post(
     "/admin/map/missions",
     { mapId: mapId, missions: missions },
@@ -277,12 +287,21 @@ const renderBadgeFiles = () => {
   $(".fileManagerBody .files .file-container .fileUnit")
     .off("click")
     .on("click", function () {
+      $(".file-description input").val("");
       $(".fileManagerBody .files .file-container .fileUnit").removeClass(
         "selected"
       );
       $(this).addClass("selected");
+      $(".file-description").fadeIn();
       notyf.success("File Selected");
       badgeDirFileName = $(this).data("id");
+      $.get(
+        "/admin/badges/description",
+        { dir: badgeDirName, file: badgeDirFileName },
+        (d) => {
+          $(".file-description input").val(d.description);
+        }
+      );
     });
 };
 const renderBadgeDirs = () => {
@@ -315,6 +334,44 @@ const renderBadgeDirs = () => {
     });
 };
 $(document).ready(() => {
+  $(".saveFileDescription").click(() => {
+    if (badgeDirFileName && badgeDirName) {
+      const badgeDescription = $("#file-description").val();
+      $.post(
+        "/admin/badges/description",
+        {
+          dir: badgeDirName,
+          file: badgeDirFileName,
+          description: badgeDescription,
+        },
+        (data) => {
+          notyf.success("Description Updated!");
+        }
+      );
+    }
+  });
+  $("#badgeUrlToggle").on("change", (event) => {
+    if (event.target.checked) {
+      if (!badgeDirFileName || !badgeDirName) {
+        event.target.checked = false;
+        usingBadgeReward = 0;
+        notyf.error("Please Choose a Badge from Settings");
+      } else {
+        usingBadgeReward = 1;
+        $("#missionurl").hide();
+        $(".badgePreview").show();
+        $(".badgePreview img").attr(
+          "src",
+          `/badges/${badgeDirName}/${badgeDirFileName}`
+        );
+      }
+    } else {
+      usingBadgeReward = 0;
+      $(".badgePreview").hide();
+      $("#missionurl").show();
+    }
+  });
+
   $(".fileManagerBody .files .controllers .btn-danger").click(() => {
     $(".fileManagerBody .loader").show();
     if (!badgeDirName) return;
