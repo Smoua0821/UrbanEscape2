@@ -125,9 +125,11 @@ $(document).ready(() => {
     $(".user-navbar").fadeIn();
     if (data) {
       const cstdta = data;
-      $(".user-navbar ul").prepend(
-        `<li data-id="${cstdta.link}">${cstdta.text}</li>`
-      );
+      if ($("#isLogin").val() != "true") {
+        $(".user-navbar ul").prepend(
+          `<li data-id="${cstdta.link}">${cstdta.text}</li>`
+        );
+      }
     }
     $(".user-navbar .navbar-container ul li").click(function () {
       const target = $(this).data("id");

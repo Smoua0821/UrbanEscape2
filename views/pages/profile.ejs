@@ -46,57 +46,33 @@
         text-align: center;
       }
 
-      .vjBtn {
-        width: min-content;
-        text-decoration: none;
-        overflow: hidden;
+      .bottomfixedbuttons {
+        position: fixed;
+        z-index: 99;
+        bottom: 10px;
+        width: 100%;
+        text-align: center;
+      }
+
+      .bottomfixedbuttons a {
+        padding: 8px 10px;
+        display: inline-block;
+        background: red;
         color: white;
-        display: block;
-        padding: 5px 10px;
+        text-decoration: none;
         border-radius: 5px;
-        text-transform: uppercase;
-        background: #a70000;
-        border: 2px solid red;
+        border: 2px solid;
         transition: 0.2s;
-        position: relative;
       }
 
-      .vjBtn:hover {
-        padding: 10px 20px;
+      .bottomfixedbuttons a.vj-learnMore {
+        background: yellow;
+        color: black;
       }
 
-      .vjBtn.rlc:before,
-      .vjBtn.rlc:after {
-        content: "Are you Sure?";
-        position: absolute;
-        font-size: 10px;
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        background: #ffffff;
-        color: red;
-        top: 0;
-        width: 200%;
-        height: 100%;
-        border-radius: 50px;
-        transition: 0.5s;
-      }
-
-      .vjBtn.rlc:before {
-        left: -200%;
-        content: "";
-      }
-
-      .vjBtn.rlc:after {
-        left: 100%;
-      }
-
-      .vjBtn.rlc:hover:before {
-        left: -50%;
-      }
-
-      .vjBtn.rlc:hover:after {
-        left: -50%;
+      .bottomfixedbuttons a:hover {
+        background: #f80;
+        border: 2px dashed;
       }
 
       @keyframes circularShadow {
@@ -178,8 +154,8 @@
         </div>
       </div>
     </div>
-    <div class="logoutContainer w-100">
-      <a href="/logout" class="vjBtn m-auto rlc">Logout</a>
+    <div class="bottomfixedbuttons">
+      <a href="/logout" class="vj-logout">Logout</a>
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
@@ -188,8 +164,8 @@
           $(".user-navbar").fadeIn();
           if (data) {
             const cstdta = data;
-            $(".link-container").append(
-              `<a class='btn btn-warning ms-2' href='${cstdta.link}' target='_blank'>${cstdta.text}</a>`
+            $(".bottomfixedbuttons").append(
+              `<a class='vj-learnMore' href='${cstdta.link}' target='_blank'>${cstdta.text}</a>`
             );
           }
         });
