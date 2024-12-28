@@ -261,7 +261,6 @@ const updateCustomBtnList = () => {
     });
 };
 const renderBadgeFiles = () => {
-  if (badgeFiles.length === 0) return notyf.error("No Files found!");
   $(".fileManagerBody .files").show();
   $(".fileManagerBody .dirs").hide();
   $(".fileManagerBody .files .file-container").empty();
@@ -323,6 +322,50 @@ $(document).ready(() => {
     $(".fileManagerBody .dirs").fadeIn();
     $(".fileManagerBody .files").hide();
   });
+  $(".fileManagerBody .files .controllers .btn-success").click(() => {
+    if (!badgeDirName)
+      return notyf.error("No folder is given to Upload the file!");
+
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+
+    input.onchange = (event) => {
+      const file = event.target.files[0];
+      if (!file) {
+        alert("No file selected!");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("dirName", badgeDirName);
+
+      // Using jQuery AJAX to upload the file
+      $.ajax({
+        url: `/admin/badges/file/new/${badgeDirName}`,
+        type: "POST",
+        data: formData,
+        contentType: false, // Prevent jQuery from setting content-type header
+        processData: false, // Prevent jQuery from processing data
+        success: (response) => {
+          if (response.status == "success") {
+            notyf.success("File uploaded successfully!");
+            badgeFiles.push(response.fileName);
+            renderBadgeFiles();
+          } else {
+            notyf.error("Error uploading file: " + response.message);
+          }
+        },
+        error: (xhr, status, error) => {
+          alert("An error occurred while uploading the file: " + error);
+        },
+      });
+    };
+
+    input.click();
+  });
+
   $(".fileManagerBody form.new-dir").submit(function () {
     $(".fileManagerBody .loader").show();
     $(".fileManagerBody .dirs").hide();
@@ -435,9 +478,9 @@ $(document).ready(() => {
         return;
       }
 
-      var formData = new FormData();
-      formData.append("image", file);
-
+      const formData = new FormData();
+      formData.append("dirName", badgeDirName);
+      formData.append("file", $("#fileInput")[0].files[0]);
       $.ajax({
         url: "/admin/map/marker",
         type: "POST",

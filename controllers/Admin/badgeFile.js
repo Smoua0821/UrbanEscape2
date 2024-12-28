@@ -65,7 +65,7 @@ const deleteDir = async (req, res) => {
     if (!fs.existsSync(dirPath))
       return res.json({ status: "error", message: "Directory does not exist" });
 
-    fs.rmdir(dirPath, { recursive: true });
+    fs.promises.rm(dirPath, { recursive: true });
     return res.json({
       status: "success",
       message: "Directory deleted successfully",

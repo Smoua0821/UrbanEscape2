@@ -1,14 +1,17 @@
 const express = require("express");
 const port = 8000;
-const bodyParser = require("body-parser");
 const connectDB = require("./config/db");
 const cookieParser = require("cookie-parser");
-
 const path = require("path");
 
 const app = express();
-connectDB();
+connectDB(); // Assuming this is your DB connection
 
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(cookieParser());
+
+// Import route modules
 const adminProvinceRoutes = require("./routes/province");
 const staticRoutes = require("./routes/static");
 const adminRoutes = require("./routes/Admin/admin");
@@ -19,14 +22,9 @@ const userRoutes = require("./routes/user");
 const apiRoutes = require("./routes/api");
 
 const { authMiddleware, adminMiddleware } = require("./middlewares/auth");
-
-app.use(express.json());
-app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: true }));
-
 app.set("view engine", "ejs");
-app.use(express.static(path.join(__dirname, "public")));
 
+app.use(express.static(path.join(__dirname, "public")));
 app.use("/auth", loginRoutes);
 app.use("/api", apiRoutes);
 app.use("/", authMiddleware, staticRoutes);
@@ -35,7 +33,6 @@ app.use("/admin", adminMiddleware, adminRoutes);
 app.use("/admin/button", adminMiddleware, adminButtonRoutes);
 app.use("/admin/badges", adminMiddleware, adminBadgeRoutes);
 app.use("/admin/province", adminMiddleware, adminProvinceRoutes);
-
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });
