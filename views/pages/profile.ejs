@@ -120,13 +120,12 @@
               </tr>
             </table>
             <div class="link-container mt-3 text-center">
-              <a href="/" class="btn btn-primary">Home</a>
               <% if (locals.primaryMap && primaryMap.map && primaryMap.map.id) {
               %>
               <a
                 href="/map/<%= primaryMap.map.id %>"
                 class="btn btn-success ms-2"
-                >Map</a
+                >Back to Map</a
               >
               <% } %> <% if (user.role.current=="admin") { %>
               <a href="/admin" class="btn btn-success ms-2">Admin</a>
