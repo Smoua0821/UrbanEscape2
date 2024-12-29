@@ -263,7 +263,7 @@ img {
 .fullscreen-toggle {
   position: fixed;
   z-index: 3;
-  bottom: 13px;
+  right: 13px;
   top: 13px;
   font-size: 10px;
   transition: 0.2s;
