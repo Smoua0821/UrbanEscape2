@@ -267,16 +267,12 @@ img {
   z-index: 999;
   right: 13px;
   top: 13px;
-  background: #ffffff;
-  padding: 2px;
   transition: 0.2s;
   border-radius: 2px;
   cursor: pointer;
+  border: 2px solid rgb(102, 102, 255);
 }
 
 .fullscreen-toggle:hover {
-  background: #f3f3f3;
-  right: 12px;
-  top: 12px;
-  padding: 3px;
+  border: 2px solid blue;
 }

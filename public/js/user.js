@@ -118,10 +118,13 @@ $(document).ready(() => {
   $(".fullscreen-toggle").click(() => {
     if (document.fullscreenElement) {
       document.exitFullscreen();
+      $(".fullscreen-toggle .fullscreen span").text(
+        "Enter Full Screen Experience"
+      );
       $("#fullscreenicon").attr("src", "/images/fullscreen.svg");
     } else {
       document.documentElement.requestFullscreen();
-      $("#fullscreenicon").attr("src", "/images/normalscreen.svg");
+      $(".fullscreen-toggle .fullscreen span").text("Exit Full Screen");
     }
   });
 
