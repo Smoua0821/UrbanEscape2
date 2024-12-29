@@ -253,8 +253,6 @@ body {
 
 .currentLocationBtn:hover {
   padding: 2px;
-  bottom: 12.5px;
-  right: 12.5px;
   filter: invert(1);
 }
 
