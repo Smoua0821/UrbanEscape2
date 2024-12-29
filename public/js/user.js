@@ -133,8 +133,8 @@ $(document).ready(() => {
     if (data) {
       const cstdta = data;
       if ($("#isLogin").val() != "true") {
-        $(".user-navbar ul").prepend(
-          `<li data-id="${cstdta.link}">${cstdta.text}</li>`
+        $(".howtoplaycontainer").html(
+          `<a href="${cstdta.link}">${cstdta.text}</a>`
         );
       }
     }

@@ -264,7 +264,7 @@ img {
 
 .fullscreen-toggle {
   position: fixed;
-  z-index: 999;
+  z-index: 3;
   right: 13px;
   top: 13px;
   transition: 0.2s;
