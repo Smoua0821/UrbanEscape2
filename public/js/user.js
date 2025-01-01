@@ -473,7 +473,6 @@ function getCurrentLocation() {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           pendingPromise = 0;
-          notyf.success("Location Updated!");
           const { latitude, longitude } = position.coords;
           pos.lat = latitude;
           pos.lng = longitude;
