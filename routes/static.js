@@ -6,7 +6,7 @@ const LoopRoute = require("../models/LoopRoute");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
-const Buttons = require("../models/Buttons");
+const PrimaryMap = require("../models/PrimaryMap");
 
 router.get("/", async (req, res) => {
   const user = await User.findOne({ email: req.user?.email });
@@ -68,12 +68,25 @@ router.get("/map/:mapId", async (req, res) => {
   });
 });
 
-router.get("/logout", (req, res) => {
-  res.clearCookie("sessionId", {
-    httpOnly: true,
-    sameSite: "strict",
-  });
-  return res.redirect("/");
+router.get("/logout", async (req, res) => {
+  try {
+    res.clearCookie("sessionId", {
+      httpOnly: true,
+      sameSite: "strict",
+    });
+
+    const primaryMap = await PrimaryMap.findOne().populate("map").lean();
+    if (primaryMap?.map) {
+      return res.redirect(`/map/${primaryMap.map.id}`);
+    }
+
+    return res.redirect("/");
+  } catch (error) {
+    console.error("Error during logout:", error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred during logout. Please try again." });
+  }
 });
 
 router.get("/static/image/:id", async (req, res) => {
