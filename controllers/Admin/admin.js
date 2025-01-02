@@ -451,7 +451,9 @@ const changeMarker = async (req, res) => {
         "images",
         marker.content
       );
-      fs.unlinkSync(filePath);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
     }
     await Setting.create({ name: "mapMarker", content: randomFilename });
 
