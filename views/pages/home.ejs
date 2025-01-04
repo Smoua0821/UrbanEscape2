@@ -96,8 +96,8 @@
                 </div>
                 <div class="col-md-7 text-center">
                   <div class="h-100 d-flex align-items-center">
-                    <p class="alert alert-warning w-100" id="captureMessage">
-                      <p id="congratsText">Captured Successfully into Profile Collections!</p>
+                    <p id="congratsText">
+                      Captured Successfully into Profile Collections!
                     </p>
                   </div>
                 </div>
@@ -177,7 +177,10 @@
               loading="lazy"
               width="100%"
             />
-            <p class="alert alert-info mText" style="text-transform: capitalize">
+            <p
+              class="alert alert-info mText"
+              style="text-transform: capitalize"
+            >
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas
               nesciunt mollitia quae, tempore sed neque eveniet numquam veniam
               architecto et eius aperiam ducimus. Ducimus, quibusdam
@@ -189,12 +192,19 @@
                 style="display: none"
               >
                 <% if(user){ %>
-                <input type="hidden" id="isLogin" value="true" >
-                <button class="btn w-100 btn-success confirmCapture" id="captureBtnTextInput">
+                <input type="hidden" id="isLogin" value="true" />
+                <button
+                  class="btn w-100 btn-success confirmCapture"
+                  id="captureBtnTextInput"
+                >
                   Capture
                 </button>
                 <%}else{%>
-                <button class="btn w-100 btn-secondary" disabled id="captureBtnTextInput">
+                <button
+                  class="btn w-100 btn-secondary"
+                  disabled
+                  id="captureBtnTextInput"
+                >
                   Capture
                 </button>
                 <%}%>

@@ -393,7 +393,6 @@ function initMap() {
               profileImages.push(polyId);
               $("#CapturedImagePopUp").fadeIn();
               $("#bsModalTitle").text(data.title);
-              $("#captureMessage").text(data.message);
               $("#bsModal").modal("show");
               if (polygonCoordinates.length > 0) {
                 removeObjectByIndex(polygonCoordinates, polyIndex);
