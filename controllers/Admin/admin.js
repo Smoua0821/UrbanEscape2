@@ -634,7 +634,12 @@ const settingsImport = async (req, res) => {
 };
 
 const settingsUpdate = async (req, res) => {
-  const allowedSettings = ["mapMarkerSize"];
+  const allowedSettings = [
+    "mapMarkerSize",
+    "congratsText",
+    "captureBtnTextInput",
+    "loginTextInput",
+  ];
   const { name, value } = req.body;
 
   if (!name || !value) {

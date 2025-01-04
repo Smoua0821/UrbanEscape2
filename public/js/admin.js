@@ -339,8 +339,40 @@ const settings = {
 };
 const updateSettings = () => {
   $("#userMapMarkerSize").val(settings.mapMarkerSize);
+
+  for (const key in settings) {
+    if (settings.hasOwnProperty(key)) {
+      const value = settings[key];
+      const inputElement = document.getElementById(key);
+      if (inputElement) {
+        inputElement.value = value;
+      }
+    }
+  }
 };
+
+const updateClientInterface = (targetName) => {
+  let text = $(`#${targetName}`).val();
+  if (!text) return notyf.error("Can't be Empty!");
+  $.post(
+    "/admin/settings/update",
+    { name: targetName, value: text },
+    (data) => {
+      if (data && data.status == "success") {
+        notyf.success(data.message);
+      } else {
+        notyf.error(data.message);
+      }
+    }
+  );
+};
+
 $(document).ready(() => {
+  $(".updateBtntrigger").click(function () {
+    const tarId = $(this).data("id");
+    if (!tarId) return notyf.error("Invalid Option!");
+    updateClientInterface(tarId);
+  });
   $(".userMapMarkerSizeBtn").click(() => {
     let sizeVal = parseInt($("#userMapMarkerSize").val());
     if (sizeVal > 10) sizeVal = 10;
