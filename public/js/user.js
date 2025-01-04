@@ -123,6 +123,7 @@ $(document).ready(() => {
     if (data && Array.isArray(data) && data.length > 0) {
       data.forEach((d) => {
         settings[d.name] = d.content;
+        $(`#${d.name}`).html(d.content);
       });
       let tmpInterval;
       tmpInterval = setInterval(() => {
@@ -734,6 +735,6 @@ function InfoModal(polyid) {
   if (!tarPolygon) return notyf.error("No Information found!");
   $(".infoBoxMarkimage").attr("src", tarPolygon.image);
   $(".informationWindow .infoTitle").text(tarPolygon.title);
-  $(".informationWindow p").text(tarPolygon.description);
+  $(".informationWindow p.mText").text(tarPolygon.description);
   $(".informationWindow").fadeIn();
 }
