@@ -75,6 +75,7 @@ async function adminPage(req, res) {
 }
 
 const mongoose = require("mongoose");
+const Settings = require("../../models/Settings");
 const deleteUser = async (req, res) => {
   const { id } = req.params;
 
@@ -617,6 +618,58 @@ const importImages = (req, res) => {
     res.status(500).send(`Error during extraction: ${err.message}`);
   });
 };
+
+const settingsImport = async (req, res) => {
+  try {
+    const settings = await Settings.find({});
+    if (!settings)
+      return res.status(404).json({ status: "error", message: "Not found" });
+    return res.json(settings);
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(403)
+      .json({ status: "error", message: "Some Error Occured!" });
+  }
+};
+
+const settingsUpdate = async (req, res) => {
+  const allowedSettings = ["mapMarkerSize"];
+  const { name, value } = req.body;
+
+  if (!name || !value) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "No Argument found!" });
+  }
+
+  if (!allowedSettings.includes(name)) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "Argument not Allowed!" });
+  }
+
+  try {
+    const updatedSetting = await Setting.findOneAndUpdate(
+      { name },
+      { content: value },
+      { new: true, upsert: true }
+    );
+
+    return res.status(updatedSetting ? 200 : 201).json({
+      status: "success",
+      message: updatedSetting
+        ? "Setting updated successfully!"
+        : "Setting created successfully!",
+      setting: updatedSetting,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ status: "error", message: "Internal server error", error });
+  }
+};
+
 module.exports = {
   adminPage,
   deleteUser,
@@ -635,4 +688,6 @@ module.exports = {
   deleteMarkerImage,
   exportImages,
   importImages,
+  settingsImport,
+  settingsUpdate,
 };

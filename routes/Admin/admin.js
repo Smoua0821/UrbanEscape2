@@ -20,6 +20,7 @@ const {
   deleteMarkerImage,
   exportImages,
   importImages,
+  settingsUpdate,
 } = require("../../controllers/Admin/admin");
 const {
   fetchLoopRoutes,
@@ -108,5 +109,7 @@ router.post(
   uploadImportImage.single("zipFile"),
   importImages
 );
+
+router.post("/settings/update", settingsUpdate);
 
 module.exports = router;
