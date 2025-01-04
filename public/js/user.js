@@ -120,6 +120,16 @@ $(document).ready(() => {
       data.forEach((d) => {
         settings[d.name] = d.content;
       });
+      let tmpInterval;
+      tmpInterval = setInterval(() => {
+        if ($("#defaultMarkerIcon") && $("#defaultMarkerIcon").length > 0) {
+          let tmpSize = settings.mapMarkerSize * 10;
+          if (tmpSize > 100) tmpSize = 100;
+          if (tmpSize < 10) tmpSize = 10;
+          $("#defaultMarkerIcon").attr("width", tmpSize);
+          clearInterval(tmpInterval);
+        }
+      }, 1000);
     }
   });
   $(".hideAllPopups").click(() => {
@@ -279,8 +289,9 @@ function initMap() {
     },
   });
   const defaultMarkerIcon = document.createElement("img");
+  defaultMarkerIcon.id = "defaultMarkerIcon";
   defaultMarkerIcon.src = "/api/marker";
-  defaultMarkerIcon.width = "50";
+  defaultMarkerIcon.width = settings.mapMarkerSize * 10;
 
   marker = new google.maps.marker.AdvancedMarkerElement({
     position: pos,
