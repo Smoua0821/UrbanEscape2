@@ -115,6 +115,10 @@ const settings = {
 };
 
 $(document).ready(() => {
+  $(".refresh").click(() => {
+    $(".refresh span").addClass("fa-spin");
+    window.location.reload();
+  });
   $.get("/api/settings/import", (data) => {
     if (data && Array.isArray(data) && data.length > 0) {
       data.forEach((d) => {

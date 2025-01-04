@@ -306,8 +306,8 @@ img {
 }
 
 .refresh {
-  top: 60px;
-  left: 15px;
+  top: 60px !important;
+  left: 15px !important;
   padding: 5px;
   background: white;
   height: 40px;
