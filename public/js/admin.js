@@ -333,7 +333,37 @@ const renderBadgeDirs = () => {
       });
     });
 };
+
+const settings = {
+  mapMarkerSize: 5,
+};
+const updateSettings = () => {
+  $("#userMapMarkerSize").val(settings.mapMarkerSize);
+};
 $(document).ready(() => {
+  $(".userMapMarkerSizeBtn").click(() => {
+    const sizeVal = parseInt($("#userMapMarkerSize").val());
+    if (!sizeVal) return notyf.error("Hi");
+    $.post(
+      "/admin/settings/update",
+      { name: "mapMarkerSize", value: sizeVal },
+      (data) => {
+        if (data && data.status == "success") {
+          notyf.success(data.message);
+        } else {
+          notyf.error(data.message);
+        }
+      }
+    );
+  });
+  $.get("/api/settings/import", (data) => {
+    if (data && Array.isArray(data) && data.length > 0) {
+      data.forEach((d) => {
+        settings[d.name] = d.content;
+      });
+      updateSettings();
+    }
+  });
   $(".saveFileDescription").click(() => {
     if (badgeDirFileName && badgeDirName) {
       const badgeDescription = $("#file-description").val();
