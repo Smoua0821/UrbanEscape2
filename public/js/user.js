@@ -110,7 +110,18 @@ function renderCapturedImage() {
   }
 }
 
+const settings = {
+  mapMarkerSize: 5,
+};
+
 $(document).ready(() => {
+  $.get("/api/settings/import", (data) => {
+    if (data && Array.isArray(data) && data.length > 0) {
+      data.forEach((d) => {
+        settings[d.name] = d.content;
+      });
+    }
+  });
   $(".hideAllPopups").click(() => {
     $("#bsModal").modal("hide");
     $(".informationWindow").hide();
