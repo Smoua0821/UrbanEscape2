@@ -97,7 +97,7 @@
                 <div class="col-md-7 text-center">
                   <div class="h-100 d-flex align-items-center">
                     <p class="alert alert-warning w-100" id="captureMessage">
-                      Captured Successfully into Profile Collections!
+                      <p id="congratsText">Captured Successfully into Profile Collections!</p>
                     </p>
                   </div>
                 </div>
@@ -189,8 +189,8 @@
                 style="display: none"
               >
                 <% if(user){ %>
-                <input type="hidden" id="isLogin" value="true" />
-                <button class="btn w-100 btn-success confirmCapture">
+                <input type="hidden" id="isLogin" value="true" >
+                <button class="btn w-100 btn-success confirmCapture" id="captureBtnTextInput">
                   Capture
                 </button>
                 <%}else{%>
@@ -207,7 +207,9 @@
               <% if(!user){ %>
               <div class="unauthinfo col-sm-12 my-2">
                 <div class="m-0 text-center text-danger">
-                  To activate the capture feature and join the game,
+                  <p id="loginTextInput">
+                    To activate the capture feature and join the game
+                  </p>
                   <a href="/auth#register">REGISTER</a> or
                   <a href="/auth#login">LOGIN</a>
                 </div>
