@@ -342,7 +342,10 @@ const updateSettings = () => {
 };
 $(document).ready(() => {
   $(".userMapMarkerSizeBtn").click(() => {
-    const sizeVal = parseInt($("#userMapMarkerSize").val());
+    let sizeVal = parseInt($("#userMapMarkerSize").val());
+    if (sizeVal > 10) sizeVal = 10;
+    if (sizeVal < 1) sizeVal = 1;
+    $("#userMapMarkerSize").val(sizeVal);
     if (!sizeVal) return notyf.error("Hi");
     $.post(
       "/admin/settings/update",
