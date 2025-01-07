@@ -597,7 +597,7 @@ const importDir = (zipFilePath, destinationDir, type, res) => {
 
   zipStream.on("entry", (entry) => {
     // Check if the entry's path starts with 'badges/' (case-sensitive)
-    if (entry.path.startsWith("badges/")) {
+    if (entry.path.startsWith("badges/") || type == "files") {
       badgesDirFound = true;
     }
 
