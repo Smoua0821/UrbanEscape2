@@ -1,12 +1,14 @@
 <div class="howtoplaycontainer"></div>
-<div class="user-navbar d-sm-flex border-0 border-sm-" style="display: none">
+<div class="user-navbar" style="display: none">
   <div class="navbar-container">
     <ul>
-      <% if (user) { %> <% if (user.role.current=="admin") { %>
+      <% if (user) { %>
+      <li data-id="/user/profile" style="float: left">
+        <span class="fa fa-bars"></span>
+      </li>
+      <% if (user.role.current=="admin") { %>
       <li data-id="/admin">Admin</li>
-      <%}%>
-      <li data-id="/user/profile"><span class="fa fa-bars"></span></li>
-      <% if (locals.missions) { %>
+      <%}%> <% if (locals.missions) { %>
       <li data-id="/missions">Missions</li>
       <% } %> <% }else{ %>
       <li data-id="/auth">Login</li>
