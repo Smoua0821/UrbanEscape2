@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const Badge = require("../../models/Badges");
+const User = require("../../models/User");
 
 const dirCreate = async (req, res) => {
   let { name } = req.body;
@@ -125,6 +126,9 @@ const deleteFile = async (req, res) => {
       return res.json({ status: "error", message: "File does not exist" });
 
     fs.unlinkSync(filePath);
+    const badgeName = `/badges/${dirName}/${filename}`;
+    await Badge.deleteOne({ file: filename, dir: dirName });
+    await User.updateMany({}, { $pull: { badges: badgeName } });
     return res.json({
       status: "success",
       message: "File deleted successfully",
