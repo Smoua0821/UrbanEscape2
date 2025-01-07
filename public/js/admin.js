@@ -292,6 +292,24 @@ const renderBadgeFiles = () => {
         "selected"
       );
       $(this).addClass("selected");
+      $(".fileManagerBody .files .file-container .fileUnit.selected")
+        .off("click")
+        .on("click", function () {
+          $.post(
+            "/admin/badges/file/delete",
+            { dirName: badgeDirName, filename: badgeDirFileName },
+            (d) => {
+              if (d.status == "success") {
+                $(this).remove();
+                $(
+                  ".fileManagerBody .files .file-container .fileUnit"
+                ).removeClass("selected");
+                return notyf.success(d.message);
+              }
+              return notyf.error(d.message);
+            }
+          );
+        });
       $(".file-description").fadeIn();
       notyf.success("File Selected");
       badgeDirFileName = $(this).data("id");

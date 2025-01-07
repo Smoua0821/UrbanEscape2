@@ -229,3 +229,8 @@
   border: 2px solid lime;
   background: rgb(230, 255, 230);
 }
+
+.fileManagerBody .files .file-container .fileUnit.selected:hover {
+  background: #ff7979;
+  border: 2px solid red;
+}
