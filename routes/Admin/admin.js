@@ -19,7 +19,9 @@ const {
   getMarkerImage,
   deleteMarkerImage,
   exportImages,
+  exportBadges,
   importImages,
+  importBadges,
   settingsUpdate,
 } = require("../../controllers/Admin/admin");
 const {
@@ -88,6 +90,7 @@ router.post("/map/missions/remove", removeMapMission);
 
 router.get("/export/users", exportExcel);
 router.get("/export/images", exportImages);
+router.get("/export/badges", exportBadges);
 
 const storageImportImage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -108,6 +111,12 @@ router.post(
   "/import/images",
   uploadImportImage.single("zipFile"),
   importImages
+);
+
+router.post(
+  "/import/badges",
+  uploadImportImage.single("zipFile"),
+  importBadges
 );
 
 router.post("/settings/update", settingsUpdate);

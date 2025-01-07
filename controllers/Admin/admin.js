@@ -519,35 +519,167 @@ const deleteMarkerImage = async (req, res) => {
   }
 };
 
-const exportImages = (req, res) => {
-  const folderPath = path.join(__dirname, "../../public/images/mapicons/");
+const exportDir = (folderPath, zipFileName, res) => {
   if (!fs.existsSync(folderPath)) {
     return res.status(404).send("Folder not found");
   }
-  const zipFileName = "imagesBackup_" + Date.now() + ".zip";
+
   const archive = archiver("zip", {
     zlib: { level: 9 },
   });
 
   res.attachment(zipFileName);
-
   archive.pipe(res);
 
-  fs.readdir(folderPath, (err, files) => {
-    if (err) {
-      return res.status(500).send("Error reading folder");
-    }
+  // Recursively add files to the archive
+  const addFilesToArchive = (currentPath, archiveBasePath) => {
+    const files = fs.readdirSync(currentPath);
 
     files.forEach((file) => {
-      const filePath = path.join(folderPath, file);
-      // Check if it's a file and not a directory
-      if (fs.statSync(filePath).isFile()) {
-        archive.file(filePath, { name: file });
+      const filePath = path.join(currentPath, file);
+      const relativePath = path.join(archiveBasePath, file);
+
+      const stat = fs.statSync(filePath);
+
+      if (stat.isDirectory()) {
+        // If it's a directory, recursively add its contents
+        addFilesToArchive(filePath, relativePath);
+      } else {
+        // If it's a file, add it to the archive
+        archive.file(filePath, { name: relativePath });
       }
     });
+  };
+
+  try {
+    // Start adding files from the root directory
+    addFilesToArchive(folderPath, path.basename(folderPath));
 
     // Finalize the archive (close it)
     archive.finalize();
+  } catch (err) {
+    return res.status(500).send("Error processing folder: " + err.message);
+  }
+};
+
+const exportImages = (req, res) => {
+  const folderPath = path.join(__dirname, "../../public/images/mapicons/");
+  const zipFileName = "imagesBackup_" + Date.now() + ".zip";
+  exportDir(folderPath, zipFileName, res);
+};
+
+const exportBadges = (req, res) => {
+  const folderPath = path.join(__dirname, "../../public/badges/");
+  const zipFileName = "badgeBackup_" + Date.now() + ".zip";
+  exportDir(folderPath, zipFileName, res);
+};
+
+const importDir = (zipFilePath, destinationDir, type, res) => {
+  const allowedType = ["directory", "files"];
+  if (!allowedType.includes(type))
+    return res.status(400).json({ status: "error", message: "Not Allowed!" });
+
+  if (!fs.existsSync(zipFilePath)) {
+    return res.status(404).send("ZIP file not found");
+  }
+
+  try {
+    fsExtra.ensureDirSync(destinationDir); // Ensure the destination directory exists
+  } catch (err) {
+    return res
+      .status(500)
+      .send(`Error ensuring destination directory: ${err.message}`);
+  }
+
+  const zipStream = fs.createReadStream(zipFilePath).pipe(unzipper.Parse());
+
+  let badgesDirFound = false; // Flag to check if 'badges' directory exists
+
+  zipStream.on("entry", (entry) => {
+    // Check if the entry's path starts with 'badges/' (case-sensitive)
+    if (entry.path.startsWith("badges/")) {
+      badgesDirFound = true;
+    }
+
+    // If 'badges' directory was found, proceed with extraction
+    if (badgesDirFound) {
+      const entryPath = path.join(destinationDir, entry.path);
+
+      if (type === "files") {
+        // If the type is 'files', ensure entry is a file and not a directory
+        if (entry.type !== "File") {
+          console.log(
+            `Skipping directory (expected files only): ${entry.path}`
+          );
+          entry.autodrain();
+        } else {
+          // Extract the file
+          entry
+            .pipe(fs.createWriteStream(entryPath))
+            .on("finish", () => {
+              console.log(`Successfully extracted file: ${entry.path}`);
+            })
+            .on("error", (err) => {
+              console.error(
+                `Error extracting file ${entry.path}: ${err.message}`
+              );
+            });
+        }
+      }
+
+      if (type === "directory") {
+        // If the type is 'directory', we need to preserve the directory structure
+        if (entry.type === "Directory") {
+          const dirPath = path.join(destinationDir, entry.path);
+          fsExtra.ensureDirSync(dirPath); // Ensure the directory structure is preserved
+          entry.autodrain();
+        } else if (entry.type === "File") {
+          // Ensure the directory structure exists before writing the file
+          const dirPath = path.dirname(entryPath);
+          fsExtra.ensureDirSync(dirPath);
+          entry
+            .pipe(fs.createWriteStream(entryPath))
+            .on("finish", () => {
+              console.log(`Successfully extracted file: ${entry.path}`);
+            })
+            .on("error", (err) => {
+              console.error(
+                `Error extracting file ${entry.path}: ${err.message}`
+              );
+            });
+        }
+      }
+    } else {
+      // If 'badges' is not found in the ZIP, skip all extraction
+      console.log("Skipping extraction because 'badges' directory is missing.");
+      entry.autodrain();
+    }
+  });
+
+  zipStream.on("close", () => {
+    try {
+      fs.unlinkSync(zipFilePath); // Delete the zip file after extraction
+      console.log(`Successfully deleted the zip file: ${zipFilePath}`);
+    } catch (err) {
+      console.error(`Error deleting zip file: ${err.message}`);
+    }
+
+    if (badgesDirFound) {
+      res.json({
+        message:
+          "Files have been successfully decompressed and copied to the destination folder",
+      });
+    } else {
+      res.status(400).json({
+        status: "error",
+        message: "'badges' directory not found in the ZIP file",
+      });
+    }
+  });
+
+  zipStream.on("error", (err) => {
+    console.error(`Error during decompression: ${err.message}`);
+    res.status(500).send(`Error during extraction: ${err.message}`);
   });
 };
 
@@ -555,68 +687,14 @@ const importImages = (req, res) => {
   const filename = req.file.filename;
   const zipFilePath = path.join(__dirname, "../../", filename);
   const destinationDir = path.join(__dirname, "../../public/images/mapicons");
+  importDir(zipFilePath, destinationDir, "files", res);
+};
 
-  // Check if the ZIP file exists
-  if (!fs.existsSync(zipFilePath)) {
-    return res.status(404).send("ZIP file not found");
-  }
-
-  // Ensure the destination directory exists, create it if it doesn't
-  try {
-    fsExtra.ensureDirSync(destinationDir);
-  } catch (err) {
-    return res
-      .status(500)
-      .send(`Error ensuring destination directory: ${err.message}`);
-  }
-
-  // Create a stream to decompress the ZIP file
-  const zipStream = fs.createReadStream(zipFilePath).pipe(unzipper.Parse()); // Use Parse() to handle individual files during decompression
-
-  zipStream.on("entry", (entry) => {
-    const entryPath = path.join(destinationDir, entry.path);
-
-    // Check if the file already exists in the destination folder
-    fsExtra.exists(entryPath, (exists) => {
-      if (exists) {
-        console.log(`Skipping existing file: ${entry.path}`);
-        entry.autodrain(); // Skip the file if it already exists
-      } else {
-        // If the file does not exist, extract it
-        entry
-          .pipe(fs.createWriteStream(entryPath))
-          .on("finish", () => {
-            console.log(`Successfully extracted: ${entry.path}`);
-          })
-          .on("error", (err) => {
-            console.error(
-              `Error extracting file ${entry.path}: ${err.message}`
-            );
-          });
-      }
-    });
-  });
-
-  zipStream.on("close", () => {
-    // Delete the original zip file after extraction
-    try {
-      fs.unlinkSync(zipFilePath); // Remove the zip file after extraction
-      console.log(`Successfully deleted the zip file: ${zipFilePath}`);
-    } catch (err) {
-      console.error(`Error deleting zip file: ${err.message}`);
-    }
-
-    // Send a success response
-    res.json({
-      message:
-        "Files have been successfully decompressed and copied to the destination folder",
-    });
-  });
-
-  zipStream.on("error", (err) => {
-    console.error(`Error during decompression: ${err.message}`);
-    res.status(500).send(`Error during extraction: ${err.message}`);
-  });
+const importBadges = (req, res) => {
+  const filename = req.file.filename;
+  const zipFilePath = path.join(__dirname, "../../", filename);
+  const destinationDir = path.join(__dirname, "../../public");
+  importDir(zipFilePath, destinationDir, "directory", res);
 };
 
 const settingsImport = async (req, res) => {
@@ -692,7 +770,9 @@ module.exports = {
   getMarkerImage,
   deleteMarkerImage,
   exportImages,
+  exportBadges,
   importImages,
+  importBadges,
   settingsImport,
   settingsUpdate,
 };
