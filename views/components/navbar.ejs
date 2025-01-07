@@ -1,11 +1,11 @@
 <div class="howtoplaycontainer"></div>
-<div class="user-navbar" style="display: none">
+<div class="user-navbar d-sm-flex border-0 border-sm-" style="display: none">
   <div class="navbar-container">
     <ul>
       <% if (user) { %> <% if (user.role.current=="admin") { %>
       <li data-id="/admin">Admin</li>
       <%}%>
-      <li data-id="/user/profile">Profile</li>
+      <li data-id="/user/profile"><span class="fa fa-bars"></span></li>
       <% if (locals.missions) { %>
       <li data-id="/missions">Missions</li>
       <% } %> <% }else{ %>
@@ -20,14 +20,12 @@
     bottom: 0;
     justify-content: center;
     width: 100%;
-    display: inline-flex;
   }
 
   .user-navbar .navbar-container {
-    background: #ffffff70;
+    background: #fff;
     border-radius: 5px;
     padding: 5px;
-    backdrop-filter: blur(5px);
     font-family: sans-serif;
     text-align: center;
   }
