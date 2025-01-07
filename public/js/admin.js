@@ -295,6 +295,10 @@ const renderBadgeFiles = () => {
       $(".fileManagerBody .files .file-container .fileUnit.selected")
         .off("click")
         .on("click", function () {
+          const cnf = confirm(
+            "Badge will be deleted permanently! Are you sure?"
+          );
+          if (!cnf) return;
           $.post(
             "/admin/badges/file/delete",
             { dirName: badgeDirName, filename: badgeDirFileName },
