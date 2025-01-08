@@ -266,7 +266,7 @@ $(document).ready(() => {
 });
 let polygonCoordinates = [];
 let map, markerElement, circle, marker;
-let pos = { lat: 55.5, lng: 254.7 };
+let pos = { lat: 50.46765140154505, lng: -104.61 };
 let iconMarker = document.createElement("img");
 let currentSegment = 0;
 let currentStep = 0;
@@ -523,49 +523,44 @@ function getCurrentLocation() {
 }
 
 function updateCurrentLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        $(".simpleLoading").fadeOut();
-        pos.lat = position.coords.latitude;
-        pos.lng = position.coords.longitude;
-        nearestPolygon();
-        marker.position = pos;
-        marker.setMap(map);
-        if (isFirstTime) {
-          isFirstTime = 0;
-          map.panTo(pos);
-          startGaming();
-        }
-      },
-      (error) => {
-        $(".errorScreen").show();
-        $("#map").remove();
-        let locerrmsg = "";
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            locerrmsg = "User denied the request for Geolocation.";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            locerrmsg = "Location information is unavailable.";
-            break;
-          case error.TIMEOUT:
-            locerrmsg = "The request to get user location timed out.";
-            break;
-          case error.UNKNOWN_ERROR:
-            locerrmsg = "An unknown error occurred.";
-            break;
-          default:
-            locerrmsg = "An error occurred while retrieving location.";
-        }
-        notyf.error(locerrmsg);
-        $(".locerrmsg").text(locerrmsg);
-      }
-    );
-    setTimeout(updateCurrentLocation, 10000);
-  } else {
+  if (!navigator.geolocation) {
     notyf.error("Geolocation is not supported by this browser.");
+    return;
   }
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      $(".simpleLoading").fadeOut();
+      pos.lat = position.coords.latitude;
+      pos.lng = position.coords.longitude;
+      nearestPolygon();
+      marker.position = pos;
+      marker.setMap(map);
+
+      if (isFirstTime) {
+        isFirstTime = 0;
+        map.panTo(pos);
+        startGaming();
+      }
+    },
+    (error) => {
+      $(".errorScreen").show();
+      $("#map").remove();
+      const locerrmsg =
+        [
+          "User denied the request for Geolocation.",
+          "Location information is unavailable.",
+          "The request to get user location timed out.",
+          "An unknown error occurred.",
+          "An error occurred while retrieving location.",
+        ][error.code] || "An error occurred while retrieving location.";
+      notyf.error(locerrmsg);
+      $(".locerrmsg").text(locerrmsg);
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+  );
+
+  setTimeout(updateCurrentLocation, 10000);
 }
 
 function interpolate(start, end, factor) {
