@@ -686,7 +686,7 @@ const importDir = (zipFilePath, destinationDir, type, res) => {
 const importImages = (req, res) => {
   const filename = req.file.filename;
   const zipFilePath = path.join(__dirname, "../../", filename);
-  const destinationDir = path.join(__dirname, "../../public/images/mapicons");
+  const destinationDir = path.join(__dirname, "../../public/images");
   importDir(zipFilePath, destinationDir, "files", res);
 };
 
