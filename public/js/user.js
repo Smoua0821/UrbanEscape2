@@ -491,10 +491,15 @@ function removeObjectByIndex(arr, index) {
 }
 let isFirstTime = 1;
 let pendingPromise = 0;
+
 function getCurrentLocation() {
+  marker.position = pos;
+  marker.setMap(map);
+  map.panTo(pos);
   if (pendingPromise) return;
   return new Promise((resolve, reject) => {
     pendingPromise = 1;
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -509,9 +514,35 @@ function getCurrentLocation() {
           resolve({ lat: latitude, lng: longitude });
         },
         (error) => {
-          // Error: reject with an error message
+          // Error: try fetching from the fallback API
           notyf.error("Can't get Location, Try Again!");
-          reject(new Error("Unable to retrieve location"));
+
+          // Fetch fallback location from the external API
+          fetch("https://freeipapi.com/api/json")
+            .then((response) => response.json())
+            .then((data) => {
+              if (data && data.latitude && data.longitude) {
+                const fallbackLat = data.latitude;
+                const fallbackLng = data.longitude;
+                pos.lat = fallbackLat;
+                pos.lng = fallbackLng;
+                nearestPolygon();
+                marker.position = pos;
+                marker.setMap(map);
+                map.panTo(pos);
+                resolve({ lat: fallbackLat, lng: fallbackLng });
+              } else {
+                // If API doesn't return valid coordinates, reject the promise
+                pendingPromise = 0;
+                reject(new Error("Unable to retrieve fallback location"));
+              }
+            })
+            .catch((err) => {
+              // Handle API request failure
+              pendingPromise = 0;
+              notyf.error("Error fetching fallback location: " + err.message);
+              reject(new Error("Error fetching fallback location"));
+            });
         }
       );
     } else {
@@ -528,39 +559,73 @@ function updateCurrentLocation() {
     return;
   }
 
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      $(".simpleLoading").fadeOut();
-      pos.lat = position.coords.latitude;
-      pos.lng = position.coords.longitude;
-      nearestPolygon();
-      marker.position = pos;
-      marker.setMap(map);
+  const successCallback = (position) => {
+    $(".simpleLoading").fadeOut();
+    pos.lat = position.coords.latitude;
+    pos.lng = position.coords.longitude;
+    nearestPolygon();
+    marker.position = pos;
+    marker.setMap(map);
 
-      if (isFirstTime) {
-        isFirstTime = 0;
-        map.panTo(pos);
-        startGaming();
-      }
-    },
-    (error) => {
+    if (isFirstTime) {
+      isFirstTime = 0;
+      map.panTo(pos);
+      startGaming();
+    }
+  };
+
+  const errorCallback = (error) => {
+    // If geolocation fails, attempt to fetch coordinates from the fallback API
+    if (error.code !== error.TIMEOUT) {
       $(".errorScreen").show();
       $("#map").remove();
-      const locerrmsg =
-        [
-          "User denied the request for Geolocation.",
-          "Location information is unavailable.",
-          "The request to get user location timed out.",
-          "An unknown error occurred.",
-          "An error occurred while retrieving location.",
-        ][error.code] || "An error occurred while retrieving location.";
-      notyf.error(locerrmsg);
-      $(".locerrmsg").text(locerrmsg);
-    },
-    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-  );
+    }
 
-  setTimeout(updateCurrentLocation, 10000);
+    const locerrmsg =
+      [
+        "User denied the request for Geolocation.",
+        "Location information is unavailable.",
+        "The request to get user location timed out.",
+        "An unknown error occurred.",
+        "An error occurred while retrieving location.",
+      ][error.code] || "An error occurred while retrieving location.";
+
+    notyf.error(locerrmsg);
+    $(".locerrmsg").text(locerrmsg);
+
+    // Fallback: Get coordinates from external API
+    fetch("https://freeipapi.com/api/json")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data && data.latitude && data.longitude) {
+          pos.lat = data.latitude;
+          pos.lng = data.longitude;
+          nearestPolygon();
+          marker.position = pos;
+          marker.setMap(map);
+
+          if (isFirstTime) {
+            isFirstTime = 0;
+            map.panTo(pos);
+            startGaming();
+          }
+        } else {
+          notyf.error("Unable to fetch fallback location.");
+        }
+      })
+      .catch((err) => {
+        notyf.error("Error fetching fallback location: " + err.message);
+      });
+  };
+
+  const options = {
+    enableHighAccuracy: true,
+    timeout: 10000, // Timeout in milliseconds
+    maximumAge: 0, // Do not use cached location
+  };
+
+  // Using watchPosition instead of getCurrentPosition
+  navigator.geolocation.watchPosition(successCallback, errorCallback, options);
 }
 
 function interpolate(start, end, factor) {
