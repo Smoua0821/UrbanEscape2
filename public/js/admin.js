@@ -118,6 +118,10 @@ $("#routeTitle")
     payloadData.title = value.trim();
   });
 $(".save_final").click(() => {
+  pos = {
+    lat: map.getCenter().lat(),
+    lng: map.getCenter().lng(),
+  };
   if (
     (payloadData.polygonCoords.length > 2 ||
       loopRouteOptions.mode == "update") &&
@@ -970,6 +974,7 @@ function renderMapMissions() {
       );
     });
 }
+
 function renderRoutes() {
   map = new google.maps.Map(document.getElementsByClassName("g-map")[0], {
     zoom: 15,
