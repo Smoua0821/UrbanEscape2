@@ -286,6 +286,7 @@ function initMap() {
     center: pos,
     mapId: "f543ed7dd1b2a7e2",
     fullscreenControl: false,
+    disableDoubleClickZoom: true,
     disableDefaultUI: true,
     mapTypeControl: true,
     mapTypeControlOptions: {
