@@ -182,12 +182,7 @@
             <p
               class="alert alert-info mText"
               style="text-transform: capitalize"
-            >
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas
-              nesciunt mollitia quae, tempore sed neque eveniet numquam veniam
-              architecto et eius aperiam ducimus. Ducimus, quibusdam
-              repellendus? Fugit tenetur repudiandae nam.
-            </p>
+            ></p>
             <div class="row m-0 p-2 justify-content-center">
               <div
                 class="my-2 col-sm-6 confirmCaptureContainer"
@@ -234,6 +229,9 @@
     </div>
     <div class="currentLocationBtn" onclick="getCurrentLocation()">
       <span class="fa fa-crosshairs"></span>
+    </div>
+    <div class="popup-button" style="display: none">
+      <button>Open Details</button>
     </div>
     <script>
       let missions=<%- JSON.stringify(missions) %>;

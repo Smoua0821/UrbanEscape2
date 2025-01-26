@@ -457,12 +457,18 @@ function initMap() {
   showAllPolygons();
 }
 function markerClickTrack(event) {
-  console.log("Clicked");
-  const tarId = event.target.id;
-  if (!tarId) return notyf.error("No Information");
-  InfoModal(tarId);
-  event.preventDefault();
-  return false;
+  $(".popup-button").show();
+  $(".popup-button")
+    .off("click")
+    .on("click", function () {
+      console.log("Clicked");
+      const tarId = event.target.id;
+      if (!tarId) return notyf.error("No Information");
+      InfoModal(tarId);
+      event.preventDefault();
+      $(".popup-button").hide();
+      return false;
+    });
 }
 function showAllPolygons() {
   $.get(`/api/looproute/${mapParsedId}`, (data, success) => {
@@ -474,7 +480,7 @@ function showAllPolygons() {
       img.width = 10 * pl.size;
       img.id = pl._id;
       img.className = "mapPolyImage";
-      img.addEventListener("dblclick", markerClickTrack);
+      img.addEventListener("click", markerClickTrack);
       // img.addEventListener("touchstart", markerClickTrack);
       new google.maps.marker.AdvancedMarkerElement({
         position: pl.polygonCoords[0],
