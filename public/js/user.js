@@ -481,7 +481,7 @@ function showAllPolygons() {
       img.id = pl._id;
       img.className = "mapPolyImage";
       img.addEventListener("click", markerClickTrack);
-      // img.addEventListener("touchstart", markerClickTrack);
+      img.addEventListener("touchstart", markerClickTrack);
       new google.maps.marker.AdvancedMarkerElement({
         position: pl.polygonCoords[0],
         content: img,
