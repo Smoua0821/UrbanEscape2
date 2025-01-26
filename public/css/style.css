@@ -328,29 +328,26 @@ img {
 
 .popup-button {
   position: fixed;
-  bottom: 0;
-  width: 100%;
+  bottom: 120px;
   background: #ffffff;
-  padding: 10px;
+  padding: 5px;
+  padding-right: 0;
   text-align: center;
+  right: 0;
+  border-radius: 10px 0 0 10px;
+  border: 2px solid lightgrey;
 }
 
 .popup-button button {
-  border: 2px solid black;
-  background: red;
-  color: white;
-  padding: 5px 20px;
-  border-radius: 10px 0 10px 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  box-shadow: 5px 5px 4px #00000061;
-  transition: 0.1s;
+  padding: 5px 10px;
+  border-radius: 10px 0 0 10px;
+  transition: 0.1s ease-in;
+  border: 2px solid lightgrey;
+  border-right: 0;
 }
 
 .popup-button button:hover {
-  box-shadow: 0 0 0 0 #00000061;
   background: yellow;
-  border: 2px solid red;
-  color: black;
-  border-radius: 0 10px 0px 10px;
+  border: 2px solid grey;
+  border-right: 0;
 }
