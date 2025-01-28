@@ -234,7 +234,7 @@ $(document).ready(() => {
     let index = 0;
     targetMission.images.forEach((image) => {
       $(".user-image-pick").append(
-        `<div class="image-line"><div class="mission-image image-picker" data-id='${++index}'></div><div class="mission-image"><img src="/images/mapicons/${image}" loading="lazy"></div></div>`
+        `<div class="image-line col-6 row p-2"><div class="mission-image image-picker col-6" data-id='${++index}'></div><div class="mission-image col-6"><img src="/images/mapicons/${image}" width="100%" loading="lazy"></div></div>`
       );
     });
     $(".image-picker")

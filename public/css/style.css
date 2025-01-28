@@ -180,24 +180,6 @@
   padding-bottom: 10px;
 }
 
-.mission-container .user-image-pick .image-line {
-  display: inline-flex;
-  width: 100%;
-  margin: 10px 0;
-}
-
-@media screen and (min-width: 500px) {
-  .mission-container .user-image-pick .image-line {
-    width: 50%;
-  }
-
-  .mission-container .user-image-pick {
-    display: flex;
-  }
-}
-
-.mission-container .user-image-pick .image-line {
-}
 .mission-container .user-image-pick .image-line .mission-image {
   width: 50%;
   max-height: 100px;
