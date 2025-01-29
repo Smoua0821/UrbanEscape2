@@ -647,10 +647,8 @@ function interpolate(start, end, factor) {
 }
 
 function gameWon() {
-  const x = $(".WinScreen")[0];
-  $("body").empty();
-  document.body.appendChild(x);
-  x.style = "";
+  markerElement.setMap(null);
+  circle.setMap(null);
   return notyf.success("You Won the Game!");
 }
 function animateMarker() {
