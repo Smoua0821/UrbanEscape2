@@ -7,6 +7,7 @@ const {
   routeRedeem,
   handleRecentMaps,
   redeemLinkHandler,
+  badgeDelete,
 } = require("../controllers/user");
 
 router.get("/profile", userProfile);
@@ -16,5 +17,7 @@ router.post("/profile/capture", captureImage);
 router.get("/profile/capture", getCaptureImage);
 
 router.post("/map/", handleRecentMaps);
+
+router.post("/profile/badge/delete", badgeDelete);
 
 module.exports = router;

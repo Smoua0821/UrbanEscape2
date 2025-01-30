@@ -196,7 +196,7 @@
             <table class="table">
               <tbody>
                 <% userBadgeDetails.forEach(badge => { %>
-                <tr>
+                <tr class="unit-badge" data-src="<%= badge.badge %>">
                   <td>
                     <img src="<%= badge.badge %>" width="100px" />
                   </td>
@@ -233,6 +233,18 @@
     ></script>
     <script>
       $(document).ready(() => {
+        $(".unit-badge").on("click", function () {
+          if (confirm("Badge will be deleted forever! Are you sure?")) {
+            const badgeId = $(this).data("src");
+            $.post("/user/profile/badge/delete", { badge: badgeId }, (data) => {
+              if (data && data.status == "success") {
+                $(this).fadeOut(() => {
+                  $(this).remove();
+                });
+              }
+            });
+          }
+        });
         $("form.profile").submit(() => {
           return false;
         });
