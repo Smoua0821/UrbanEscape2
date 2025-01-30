@@ -48,7 +48,6 @@ const loginValidate = async (req, res) => {
     res.cookie("sessionId", token, {
       maxAge: 1000 * 60 * 60 * 24,
       httpOnly: true,
-      sameSite: "strict",
     });
 
     if (user.role.current === "admin") return res.redirect("/admin");
