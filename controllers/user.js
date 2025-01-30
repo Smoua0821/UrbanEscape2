@@ -308,6 +308,42 @@ const redeemLinkHandler = async (req, res) => {
   }
 };
 
+const badgeDelete = async (req, res) => {
+  const { badge } = req.body;
+
+  if (!badge) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "Invalid Badge ID" });
+  }
+
+  if (!req.user || !req.user._id) {
+    return res.status(400).json({ status: "error", message: "No User found" });
+  }
+
+  try {
+    const result = await User.updateOne(
+      { _id: req.user._id },
+      { $pull: { badges: badge } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res
+        .status(404)
+        .json({
+          status: "error",
+          message: "Badge not found or already removed",
+        });
+    }
+
+    return res
+      .status(200)
+      .json({ status: "success", message: "Badge Deleted Successfully!" });
+  } catch (error) {
+    console.error("Error deleting badge:", error);
+    return res.status(500).json({ status: "error", message: "Server Error" });
+  }
+};
 module.exports = {
   userProfile,
   captureImage,
@@ -315,4 +351,5 @@ module.exports = {
   routeRedeem,
   handleRecentMaps,
   redeemLinkHandler,
+  badgeDelete,
 };
