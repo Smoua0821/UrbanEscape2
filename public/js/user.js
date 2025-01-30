@@ -771,7 +771,7 @@ function moveMarker(data) {
     });
   }
   iconMarker.width = data.size * 10;
-  markerElement.position = data.polygonCoords[polyIndex];
+  // markerElement.position = data.polygonCoords[polyIndex];
   circle.setRadius(data.radius);
 }
 function startGaming() {
