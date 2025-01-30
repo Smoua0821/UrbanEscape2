@@ -198,6 +198,14 @@
         }
       }
       $(document).ready(() => {
+        document
+          .getElementById("ppolicyCheck")
+          .addEventListener("change", function () {
+            if (!this.checked) return $("#registerBtn").hide();
+            if (!$("#citySelector").val()) return;
+            return $("#registerBtn").show();
+          });
+
         if (window.location.hash == "#register") {
           toggleForm();
         }
@@ -217,6 +225,8 @@
 
             $("#citySelector").on("change", (event) => {
               if (!event.target.value) return $("#registerBtn").hide();
+              x = $("#ppolicyCheck")[0];
+              if (!x.checked) return;
               return $("#registerBtn").show();
             });
           }
