@@ -789,7 +789,9 @@ function startGaming() {
     haversineDistance(
       polygonCoordinates[polyIndex].polygonCoords[0],
       polygonCoordinates[polyIndex].polygonCoords[1]
-    ) * 500;
+    ) *
+    500 *
+    (2 - speed / 100);
   moveMarker(polygonCoordinates[polyIndex]);
   animateMarker();
   gameStarted = 1;
