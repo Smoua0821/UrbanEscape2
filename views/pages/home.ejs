@@ -42,14 +42,21 @@
             </div>
             <div class="card-body">
               <div class="row countdown text-center">
-                <div class="col-4 p-0">
+                <div class="col-3 p-0">
+                  <span class="timec day">00</span>
+                  <span class="timer-titles">Days</span>
+                </div>
+                <div class="col-3 p-0">
                   <span class="timec hour">00</span>
+                  <span class="timer-titles">Hours</span>
                 </div>
-                <div class="col-4 p-0">
+                <div class="col-3 p-0">
                   <span class="timec minute">00</span>
+                  <span class="timer-titles">minutes</span>
                 </div>
-                <div class="col-4 p-0">
+                <div class="col-3 p-0">
                   <span class="timec second">00</span>
+                  <span class="timer-titles">second</span>
                 </div>
               </div>
             </div>
@@ -67,6 +74,11 @@
         background: linear-gradient(0, #6900ab6b, transparent, #6d00ff6b);
         display: block;
         margin: 1px;
+      }
+
+      .countdown .timer-titles {
+        font-size: 0.8rem;
+        text-transform: uppercase;
       }
     </style>
     <%}%>
