@@ -1,3 +1,33 @@
+function formatTime(seconds) {
+  const hours = String(Math.floor(seconds / 3600)).padStart(2, "0");
+  const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+  const remainingSeconds = String(seconds % 60).padStart(2, "0");
+
+  $(".timec.hour").html(hours);
+  $(".timec.minute").html(minutes);
+  $(".timec.second").html(remainingSeconds);
+
+  if (seconds === 0) {
+    $(".countdown-holder").fadeOut();
+    clearInterval(ctwlIvl);
+  }
+}
+
+const countdownTimec = parseInt(
+  document.getElementById("countdownTimec").value / 1000
+);
+if (countdownTimec > 0) {
+  let secondsRemaining = countdownTimec;
+  const ctwlIvl = setInterval(() => {
+    formatTime(secondsRemaining);
+    if (secondsRemaining <= 0) {
+      clearInterval(ctwlIvl);
+    } else {
+      secondsRemaining--;
+    }
+  }, 1000);
+}
+
 function voeed() {
   return true;
 }

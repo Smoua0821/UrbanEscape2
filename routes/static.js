@@ -58,6 +58,12 @@ router.get("/map/:mapId", async (req, res) => {
   }
 
   if (!imgexist) imgexist = [];
+  function dateInFuture(isoDateString) {
+    const now = new Date();
+    const givenDate = new Date(isoDateString);
+    return givenDate - now;
+  }
+  console.log(dateInFuture(map.launchTime));
   res.render("pages/home", {
     apiKey: "AIzaSyBaQ334LSpDNZXU8flkT1VjGpdj7f3_BZI",
     user: user,
@@ -65,6 +71,7 @@ router.get("/map/:mapId", async (req, res) => {
     title: map.name,
     missions: map.missions,
     imageExist: imgexist,
+    timeFuture: dateInFuture(map.launchTime),
   });
 });
 
