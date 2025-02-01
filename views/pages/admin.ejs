@@ -124,19 +124,37 @@
               </div>
             </div>
             <div class="vj_dynamic maplist">
-              <div class="row justify-content-center">
-                <form
-                  class="form my-5 bg-light p-3 col-sm-10 col-md-8 col-lg-6 m-0 new_map_form"
-                >
+              <div class="justify-content-center">
+                <form class="form my-5 bg-light p-3 m-0 new_map_form">
                   <h3 class="text-center m-0 mb-3">New Map</h3>
-                  <div class="d-flex">
-                    <input
-                      placeholder="Map Name"
-                      class="form-control"
-                      name="name"
-                      id="name"
-                    />
-                    <button class="ms-2 btn btn-warning">Create</button>
+                  <div class="row">
+                    <div class="col-12 col-md-6 col-lg-5 my-2">
+                      <input
+                        placeholder="Map Name"
+                        class="form-control"
+                        name="name"
+                        id="name"
+                      />
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-3 my-2">
+                      <input
+                        type="date"
+                        class="form-control"
+                        name="mapLaunchDate"
+                        id="mapLaunchDate"
+                      />
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-2 my-2">
+                      <input
+                        type="time"
+                        class="form-control"
+                        name="mapLaunchTime"
+                        id="mapLaunchTime"
+                      />
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-2 my-2">
+                      <button class="w-100 btn btn-warning">Create</button>
+                    </div>
                   </div>
                 </form>
                 <div

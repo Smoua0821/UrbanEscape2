@@ -21,6 +21,10 @@ const mapSchema = new mongoose.Schema(
       min: 0,
       max: 22,
     },
+    launchTime: {
+      type: Date,
+      required: true,
+    },
     missions: [
       {
         redeemLink: {

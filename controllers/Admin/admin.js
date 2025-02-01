@@ -124,16 +124,23 @@ const fetchMaps = async (req, res) => {
   });
 };
 const newMap = async (req, res) => {
-  const { name } = req.body;
+  const { name, mapLaunchTime, mapLaunchDate } = req.body;
 
-  if (!name) {
+  if (!name || !mapLaunchTime || !mapLaunchDate) {
     return res
       .status(400)
       .json({ status: "error", message: "Map name is required" });
   }
+  let ISODate = new Date(`${mapLaunchDate}T${mapLaunchTime}`);
+  ISODate = ISODate.toISOString();
 
   try {
-    const newMap = new Map({ name, id: uuidv4(), zoom: 15 });
+    const newMap = new Map({
+      name,
+      id: uuidv4(),
+      zoom: 15,
+      launchTime: ISODate,
+    });
     const savedMap = await newMap.save();
     res
       .status(201)

@@ -698,14 +698,26 @@ $(document).ready(() => {
   });
   $("form.new_map_form").submit(function () {
     const mapName = $("form.new_map_form input#name").val();
+    const mapLaunchDate = $("form.new_map_form input#mapLaunchDate").val();
+    const mapLaunchTime = $("form.new_map_form input#mapLaunchTime").val();
+
+    mapLaunchTime;
     if (!mapName) alert("Please Enter a Valid Name");
-    $.post("/admin/map", { name: mapName }, (data) => {
-      if (data.status == "success") {
-        notyf.success(`Form '${mapName}' created successfully!`);
-        fetchMaps();
-        $("form.new_map_form input#name").val("");
+    $.post(
+      "/admin/map",
+      {
+        name: mapName,
+        mapLaunchDate: mapLaunchDate,
+        mapLaunchTime: mapLaunchTime,
+      },
+      (data) => {
+        if (data.status == "success") {
+          notyf.success(`Form '${mapName}' created successfully!`);
+          fetchMaps();
+          $("form.new_map_form input#name").val("");
+        }
       }
-    });
+    );
     return false;
   });
   $("#image-upload").on("change", function (e) {
