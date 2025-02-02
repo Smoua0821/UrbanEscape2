@@ -33,14 +33,20 @@
         class="d-inline-flex justify-content-center align-items-center w-100 vh-100"
       >
         <div class="col-10 col-sm-8 col-md-6 col-lg-4">
-          <div class="card rounded-0">
+          <div
+            class="card rounded-0"
+            style="background: #ffffff59; backdrop-filter: blur(10px)"
+          >
             <div
               class="card-header rounded-0"
-              style="background: #9900b3; color: white"
+              style="
+                background: linear-gradient(45deg, #da00ff, #0011ff);
+                color: white;
+              "
             >
               <h3 class="m-0 text-center">Live Soon!</h3>
             </div>
-            <div class="card-body">
+            <div class="card-body" style="display: transparent">
               <div class="row countdown text-center">
                 <div class="col-3 p-0">
                   <span class="timec day">00</span>
@@ -65,13 +71,16 @@
       </div>
     </div>
     <style>
-      .countdown {
+      .countdown-holder {
         font-size: 3rem;
         font-weight: 500;
+        background: url(/images/mountains-background-game-vector.jpg);
+        background-size: cover;
+        background-position: top;
       }
 
       .countdown .timec {
-        background: linear-gradient(0, #6900ab6b, transparent, #6d00ff6b);
+        background: linear-gradient(0, #ffffff6b, transparent, #0000006b);
         display: block;
         margin: 1px;
       }
