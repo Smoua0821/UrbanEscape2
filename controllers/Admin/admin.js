@@ -760,11 +760,35 @@ const settingsUpdate = async (req, res) => {
   }
 };
 
+const updateMapDate = async (req, res) => {
+  const { id, mapLaunchTime, mapLaunchDate } = req.body;
+  if (!id || !mapLaunchTime || !mapLaunchDate) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "Map Arguments are required!" });
+  }
+  let ISODate = new Date(`${mapLaunchDate}T${mapLaunchTime}`);
+  ISODate = ISODate.toISOString();
+  if (!ISODate)
+    return res.status(400).json({ status: "error", message: "Invalid Date!" });
+
+  try {
+    await Map.updateOne({ id: id }, { $set: { launchTime: ISODate } });
+    return res
+      .status(200)
+      .json({ status: "success", message: "Date Updated!" });
+  } catch (error) {
+    console.log(error);
+    return res.status(401).json({ status: "error", message: "Server Error!" });
+  }
+};
+
 module.exports = {
   adminPage,
   deleteUser,
   fetchMaps,
   newMap,
+  updateMapDate,
   deleteMap,
   newMapMission,
   MapMissions,
