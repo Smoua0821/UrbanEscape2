@@ -23,6 +23,7 @@ const {
   importImages,
   importBadges,
   settingsUpdate,
+  updateMapDate,
 } = require("../../controllers/Admin/admin");
 const {
   fetchLoopRoutes,
@@ -77,6 +78,8 @@ router.post("/delete/:id", deleteUser);
 
 router.get("/map", fetchMaps);
 router.post("/map", newMap);
+
+router.post("/map/update/launch", updateMapDate);
 
 router.get("/map/primary", fetchPrimaryMap);
 router.post("/map/primary", handlePrimaryMap);

@@ -394,6 +394,23 @@ const updateClientInterface = (targetName) => {
 };
 
 $(document).ready(() => {
+  $(".map-countdown-update").submit(function () {
+    const data = $(this).serializeArray();
+    $(".map-countdown-update input[name='id'").val(mapId);
+    const date = data[0].value;
+    const time = data[1].value;
+    if (!date || !time) {
+      notyf.error("Invalid Date Time");
+      return false;
+    }
+    $.post("/admin/map/update/launch", data, (data) => {
+      if (data.status == "success") {
+        return notyf.success(data.message);
+      }
+    });
+
+    return false;
+  });
   $(".updateBtntrigger").click(function () {
     const tarId = $(this).data("id");
     if (!tarId) return notyf.error("Invalid Option!");

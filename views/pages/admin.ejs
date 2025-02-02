@@ -110,6 +110,32 @@
               </div>
             </div>
             <div class="vj_dynamic routes">
+              <div class="MapControllerSetting">
+                <div class="body-mapSetting">
+                  <form class="map-countdown-update">
+                    <div class="row">
+                      <div class="col-5">
+                        <input
+                          type="date"
+                          name="mapLaunchDate"
+                          class="form-control"
+                        />
+                      </div>
+                      <div class="col-5">
+                        <input
+                          type="time"
+                          name="mapLaunchTime"
+                          class="form-control"
+                        />
+                      </div>
+                      <input type="hidden" name="id" />
+                      <div class="col-2">
+                        <button class="btn btn-success">update</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
               <div class="map-container">
                 <div class="g-map vh-100"></div>
                 <div class="map-controller" style="display: none">

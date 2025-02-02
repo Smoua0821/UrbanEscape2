@@ -234,3 +234,17 @@
   background: #ff7979;
   border: 2px solid red;
 }
+
+.vj_dynamic {
+  position: relative;
+}
+
+.MapControllerSetting {
+  padding: 20px;
+  min-width: 50vw;
+  position: absolute;
+  left: 0;
+  background: white;
+  width: 100%;
+  z-index: 9;
+}
