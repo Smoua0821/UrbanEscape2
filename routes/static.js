@@ -61,6 +61,7 @@ router.get("/map/:mapId", async (req, res) => {
   function dateInFuture(isoDateString) {
     const now = new Date();
     const givenDate = new Date(isoDateString);
+    console.log(`${now} --- ${givenDate}`);
     return givenDate - now;
   }
   res.render("pages/home", {

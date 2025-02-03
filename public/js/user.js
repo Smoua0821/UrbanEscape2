@@ -21,7 +21,7 @@ function formatTime(seconds) {
 const countdownTimec = parseInt(
   document.getElementById("countdownTimec").value / 1000
 );
-let initialTime = countdownTimec + 7 * 60 * 60;
+let initialTime = countdownTimec;
 let startTime = new Date();
 
 const ctwlIvl = setInterval(() => {
