@@ -18,17 +18,22 @@ function formatTime(seconds) {
 const countdownTimec = parseInt(
   document.getElementById("countdownTimec").value / 1000
 );
-if (countdownTimec > 0) {
-  let secondsRemaining = countdownTimec;
-  const ctwlIvl = setInterval(() => {
-    formatTime(secondsRemaining);
-    if (secondsRemaining <= 0) {
-      clearInterval(ctwlIvl);
-    } else {
-      secondsRemaining--;
-    }
-  }, 1000);
-}
+let initialTime = countdownTimec;
+let startTime = new Date();
+
+const ctwlIvl = setInterval(() => {
+  let currentTime = new Date();
+  let elapsedTime = Math.floor((currentTime - startTime) / 1000);
+
+  let secondsRemaining = initialTime - elapsedTime;
+
+  if (secondsRemaining <= 0) {
+    clearInterval(ctwlIvl);
+    secondsRemaining = 0;
+  }
+
+  formatTime(secondsRemaining);
+}, 1000);
 
 function voeed() {
   return true;
