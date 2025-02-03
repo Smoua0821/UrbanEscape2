@@ -63,7 +63,6 @@ router.get("/map/:mapId", async (req, res) => {
     const givenDate = new Date(isoDateString);
     return givenDate - now;
   }
-  console.log(dateInFuture(map.launchTime));
   res.render("pages/home", {
     apiKey: "AIzaSyBaQ334LSpDNZXU8flkT1VjGpdj7f3_BZI",
     user: user,
