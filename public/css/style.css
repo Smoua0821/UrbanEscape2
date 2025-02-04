@@ -345,3 +345,23 @@ img {
   border: 2px solid grey;
   border-right: 0;
 }
+
+.currentLocationBtn.pending {
+  animation: 3s changeBackgroundColor infinite;
+}
+
+@keyframes changeBackgroundColor {
+  0%,
+  100% {
+    background-color: #ff8e8e;
+  }
+  25% {
+    background-color: #00c2ff;
+  }
+  50% {
+    background-color: #00ff00;
+  }
+  75% {
+    background-color: yellow;
+  }
+}

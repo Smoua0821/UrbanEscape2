@@ -21,6 +21,19 @@ function formatTime(seconds) {
 const countdownTimec = parseInt(
   document.getElementById("countdownTimec").value / 1000
 );
+
+const locationMarkerUpdate = (pos) => {
+  nearestPolygon();
+  marker.position = pos;
+  marker.setMap(map);
+
+  if (isFirstTime) {
+    isFirstTime = 0;
+    map.panTo(pos);
+    startGaming();
+  }
+};
+
 let initialTime = countdownTimec;
 let startTime = new Date();
 
@@ -104,6 +117,7 @@ readyToSaveCheckpoint = 0;
 let profileImages = [];
 let isFirstTimeFetchProfilePicture = 1;
 const capturedPolygons = [];
+let positionRadius = 0;
 
 function renderCapturedImage() {
   if (!profileImages) {
@@ -388,7 +402,7 @@ function initMap() {
     if (clickDist2 < circle.getRadius())
       InfoModal(polygonCoordinates[polyIndex]._id);
 
-    if (clickDist > circle.getRadius() / 1000)
+    if (clickDist > (circle.getRadius() + positionRadius) / 1000)
       return console.log("Your live Location is Outside Circle");
 
     InfoModal(polygonCoordinates[polyIndex]._id);
@@ -543,6 +557,7 @@ function getCurrentLocation() {
   marker.position = pos;
   marker.setMap(map);
   map.panTo(pos);
+  $(".currentLocationBtn").addClass("pending");
   if (pendingPromise) return;
   return new Promise((resolve, reject) => {
     pendingPromise = 1;
@@ -554,9 +569,9 @@ function getCurrentLocation() {
           const { latitude, longitude } = position.coords;
           pos.lat = latitude;
           pos.lng = longitude;
-          nearestPolygon();
-          marker.position = pos;
-          marker.setMap(map);
+          locationMarkerUpdate(pos);
+          $(".currentLocationBtn").removeClass("pending");
+          map.setZoom(18);
           map.panTo(pos);
           resolve({ lat: latitude, lng: longitude });
         },
@@ -573,9 +588,8 @@ function getCurrentLocation() {
                 const fallbackLng = data.longitude;
                 pos.lat = fallbackLat;
                 pos.lng = fallbackLng;
-                nearestPolygon();
-                marker.position = pos;
-                marker.setMap(map);
+                locationMarkerUpdate(pos);
+                $("currentLocationBtn").removeClass("pending");
                 map.panTo(pos);
                 resolve({ lat: fallbackLat, lng: fallbackLng });
               } else {
@@ -610,15 +624,7 @@ function updateCurrentLocation() {
     $(".simpleLoading").fadeOut();
     pos.lat = position.coords.latitude;
     pos.lng = position.coords.longitude;
-    nearestPolygon();
-    marker.position = pos;
-    marker.setMap(map);
-
-    if (isFirstTime) {
-      isFirstTime = 0;
-      map.panTo(pos);
-      startGaming();
-    }
+    locationMarkerUpdate(pos);
   };
 
   const errorCallback = (error) => {
@@ -647,15 +653,7 @@ function updateCurrentLocation() {
         if (data && data.latitude && data.longitude) {
           pos.lat = data.latitude;
           pos.lng = data.longitude;
-          nearestPolygon();
-          marker.position = pos;
-          marker.setMap(map);
-
-          if (isFirstTime) {
-            isFirstTime = 0;
-            map.panTo(pos);
-            startGaming();
-          }
+          locationMarkerUpdate(pos);
         } else {
           notyf.error("Unable to fetch fallback location.");
         }
