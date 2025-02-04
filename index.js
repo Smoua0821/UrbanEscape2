@@ -17,6 +17,7 @@ const staticRoutes = require("./routes/static");
 const adminRoutes = require("./routes/Admin/admin");
 const adminButtonRoutes = require("./routes/Admin/buttons");
 const adminBadgeRoutes = require("./routes/Admin/badgeFile");
+const adminUserRoutes = require("./routes/Admin/user");
 const loginRoutes = require("./routes/login");
 const userRoutes = require("./routes/user");
 const apiRoutes = require("./routes/api");
@@ -32,6 +33,7 @@ app.use("/user", userRoutes);
 app.use("/admin", adminMiddleware, adminRoutes);
 app.use("/admin/button", adminMiddleware, adminButtonRoutes);
 app.use("/admin/badges", adminMiddleware, adminBadgeRoutes);
+app.use("/admin/user", adminMiddleware, adminUserRoutes);
 app.use("/admin/province", adminMiddleware, adminProvinceRoutes);
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);

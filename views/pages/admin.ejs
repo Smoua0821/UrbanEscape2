@@ -102,6 +102,12 @@
                         >
                           Delete
                         </button>
+                        <button
+                          class="btn btn-success changeRadius"
+                          data-id="<%= user._id %>"
+                        >
+                          Radius
+                        </button>
                       </td>
                     </tr>
                     <% } %> <% }) %>
@@ -121,7 +127,7 @@
                           class="form-control"
                         />
                       </div>
-                      <div class="col-5">
+                      <div class="col-4">
                         <input
                           type="time"
                           name="mapLaunchTime"
@@ -129,8 +135,8 @@
                         />
                       </div>
                       <input type="hidden" name="id" />
-                      <div class="col-2">
-                        <button class="btn btn-success">update</button>
+                      <div class="col-3">
+                        <button class="w-100 btn btn-success">update</button>
                       </div>
                     </div>
                   </form>

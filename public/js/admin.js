@@ -798,6 +798,18 @@ $(document).ready(() => {
       });
     }
   });
+  $(".user-container table tr button.changeRadius").click(function () {
+    const tarId = $(this).data("id");
+    if (!tarId) return;
+    const newRadius = parseInt(prompt("Enter Radius (in meters)?"));
+    $.post(`/admin/user/radius`, { id: tarId, radius: newRadius }, (data) => {
+      if (data.status == "success") {
+        notyf.success(data.message);
+      } else {
+        notyf.error(data.message);
+      }
+    });
+  });
   $(".vj_dynamic").hide();
   $(".vj_dynamic.home").fadeIn();
   $(".sidebar-container .sidebar .menu ul li").click(function () {

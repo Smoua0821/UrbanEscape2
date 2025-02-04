@@ -21,6 +21,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: "other",
     },
+    radius: {
+      type: Number,
+      default: 0,
+    },
     badges: [
       {
         type: String,
