@@ -2,7 +2,7 @@ const User = require("../../models/User");
 
 const setMarkerRadius = async (req, res) => {
   const { id, radius } = req.body;
-  if (!id || !radius)
+  if (!id)
     return res
       .status(400)
       .json({ status: "error", message: "Invalid Arguments" });

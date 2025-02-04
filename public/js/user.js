@@ -29,7 +29,7 @@ const locationMarkerUpdate = (newPos) => {
     lastPos = newPos;
   }
 
-  const steps = 20;
+  const steps = 50;
   let currentStep = 0;
 
   const interInterval = setInterval(() => {
@@ -47,7 +47,7 @@ const locationMarkerUpdate = (newPos) => {
       clearInterval(interInterval);
       lastPos = newPos;
     }
-  }, 50);
+  }, 10);
 
   if (isFirstTime) {
     isFirstTime = false;
@@ -192,6 +192,7 @@ const settings = {
 
 $(document).ready(() => {
   positionRadius = parseInt($("#userLocationRadius").val());
+  if (!positionRadius) positionRadius = 0;
   positionCircle = new google.maps.Circle({
     radius: positionRadius,
   });
