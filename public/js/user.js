@@ -22,17 +22,36 @@ const countdownTimec = parseInt(
   document.getElementById("countdownTimec").value / 1000
 );
 
-const locationMarkerUpdate = (pos) => {
+let lastPos;
+const locationMarkerUpdate = (newPos) => {
   nearestPolygon();
-  marker.position = pos;
-  marker.setMap(map);
-  if (positionRadius > 0) {
-    positionCircle.setCenter(pos);
+  if (!lastPos) {
+    lastPos = newPos;
   }
 
+  const steps = 20;
+  let currentStep = 0;
+
+  const interInterval = setInterval(() => {
+    currentStep++;
+    const factor = currentStep / steps;
+    const movableCoord = interpolate(lastPos, newPos, factor);
+    marker.position = movableCoord;
+    marker.setMap(map);
+
+    if (positionRadius > 0) {
+      positionCircle.setCenter(movableCoord);
+    }
+    if (currentStep === steps) {
+      currentStep = 0;
+      clearInterval(interInterval);
+      lastPos = newPos;
+    }
+  }, 50);
+
   if (isFirstTime) {
-    isFirstTime = 0;
-    map.panTo(pos);
+    isFirstTime = false;
+    map.panTo(newPos);
     startGaming();
   }
 };
