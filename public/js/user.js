@@ -26,6 +26,9 @@ const locationMarkerUpdate = (pos) => {
   nearestPolygon();
   marker.position = pos;
   marker.setMap(map);
+  if (positionRadius > 0) {
+    positionCircle.setCenter(pos);
+  }
 
   if (isFirstTime) {
     isFirstTime = 0;
@@ -117,7 +120,7 @@ readyToSaveCheckpoint = 0;
 let profileImages = [];
 let isFirstTimeFetchProfilePicture = 1;
 const capturedPolygons = [];
-let positionRadius = 0;
+let positionRadius, positionCircle;
 
 function renderCapturedImage() {
   if (!profileImages) {
@@ -169,6 +172,14 @@ const settings = {
 };
 
 $(document).ready(() => {
+  positionRadius = parseInt($("#userLocationRadius").val());
+  positionCircle = new google.maps.Circle({
+    radius: positionRadius,
+  });
+  if (positionRadius) {
+    positionCircle.setMap(map);
+    console.log(positionCircle);
+  }
   $(".refresh").click(() => {
     $(".refresh span").addClass("fa-spin");
     window.location.reload();
