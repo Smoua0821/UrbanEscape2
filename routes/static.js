@@ -128,4 +128,12 @@ router.get("/privacy-policy", (req, res) => {
   return res.render("pages/privacy_policy");
 });
 
+router.get("/map/background/:tarId", (req, res) => {
+  const pathN = `public/images/map_countdown/`;
+  const imgPath = path.join(__dirname, "../", pathN, `${req.params.tarId}.jpg`);
+  if (!fs.existsSync(imgPath))
+    return res.sendFile(path.join(__dirname, "../", pathN, "default.jpg"));
+  res.status(200).sendFile(imgPath);
+});
+
 module.exports = router;

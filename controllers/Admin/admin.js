@@ -26,6 +26,16 @@ const cleanUp = async (rawId, mapId) => {
       { "capturedImages.mapId": mapId },
       { $pull: { capturedImages: { mapId: mapId } } }
     );
+
+    const filePath = `public/images/map_countdown/${mapId}.jpg`;
+
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        console.error("Error deleting file:", err);
+        return;
+      }
+      console.log("File deleted successfully");
+    });
   } catch (err) {
     console.error("Error Cleanup: ", err);
   }
@@ -135,12 +145,28 @@ const newMap = async (req, res) => {
   ISODate = ISODate.toISOString();
 
   try {
+    const uniqueId = uuidv4();
     const newMap = new Map({
       name,
-      id: uuidv4(),
+      id: uniqueId,
       zoom: 15,
       launchTime: ISODate,
     });
+
+    const destinationFile = `public/images/map_countdown/${uniqueId}.jpg`;
+    fs.copyFile(
+      "public/images/map_countdown/default.jpg",
+      destinationFile,
+      (err) => {
+        if (err) {
+          console.error("Error copying file:", err);
+        } else {
+          console.log(
+            `File copied and renamed to "${destinationFile}" successfully!`
+          );
+        }
+      }
+    );
     const savedMap = await newMap.save();
     res
       .status(201)

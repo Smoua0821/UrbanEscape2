@@ -805,6 +805,7 @@ $(document).ready(() => {
     $.post(`/admin/user/radius`, { id: tarId, radius: newRadius }, (data) => {
       if (data.status == "success") {
         notyf.success(data.message);
+        $(`tr[data-id='${tarId}'] #radiusVisual`).html(newRadius);
       } else {
         notyf.error(data.message);
       }
@@ -1160,7 +1161,7 @@ function fetchMaps() {
     $(".primaryMapSelector").empty();
     myData.forEach((d) => {
       $("tbody.map_list").append(
-        `<tr><td>${d.name}</td><td><a target='_blank' href='/map/${d.id}'>View Map</a></td><td><button class='btn btn-info me-1 edit_map' data-id='${d.id}'>Edit</button><button class='me-1 btn btn-danger delete_map' data-id='${d.id}'>delete</button><button class='btn btn-warning setupMissions' data-id='${d.id}'>Missions</button><button class='btn btn-info ms-2 setUpDuplicate' data-id='${d.id}'>Duplicate</button></td></tr>`
+        `<tr><td>${d.name}</td><td><a target='_blank' href='/map/${d.id}'>View Map</a></td><td><button class='btn btn-info me-1 edit_map' data-id='${d.id}'>Edit</button><button class='me-1 btn btn-danger delete_map' data-id='${d.id}'>delete</button><button class='btn btn-warning setupMissions' data-id='${d.id}'>Missions</button><button class='btn btn-info ms-2 setUpDuplicate' data-id='${d.id}'>Duplicate</button><button data-id='${d.id}' class='mapBgUpload btn btn-warning'>Background</button></td></tr>`
       );
       $(".primaryMapSelector").append(
         `<option value='${d._id}'>${d.name}</option>`
@@ -1202,6 +1203,47 @@ function fetchMaps() {
         renderMapMissions();
       });
 
+    $(".mapBgUpload").click(function () {
+      const tarId = $(this).data("id");
+      if (!tarId) {
+        notyf.error("No Target found!");
+        return;
+      }
+
+      // Create a file input element
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = "image/*"; // Only allow image files
+
+      // Trigger the file input dialog
+      fileInput.click();
+
+      // Handle file selection
+      fileInput.onchange = function (event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("image", file);
+        formData.append("targetId", tarId);
+        fetch(`/admin/map/background/${tarId}`, {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status == "success") {
+              notyf.success("File uploaded successfully!");
+            } else {
+              notyf.error("File upload failed: " + data.message);
+            }
+          })
+          .catch((error) => {
+            notyf.error("An error occurred while uploading the file.");
+            console.error("Error:", error);
+          });
+      };
+    });
     $(".setUpDuplicate")
       .off("click")
       .on("click", function () {

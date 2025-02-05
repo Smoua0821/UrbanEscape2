@@ -29,7 +29,10 @@
     <%}%> <%if(timeFuture>=0){%>
     <div
       class="countdown-holder fixed-top bg-white w-100 vh-100"
-      style="z-index: 1"
+      style="
+        z-index: 1;
+        background: url(/map/background/<%=mapParsed%>) no-repeat center/cover;
+      "
     >
       <div
         class="d-inline-flex justify-content-center align-items-center w-100 vh-100"
@@ -76,9 +79,6 @@
       .countdown-holder {
         font-size: 3rem;
         font-weight: 500;
-        background: url(/images/mountains-background-game-vector.jpg);
-        background-size: cover;
-        background-position: top;
       }
 
       .countdown .timec {
