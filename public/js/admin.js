@@ -394,6 +394,17 @@ const updateClientInterface = (targetName) => {
 };
 
 $(document).ready(() => {
+  $(".MapControllerSetting .visibility-toggle span").click(function () {
+    if ($(this).hasClass("fa-arrow-up")) {
+      $(this).removeClass("fa-arrow-up");
+      $(this).addClass("fa-arrow-down");
+      $(".MapControllerSetting").attr("style", "top:-70px");
+    } else {
+      $(this).addClass("fa-arrow-up");
+      $(this).removeClass("fa-arrow-down");
+      $(".MapControllerSetting").removeAttr("style");
+    }
+  });
   $(".map-countdown-update").submit(function () {
     const data = $(this).serializeArray();
     $(".map-countdown-update input[name='id'").val(mapId);

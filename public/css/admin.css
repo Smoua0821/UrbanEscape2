@@ -247,4 +247,22 @@
   background: white;
   width: 100%;
   z-index: 9;
+  top: 0;
+  transition: 0.2s;
+}
+
+.MapControllerSetting .visibility-toggle {
+  position: absolute;
+  width: 100%;
+  display: inline-flex;
+  justify-content: center;
+  left: 0;
+  bottom: -20px;
+}
+
+.MapControllerSetting .visibility-toggle span {
+  padding: 10px 20px;
+  border-radius: 0 0 10px 10px;
+  cursor: pointer;
+  background: linear-gradient(0, #d5d5d5, #ffffff, #ffffff);
 }
