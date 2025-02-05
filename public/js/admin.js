@@ -81,7 +81,7 @@ const setMarkerSizeNum = (event) => {
 };
 const setMapRadius = (event) => {
   circle.setCenter(polyCoords[0]);
-  radius = Math.pow(event.value / 10, 1.5) * 100;
+  radius = parseInt(event.value);
   $("#radiusNum").val(event.value);
   circle.setRadius(radius);
   circle.setMap(map);
@@ -93,7 +93,7 @@ const setMapRadiusNum = (event) => {
     event.value = 1000;
   }
   circle.setCenter(polyCoords[0]);
-  radius = Math.pow(event.value / 10, 1.5) * (1000 / map.getZoom());
+  radius = parseInt(event.value);
   $("#radiusRange").val(event.value);
   circle.setRadius(radius);
   circle.setMap(map);
@@ -1124,9 +1124,10 @@ function renderRoutes() {
         $("#routeTitle").val(tarObj.title);
         $("#routeDescription").val(tarObj.description);
         $("#sizeRange").val(tarObj.title);
-        const modifiedRadius = parseInt(
-          10 * Math.pow(tarObj.radius / 100, 2 / 3)
-        );
+        // const modifiedRadius = parseInt(
+        //   10 * Math.pow(tarObj.radius / 100, 2 / 3)
+        // );
+        const modifiedRadius = tarObj.radius;
         $("#radiusRange").val(modifiedRadius);
         $("#sizeRange").val(tarObj.size);
         $("#radiusNum").val(modifiedRadius);
