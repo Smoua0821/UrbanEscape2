@@ -23,7 +23,12 @@ const countdownTimec = parseInt(
 );
 
 let lastPos;
+let movingPending = false;
 const locationMarkerUpdate = (newPos) => {
+  if (movingPending) {
+    return;
+  }
+  movingPending = true;
   nearestPolygon();
   if (!lastPos) {
     lastPos = newPos;
@@ -46,6 +51,7 @@ const locationMarkerUpdate = (newPos) => {
       currentStep = 0;
       clearInterval(interInterval);
       lastPos = newPos;
+      movingPending = false;
     }
   }, 10);
 
@@ -600,7 +606,8 @@ function getCurrentLocation() {
           const { latitude, longitude } = position.coords;
           pos.lat = latitude;
           pos.lng = longitude;
-          locationMarkerUpdate(pos);
+          const newPos = { ...pos };
+          locationMarkerUpdate(newPos);
           $(".currentLocationBtn").removeClass("pending");
           map.setZoom(18);
           map.panTo(pos);
@@ -619,7 +626,8 @@ function getCurrentLocation() {
                 const fallbackLng = data.longitude;
                 pos.lat = fallbackLat;
                 pos.lng = fallbackLng;
-                locationMarkerUpdate(pos);
+                const newPos = { ...pos };
+                locationMarkerUpdate(newPos);
                 $("currentLocationBtn").removeClass("pending");
                 map.panTo(pos);
                 resolve({ lat: fallbackLat, lng: fallbackLng });
@@ -655,7 +663,8 @@ function updateCurrentLocation() {
     $(".simpleLoading").fadeOut();
     pos.lat = position.coords.latitude;
     pos.lng = position.coords.longitude;
-    locationMarkerUpdate(pos);
+    const newPos = { ...pos };
+    locationMarkerUpdate(newPos);
   };
 
   const errorCallback = (error) => {
@@ -684,7 +693,8 @@ function updateCurrentLocation() {
         if (data && data.latitude && data.longitude) {
           pos.lat = data.latitude;
           pos.lng = data.longitude;
-          locationMarkerUpdate(pos);
+          const newPos = { ...pos };
+          locationMarkerUpdate(newPos);
         } else {
           notyf.error("Unable to fetch fallback location.");
         }
