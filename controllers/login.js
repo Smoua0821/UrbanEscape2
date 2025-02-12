@@ -8,7 +8,10 @@ dotenv.config();
 
 const loginPage = async (req, res) => {
   const token = req.cookies.sessionId;
-  if (!token) return res.render("pages/login");
+  if (!token)
+    return res.render("pages/login", {
+      GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+    });
 
   try {
     const user = await jwt.verify(token, process.env.JWT_SECRET);
@@ -21,7 +24,10 @@ const loginPage = async (req, res) => {
     } else {
       return res
         .status(401)
-        .render("pages/login", { error: "Invalid user role" });
+        .render("pages/login", {
+          error: "Invalid user role",
+          GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        });
     }
   } catch (error) {
     console.error("Error verifying token:", error);
