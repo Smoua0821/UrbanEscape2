@@ -157,6 +157,7 @@ const pluginLoginController = async (req, res) => {
           name: payload.name,
           email: payload.email,
           loginType: type,
+          picture: payload.picture,
         });
       }
       const tokenSigned = jwt.sign(user.toObject(), process.env.JWT_SECRET);
