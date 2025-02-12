@@ -2,8 +2,11 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
+const { OAuth2Client } = require("google-auth-library");
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const Province = require("../models/Provinces");
 const PrimaryMap = require("../models/PrimaryMap");
+
 dotenv.config();
 
 const loginPage = async (req, res) => {
@@ -14,7 +17,7 @@ const loginPage = async (req, res) => {
     });
 
   try {
-    const user = await jwt.verify(token, process.env.JWT_SECRET);
+    const user = jwt.verify(token, process.env.JWT_SECRET);
     if (user && user.role && user.role.current) {
       if (user.role.current === "admin") {
         return res.redirect("/admin");
@@ -22,12 +25,10 @@ const loginPage = async (req, res) => {
         return res.redirect("/");
       }
     } else {
-      return res
-        .status(401)
-        .render("pages/login", {
-          error: "Invalid user role",
-          GoogleClientID: process.env.GOOGLE_CLIENT_ID,
-        });
+      return res.status(401).render("pages/login", {
+        error: "Invalid user role",
+        GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+      });
     }
   } catch (error) {
     console.error("Error verifying token:", error);
@@ -50,7 +51,7 @@ const loginValidate = async (req, res) => {
     if (!isMatched)
       return res.render("pages/login", { error: "Invalid Password" });
 
-    const token = await jwt.sign(user, process.env.JWT_SECRET);
+    const token = jwt.sign(user, process.env.JWT_SECRET);
     res.cookie("sessionId", token, {
       maxAge: 1000 * 60 * 60 * 24,
       httpOnly: true,
@@ -132,4 +133,64 @@ const provinceList = async (req, res) => {
   return res.json({ status: "success", countries: data });
 };
 
-module.exports = { loginPage, loginValidate, newUser, provinceList };
+const pluginLoginController = async (req, res) => {
+  const { type, token } = req.body;
+  const allowedTypes = ["google", "facebook"];
+
+  if (!allowedTypes.includes(type))
+    return res
+      .status(400)
+      .json({ status: "error", message: `${type} Not Allowed` });
+
+  if (type === "google") {
+    try {
+      const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+
+      const payload = ticket.getPayload(); // Extract user info
+
+      let user = await User.findOne({ email: payload.email });
+      if (!user) {
+        user = await User.create({
+          name: payload.name,
+          email: payload.email,
+          loginType: type,
+        });
+      }
+      const tokenSigned = jwt.sign(user.toObject(), process.env.JWT_SECRET);
+
+      return res.json({
+        status: "success",
+        token: tokenSigned,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(400).json({
+        status: "error",
+        message: "Login with Google Failed, please Try Again Later!",
+      });
+    }
+  }
+};
+
+const setPluginLogin = (req, res) => {
+  const { token } = req.query;
+  if (!token) return res.render("pages/login", { error: "Login Failed!" });
+  return res
+    .cookie("sessionId", token, {
+      maxAge: 1000 * 60 * 60 * 24,
+      httpOnly: true,
+    })
+    .redirect("/");
+};
+
+module.exports = {
+  loginPage,
+  loginValidate,
+  newUser,
+  provinceList,
+  pluginLoginController,
+  setPluginLogin,
+};

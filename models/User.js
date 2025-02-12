@@ -15,7 +15,14 @@ const UserSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+    },
+    picture: {
+      type: String,
+      default: "",
+    },
+    loginType: {
+      type: String,
+      default: "direct",
     },
     state: {
       type: String,

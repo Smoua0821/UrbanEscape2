@@ -5,12 +5,19 @@ const {
   loginValidate,
   newUser,
   provinceList,
+  pluginLoginController,
+  setPluginLogin,
 } = require("../controllers/login");
+
 router.get("/", loginPage);
 
-router.post("/", loginValidate);
+// router.post("/", loginValidate);
 
-router.post("/new", newUser);
+// router.post("/new", newUser);
 
-router.get("/countries", provinceList);
+// router.get("/countries", provinceList);
+
+router.post("/plugins", pluginLoginController);
+router.get("/verifyPlugin", setPluginLogin);
+
 module.exports = router;
