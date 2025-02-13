@@ -209,9 +209,10 @@ const gitOAuthVerify = async (req, res) => {
     const userResponse = await axios.get("https://api.github.com/user", {
       headers: { Authorization: `Bearer ${access_token}` },
     });
-    if (!userResponse?.name)
+    if (!userResponse?.data?.name) {
       return res.redirect("/auth?error=Invalid Identity Detected!");
-    const name = userResponse.name;
+    }
+    const name = userResponse.data.name;
     const emailResponse = await axios.get(
       "https://api.github.com/user/emails",
       {
