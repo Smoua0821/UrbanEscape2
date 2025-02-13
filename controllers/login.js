@@ -6,14 +6,17 @@ const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const Province = require("../models/Provinces");
 const PrimaryMap = require("../models/PrimaryMap");
+const axios = require("axios");
 
 dotenv.config();
 
 const loginPage = async (req, res) => {
   const token = req.cookies.sessionId;
+  const { error } = req.query;
   if (!token)
     return res.render("pages/login", {
       GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+      error: error,
     });
 
   try {
@@ -46,7 +49,7 @@ const loginValidate = async (req, res) => {
     let isMatched =
       email.toLowerCase() === process.env.ADMIN_EMAIL
         ? password === process.env.ADMIN_PASS
-        : await bcrypt.compare(password, user.password);
+        : bcrypt.compare(password, user.password);
 
     if (!isMatched)
       return res.render("pages/login", { error: "Invalid Password" });
@@ -188,7 +191,7 @@ const setPluginLogin = (req, res) => {
 };
 
 const gitOAuthVerify = async (req, res) => {
-  const { code } = req.body;
+  const { code } = req.query;
   if (!code) return res.redirect("/auth?error=Invalid Github Login");
 
   try {
