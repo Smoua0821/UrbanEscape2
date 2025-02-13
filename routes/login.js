@@ -7,6 +7,7 @@ const {
   provinceList,
   pluginLoginController,
   setPluginLogin,
+  gitOAuthVerify,
 } = require("../controllers/login");
 
 router.get("/", loginPage);
@@ -20,4 +21,5 @@ router.get("/", loginPage);
 router.post("/plugins", pluginLoginController);
 router.get("/verifyPlugin", setPluginLogin);
 
+router.get("/github/callback", gitOAuthVerify);
 module.exports = router;

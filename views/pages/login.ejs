@@ -116,6 +116,16 @@
                 >
                   <div class="g_id_signin" data-type="standard"></div>
                 </div>
+                <div
+                  class="login-card github-login animate__animated animate__backInLeft animate__delay-1s"
+                >
+                  <button class="w-100 git_id_signin btn btn-dark mt-2">
+                    <span style="float: left;">
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="Github Icon" width="25px" style="filter: invert(1);">
+                    </span>
+                    <span>Sign in with Github</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -143,6 +153,12 @@
         const token = response.credential;
         pluginLogin("google", token);
       }
+      $(document).ready(()=>{
+        $(".git_id_signin").click(()=>{
+          const url=`https://github.com/login/oauth/authorize?client_id=Ov23limGU0MJl6J4PCBo&scope=user:email`;
+          window.location.href=url;
+        });
+      });
     </script>
   </body>
 </html>

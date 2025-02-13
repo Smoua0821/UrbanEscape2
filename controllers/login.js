@@ -187,6 +187,65 @@ const setPluginLogin = (req, res) => {
     .redirect("/");
 };
 
+const gitOAuthVerify = async (req, res) => {
+  const { code } = req.body;
+  if (!code) return res.redirect("/auth?error=Invalid Github Login");
+
+  try {
+    const response = await axios.post(
+      "https://github.com/login/oauth/access_token",
+      {
+        client_id: process.env.GIT_CLIENT_ID,
+        client_secret: process.env.GIT_CLIENT_SECRET,
+        code: code,
+      },
+      { headers: { Accept: "application/json" } }
+    );
+
+    const access_token = response.data.access_token;
+    const userResponse = await axios.get("https://api.github.com/user", {
+      headers: { Authorization: `Bearer ${access_token}` },
+    });
+    if (!userResponse?.name)
+      return res.redirect("/auth?error=Invalid Identity Detected!");
+    const name = userResponse.name;
+    const emailResponse = await axios.get(
+      "https://api.github.com/user/emails",
+      {
+        headers: { Authorization: `Bearer ${access_token}` },
+      }
+    );
+    const email = emailResponse.data.find((e) => e.primary).email;
+    if (!email)
+      return res.redirect(
+        "/auth?error=No Email ID provided, Try different SignIN option!"
+      );
+
+    let user = await User.findOne({ email: email });
+    if (!user) {
+      user = await User.create({
+        name: name,
+        email: email,
+        loginType: "github",
+        picture: userResponse?.avatar_url,
+      });
+    }
+    const tokenSigned = jwt.sign(user.toObject(), process.env.JWT_SECRET);
+    if (!tokenSigned)
+      return res.redirect("/auth?error=No Login Identifier found!");
+    return res
+      .cookie("sessionId", tokenSigned, {
+        maxAge: 1000 * 60 * 60 * 24,
+        httpOnly: true,
+      })
+      .redirect("/");
+  } catch (error) {
+    console.error(error);
+    const errorMessage = error.response?.data?.error || "Authentication failed";
+    res.status(500).send(errorMessage);
+  }
+};
+
 module.exports = {
   loginPage,
   loginValidate,
@@ -194,4 +253,5 @@ module.exports = {
   provinceList,
   pluginLoginController,
   setPluginLogin,
+  gitOAuthVerify,
 };
