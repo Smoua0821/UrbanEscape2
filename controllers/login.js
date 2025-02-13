@@ -55,9 +55,9 @@ const loginValidate = async (req, res) => {
     if (!user.password)
       return res.render("pages/login", {
         GoogleClientID: process.env.GOOGLE_CLIENT_ID,
-        error: `This Login Method not supported for Your Account Please try with ${
+        error: `This Login Method not supported for Your Account, Please try with ${
           user.loginType ? user.loginType : "Other Options"
-        }`,
+        } and generate your password from the profile!`,
       });
     if (!password)
       return res.render("pages/login", {
