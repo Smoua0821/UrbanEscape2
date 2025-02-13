@@ -29,13 +29,16 @@ const loginPage = async (req, res) => {
       }
     } else {
       return res.status(401).render("pages/login", {
-        error: "Invalid user role",
         GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        error: "Invalid user role",
       });
     }
   } catch (error) {
     console.error("Error verifying token:", error);
-    return res.status(401).render("pages/login", { error: "Invalid session" });
+    return res.status(401).render("pages/login", {
+      GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+      error: "Invalid session",
+    });
   }
 };
 
@@ -44,15 +47,23 @@ const loginValidate = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email: email }).lean();
 
-    if (!user) return res.render("pages/login", { error: "Invalid Email" });
+    if (!user)
+      return res.render("pages/login", {
+        GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        error: "Invalid Email",
+      });
     if (!user.password)
       return res.render("pages/login", {
+        GoogleClientID: process.env.GOOGLE_CLIENT_ID,
         error: `This Login Method not supported for Your Account Please try with ${
           user.loginType ? user.loginType : "Other Options"
         }`,
       });
     if (!password)
-      return res.render("pages/login", { error: "No Password Provided!!" });
+      return res.render("pages/login", {
+        GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        error: "No Password Provided!!",
+      });
 
     let isMatched =
       email.toLowerCase() === process.env.ADMIN_EMAIL
@@ -60,7 +71,10 @@ const loginValidate = async (req, res) => {
         : bcrypt.compare(password, user.password);
 
     if (!isMatched)
-      return res.render("pages/login", { error: "Invalid Password" });
+      return res.render("pages/login", {
+        GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        error: "Invalid Password",
+      });
 
     const token = jwt.sign(user, process.env.JWT_SECRET);
     res.cookie("sessionId", token, {
@@ -77,6 +91,7 @@ const loginValidate = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.render("pages/login", {
+      GoogleClientID: process.env.GOOGLE_CLIENT_ID,
       error: "Something went wrong, please try again later.",
     });
   }
@@ -87,6 +102,7 @@ const newUser = async (req, res) => {
 
   if (!ppolicy)
     return res.render("pages/login", {
+      GoogleClientID: process.env.GOOGLE_CLIENT_ID,
       error: "Privacy Policy must be accepted!",
     });
 
@@ -108,7 +124,10 @@ const newUser = async (req, res) => {
     }
     const province = await Province.findOne({ name: state });
     if (!province)
-      return res.render("pages/login", { error: "Invalid State Choosen" });
+      return res.render("pages/login", {
+        GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        error: "Invalid State Choosen",
+      });
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newuser = await User.create({
@@ -189,7 +208,11 @@ const pluginLoginController = async (req, res) => {
 
 const setPluginLogin = (req, res) => {
   const { token } = req.query;
-  if (!token) return res.render("pages/login", { error: "Login Failed!" });
+  if (!token)
+    return res.render("pages/login", {
+      GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+      error: "Login Failed!",
+    });
   return res
     .cookie("sessionId", token, {
       maxAge: 1000 * 60 * 60 * 24,
