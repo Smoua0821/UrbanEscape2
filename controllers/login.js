@@ -16,6 +16,7 @@ const loginPage = async (req, res) => {
   if (!token)
     return res.render("pages/login", {
       GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+      GitClientID: process.env.GIT_CLIENT_ID,
       error: error,
     });
 
@@ -30,6 +31,7 @@ const loginPage = async (req, res) => {
     } else {
       return res.status(401).render("pages/login", {
         GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        GitClientID: process.env.GIT_CLIENT_ID,
         error: "Invalid user role",
       });
     }
@@ -37,6 +39,7 @@ const loginPage = async (req, res) => {
     console.error("Error verifying token:", error);
     return res.status(401).render("pages/login", {
       GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+      GitClientID: process.env.GIT_CLIENT_ID,
       error: "Invalid session",
     });
   }
@@ -50,11 +53,13 @@ const loginValidate = async (req, res) => {
     if (!user)
       return res.render("pages/login", {
         GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        GitClientID: process.env.GIT_CLIENT_ID,
         error: "Invalid Email",
       });
     if (!user.password)
       return res.render("pages/login", {
         GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        GitClientID: process.env.GIT_CLIENT_ID,
         error: `This Login Method not supported for Your Account, Please try with ${
           user.loginType ? user.loginType : "Other Options"
         } and generate your password from the profile!`,
@@ -62,6 +67,7 @@ const loginValidate = async (req, res) => {
     if (!password)
       return res.render("pages/login", {
         GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        GitClientID: process.env.GIT_CLIENT_ID,
         error: "No Password Provided!!",
       });
 
@@ -73,6 +79,7 @@ const loginValidate = async (req, res) => {
     if (!isMatched)
       return res.render("pages/login", {
         GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        GitClientID: process.env.GIT_CLIENT_ID,
         error: "Invalid Password",
       });
 
@@ -92,6 +99,7 @@ const loginValidate = async (req, res) => {
     console.error(error);
     return res.render("pages/login", {
       GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+      GitClientID: process.env.GIT_CLIENT_ID,
       error: "Something went wrong, please try again later.",
     });
   }
@@ -103,6 +111,7 @@ const newUser = async (req, res) => {
   if (!ppolicy)
     return res.render("pages/login", {
       GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+      GitClientID: process.env.GIT_CLIENT_ID,
       error: "Privacy Policy must be accepted!",
     });
 
@@ -126,6 +135,7 @@ const newUser = async (req, res) => {
     if (!province)
       return res.render("pages/login", {
         GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        GitClientID: process.env.GIT_CLIENT_ID,
         error: "Invalid State Choosen",
       });
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -211,6 +221,7 @@ const setPluginLogin = (req, res) => {
   if (!token)
     return res.render("pages/login", {
       GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+      GitClientID: process.env.GIT_CLIENT_ID,
       error: "Login Failed!",
     });
   return res
