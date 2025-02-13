@@ -45,6 +45,14 @@ const loginValidate = async (req, res) => {
     const user = await User.findOne({ email: email }).lean();
 
     if (!user) return res.render("pages/login", { error: "Invalid Email" });
+    if (!user.password)
+      return res.render("pages/login", {
+        error: `This Login Method not supported for Your Account Please try with ${
+          user.loginType ? user.loginType : "Other Options"
+        }`,
+      });
+    if (!password)
+      return res.render("pages/login", { error: "No Password Provided!!" });
 
     let isMatched =
       email.toLowerCase() === process.env.ADMIN_EMAIL

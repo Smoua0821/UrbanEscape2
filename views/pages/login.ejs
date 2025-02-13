@@ -6,6 +6,12 @@
         overflow: hidden;
       }
 
+      .overflow-ellipsis {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
       .login-box {
         background: linear-gradient(45deg, #ffffff26, #b5b5b569, #ffffff30);
         padding: 20px;
@@ -76,54 +82,72 @@
           <div
             class="vh-100 d-inline-flex align-items-center animate__animated animate__backInDown"
           >
-            <div class="login-box w-100">
-              <h3>Login</h3>
-              <form
-                method="POST"
-                action="/auth"
-                class="classic-login animate__animated animate__bounce animate__delay-1s"
-              >
-                <input
-                  required
-                  type="email"
-                  name="email"
-                  placeholder="user@gmail.com"
-                  class="c-input animate__animated animate__backInRight animate__delay-1s"
-                />
-                <input
-                  required
-                  type="password"
-                  name="password"
-                  placeholder="******"
-                  class="c-input animate__animated animate__backInLeft animate__delay-1s"
-                />
-                <button
-                  class="btn btn-secondary w-100 mt-2 animate__animated animate__backInUp animate__delay-1s"
+            <div class="animated-box">
+              <div class="login-box w-100">
+                <h3>Login</h3>
+                <form
+                  method="POST"
+                  action="/auth"
+                  class="classic-login animate__animated animate__bounce animate__delay-1s"
                 >
-                  SUBMIT
-                </button>
-              </form>
-              <div class="login-responses">
-                <% if(locals.error){ %>
-                <div class="alert alert-danger text-center">
-                  <p class="m-0"><%=error%></p>
+                  <input
+                    required
+                    type="email"
+                    name="email"
+                    placeholder="user@gmail.com"
+                    class="c-input animate__animated animate__backInRight animate__delay-1s"
+                  />
+                  <input
+                    required
+                    type="password"
+                    name="password"
+                    placeholder="******"
+                    class="c-input animate__animated animate__backInLeft animate__delay-1s"
+                  />
+                  <button
+                    class="btn btn-secondary w-100 mt-2 animate__animated animate__backInUp animate__delay-1s"
+                  >
+                    SUBMIT
+                  </button>
+                </form>
+                <div class="login-responses">
+                  <% if(locals.error){ %>
+                  <div class="alert alert-danger text-center">
+                    <p class="m-0"><%=error%></p>
+                  </div>
+                  <%}%>
                 </div>
-                <%}%>
-              </div>
-              <div class="plugin-login">
-                <div
-                  class="login-card google-login animate__animated animate__backInRight animate__delay-1s"
-                >
-                  <div class="g_id_signin" data-type="standard"></div>
-                </div>
-                <div
-                  class="login-card github-login animate__animated animate__backInLeft animate__delay-1s"
-                >
-                  <button class="w-100 git_id_signin btn btn-dark mt-2">
-                    <span style="float: left;">
-                      <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="Github Icon" width="25px" style="filter: invert(1);">
-                    </span>
-                    <span>Sign in with Github</span>
+                <div class="plugin-login">
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div
+                        class="login-card google-login animate__animated animate__backInRight animate__delay-1s"
+                      >
+                        <div
+                          class="g_id_signin my-2"
+                          data-type="standard"
+                        ></div>
+                      </div>
+                    </div>
+                    <div class="col-lg-6">
+                      <div
+                        class="login-card github-login animate__animated animate__backInLeft animate__delay-1s"
+                      >
+                        <button
+                          class="w-100 git_id_signin btn btn-dark my-2 overflow-ellipsis"
+                        >
+                          <span style="float: left">
+                            <img
+                              src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg"
+                              alt="Github Icon"
+                              width="25px"
+                              style="filter: invert(1)"
+                            />
+                          </span>
+                          <span class="px-2">Sign in with Github</span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -153,10 +177,10 @@
         const token = response.credential;
         pluginLogin("google", token);
       }
-      $(document).ready(()=>{
-        $(".git_id_signin").click(()=>{
-          const url=`https://github.com/login/oauth/authorize?client_id=Ov23limGU0MJl6J4PCBo&scope=user:email`;
-          window.location.href=url;
+      $(document).ready(() => {
+        $(".git_id_signin").click(() => {
+          const url = `https://github.com/login/oauth/authorize?client_id=Ov23limGU0MJl6J4PCBo&scope=user:email`;
+          window.location.href = url;
         });
       });
     </script>

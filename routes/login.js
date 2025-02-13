@@ -12,7 +12,7 @@ const {
 
 router.get("/", loginPage);
 
-// router.post("/", loginValidate);
+router.post("/", loginValidate);
 
 // router.post("/new", newUser);
 
