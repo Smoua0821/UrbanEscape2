@@ -1,6 +1,41 @@
 <div class="howtoplaycontainer"></div>
 <div class="user-navbar" style="display: none">
+  <div class="game-tracker">
+    <div class="internal">
+      <div class="row">
+        <div class="col-4">
+          <div class="internal">
+            <div class="time-taken"></div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="internal">
+            <div class="life-container"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="navbar-container">
+    <div class="game-options pt-2 pb-3">
+      <div class="row">
+        <div class="col-4 col-md-4">
+          <div class="text-center game-timer">
+            <div class="time-countdown">11:26</div>
+            <div class="title">Time Played</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4">
+          <div class="text-center game-lifes">
+            <div class="life-center">
+              <span class="fa fa-heart"></span>
+              <span class="fa fa-heart active"></span>
+              <span class="fa fa-heart active"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <ul>
       <% if (user) { %>
       <li data-id="/user/profile" style="float: left">
@@ -52,5 +87,24 @@
   .user-navbar .navbar-container ul li:hover {
     background: #ff0000;
     color: white;
+  }
+
+  .game-options .game-lifes .life-center span.fa {
+    font-size: 30px;
+    margin: 0 5px;
+    color: #0000002e;
+    webkit-text-stroke: 2px black;
+  }
+
+  .game-options .game-lifes .life-center span.fa.active {
+    color: red;
+  }
+
+  .game-options .game-timer .time-countdown {
+    font-size: 1.5rem;
+  }
+
+  .game-options .game-timer .title {
+    font-size: 0.78rem;
   }
 </style>
