@@ -23,6 +23,18 @@
     />
   </head>
   <body style="margin: 0">
+    <% if(lifes==0 && user) { %>
+    <script>
+      const cnfPur = confirm(
+        "You have no Life remain to play this Map, Purchase some from the store?"
+      );
+      let redirectURL = "/user/shop";
+      if (!cnfPur) {
+        redirectURL = "/user/profile";
+      }
+      window.location.href = `${redirectURL}?redirect=${window.location.pathname}`;
+    </script>
+    <% } %>
     <input type="hidden" value="<%=timeFuture%>" id="countdownTimec" />
     <%if(user && user.radius){%>
     <input type="hidden" value="<%=user.radius%>" id="userLocationRadius" />

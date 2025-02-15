@@ -18,18 +18,7 @@
   </div>
   <div class="navbar-container">
     <input type="hidden" id="userLifeCount" value="lifes" />
-    <% if(lifes==0 && user) { %>
-    <script>
-      const cnfPur = confirm(
-        "You have no Life remain to play this Map, Purchase some from the store?"
-      );
-      let redirectURL = "/user/shop";
-      if (!cnfPur) {
-        redirectURL = "/user/profile";
-      }
-      window.location.href = `${redirectURL}?redirect=${window.location.pathname}`;
-    </script>
-    <% } %> <% if(user && lifes>0){ %>
+    <% if(user && lifes>0){ %>
     <div class="game-options pt-3 pb-2">
       <div class="row">
         <div class="col-4 col-md-4">
