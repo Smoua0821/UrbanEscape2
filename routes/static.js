@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
 const PrimaryMap = require("../models/PrimaryMap");
+const MapDynamics = require("../models/MapDynamics");
 
 router.get("/", async (req, res) => {
   const user = await User.findOne({ email: req.user?.email });
@@ -15,9 +16,11 @@ router.get("/", async (req, res) => {
   });
 });
 router.get("/map/:mapId", async (req, res) => {
+  let lifes = 0;
   const { mapId } = req.params;
   if (!mapId) return res.status(301).redirect("/");
   const map = await Map.findOne({ id: mapId });
+
   if (!map) {
     const user = await User.findOne({ email: req.user?.email });
     if (user && user.savedMaps) {
@@ -42,7 +45,7 @@ router.get("/map/:mapId", async (req, res) => {
   const token = req.cookies.sessionId;
   if (token) {
     try {
-      const userO = await jwt.verify(token, process.env.JWT_SECRET);
+      const userO = jwt.verify(token, process.env.JWT_SECRET);
       if (userO) {
         const user = await User.findOne({ email: userO.email });
         if (user) {
@@ -50,6 +53,52 @@ router.get("/map/:mapId", async (req, res) => {
             (ci) => ci.mapId.toString() === map._id.toString()
           );
           if (!imgexist) imgexist = [];
+
+          const map_Id = map._id;
+          const userId = user._id;
+
+          let MapDynamicsData = await MapDynamics.findOne({
+            mapId: map_Id,
+            "users.userId": userId, // Ensure the user exists in the array
+          });
+
+          if (!MapDynamicsData) {
+            console.log("User not found in this map. Creating entry...");
+            MapDynamicsData = await MapDynamics.updateOne(
+              { mapId: map_Id },
+              {
+                $push: {
+                  users: {
+                    userId: userId,
+                    lifes: 2,
+                    history: [{ startTime: new Date() }],
+                  },
+                },
+              },
+              { upsert: true }
+            );
+          } else {
+            console.log("User found. Deducting life and setting startTime...");
+            MapDynamicsData = await MapDynamics.updateOne(
+              {
+                mapId: map_Id,
+                "users.userId": userId,
+                "users.lifes": { $gt: 0 },
+              }, // Prevent negative lives
+              {
+                $inc: { "users.$.lifes": -1 }, // Deduct 1 life
+                $push: { "users.$.history": { startTime: new Date() } }, // Set startTime
+              }
+            );
+          }
+
+          let updatedData = await MapDynamics.findOne(
+            { mapId: map_Id, "users.userId": userId },
+            { "users.$": 1 }
+          );
+
+          updatedData = updatedData.toObject();
+          lifes = updatedData.users[0].lifes;
         }
       }
     } catch (error) {
@@ -73,6 +122,7 @@ router.get("/map/:mapId", async (req, res) => {
     missions: map.missions,
     imageExist: imgexist,
     timeFuture: dateInFuture(map.launchTime),
+    lifes: lifes,
   });
 });
 

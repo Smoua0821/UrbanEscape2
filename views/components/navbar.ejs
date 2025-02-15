@@ -17,6 +17,19 @@
     </div>
   </div>
   <div class="navbar-container">
+    <input type="hidden" id="userLifeCount" value="lifes" />
+    <% if(lifes==0 && user) { %>
+    <script>
+      const cnfPur = confirm(
+        "You have no Life remain to play this Map, Purchase some from the store?"
+      );
+      let redirectURL = "/user/shop";
+      if (!cnfPur) {
+        redirectURL = "/user/profile";
+      }
+      window.location.href = `${redirectURL}?redirect=${window.location.pathname}`;
+    </script>
+    <% } %> <% if(user && lifes>0){ %>
     <div class="game-options pt-3 pb-2">
       <div class="row">
         <div class="col-4 col-md-4">
@@ -28,14 +41,17 @@
         <div class="col-6 col-md-4">
           <div class="text-center game-lifes">
             <div class="life-center">
+              <% for(let i = 0; i < (3 - lifes); i++) { %>
               <span class="fa fa-heart"></span>
+              <% } %> <% for(let i = 0; i < lifes; i++) { %>
               <span class="fa fa-heart active"></span>
-              <span class="fa fa-heart active"></span>
+              <% } %>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <%}%>
     <ul>
       <% if (user) { %>
       <li data-id="/user/profile" style="float: left">
