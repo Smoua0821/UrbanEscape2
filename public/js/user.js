@@ -13,7 +13,8 @@ function formatTime(seconds) {
   $(".timec.second").html(remainingSeconds);
 
   if (seconds === 0) {
-    $(".countdown-holder").fadeOut();
+    // $(".countdown-holder").fadeOut();
+    $(".restBtn").show();
     clearInterval(ctwlIvl);
   }
 }
@@ -146,6 +147,7 @@ let profileImages = [];
 let isFirstTimeFetchProfilePicture = 1;
 const capturedPolygons = [];
 let positionRadius, positionCircle;
+const gameStartedServer = document.getElementById("gameStarted").value;
 
 function renderCapturedImage() {
   if (!profileImages) {
