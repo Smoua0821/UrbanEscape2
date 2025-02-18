@@ -17,6 +17,7 @@ router.get("/", async (req, res) => {
 });
 router.get("/map/:mapId", async (req, res) => {
   let lifes = 0;
+  let gameStarted = 0;
   const { mapId } = req.params;
   if (!mapId) return res.status(301).redirect("/");
   const map = await Map.findOne({ id: mapId });
@@ -39,6 +40,12 @@ router.get("/map/:mapId", async (req, res) => {
       message: "Map Not found!",
     });
   }
+  const launchTime = map.launchTime;
+  const curTime = new Date();
+
+  curTime.setHours(curTime.getHours() - 2);
+
+  if (launchTime.getTime() <= curTime.getTime()) gameStarted = 1;
   const user = req.user;
 
   let imgexist = [];
@@ -53,52 +60,55 @@ router.get("/map/:mapId", async (req, res) => {
             (ci) => ci.mapId.toString() === map._id.toString()
           );
           if (!imgexist) imgexist = [];
+          if (gameStarted) {
+            const map_Id = map._id;
+            const userId = user._id;
 
-          const map_Id = map._id;
-          const userId = user._id;
+            let MapDynamicsData = await MapDynamics.findOne({
+              mapId: map_Id,
+              "users.userId": userId, // Ensure the user exists in the array
+            });
 
-          let MapDynamicsData = await MapDynamics.findOne({
-            mapId: map_Id,
-            "users.userId": userId, // Ensure the user exists in the array
-          });
-
-          if (!MapDynamicsData) {
-            console.log("User not found in this map. Creating entry...");
-            MapDynamicsData = await MapDynamics.updateOne(
-              { mapId: map_Id },
-              {
-                $push: {
-                  users: {
-                    userId: userId,
-                    lifes: 2,
-                    history: [{ startTime: new Date() }],
+            if (!MapDynamicsData) {
+              console.log("User not found in this map. Creating entry...");
+              MapDynamicsData = await MapDynamics.updateOne(
+                { mapId: map_Id },
+                {
+                  $push: {
+                    users: {
+                      userId: userId,
+                      lifes: 2,
+                      history: [{ startTime: new Date() }],
+                    },
                   },
                 },
-              },
-              { upsert: true }
+                { upsert: true }
+              );
+            } else {
+              console.log(
+                "User found. Deducting life and setting startTime..."
+              );
+              MapDynamicsData = await MapDynamics.updateOne(
+                {
+                  mapId: map_Id,
+                  "users.userId": userId,
+                  "users.lifes": { $gt: 0 },
+                }, // Prevent negative lives
+                {
+                  $inc: { "users.$.lifes": -1 }, // Deduct 1 life
+                  $push: { "users.$.history": { startTime: new Date() } }, // Set startTime
+                }
+              );
+            }
+
+            let updatedData = await MapDynamics.findOne(
+              { mapId: map_Id, "users.userId": userId },
+              { "users.$": 1 }
             );
-          } else {
-            console.log("User found. Deducting life and setting startTime...");
-            MapDynamicsData = await MapDynamics.updateOne(
-              {
-                mapId: map_Id,
-                "users.userId": userId,
-                "users.lifes": { $gt: 0 },
-              }, // Prevent negative lives
-              {
-                $inc: { "users.$.lifes": -1 }, // Deduct 1 life
-                $push: { "users.$.history": { startTime: new Date() } }, // Set startTime
-              }
-            );
+
+            updatedData = updatedData.toObject();
+            lifes = updatedData.users[0].lifes;
           }
-
-          let updatedData = await MapDynamics.findOne(
-            { mapId: map_Id, "users.userId": userId },
-            { "users.$": 1 }
-          );
-
-          updatedData = updatedData.toObject();
-          lifes = updatedData.users[0].lifes;
         }
       }
     } catch (error) {
@@ -123,6 +133,7 @@ router.get("/map/:mapId", async (req, res) => {
     imageExist: imgexist,
     timeFuture: dateInFuture(map.launchTime),
     lifes: lifes,
+    gameStarted: gameStarted,
   });
 });
 

@@ -20,4 +20,8 @@ router.post("/map/", handleRecentMaps);
 
 router.post("/profile/badge/delete", badgeDelete);
 
+router.get("/shop", (req, res) => {
+  return res.json({ status: "Maintenance Mode", message: "Available Soon!" });
+});
+
 module.exports = router;
