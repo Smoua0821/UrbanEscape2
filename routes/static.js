@@ -77,7 +77,7 @@ router.get("/map/:mapId", async (req, res) => {
                   $push: {
                     users: {
                       userId: userId,
-                      lifes: 4,
+                      lifes: 3,
                       history: [{ startTime: new Date() }],
                     },
                   },

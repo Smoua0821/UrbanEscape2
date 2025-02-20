@@ -1,46 +1,54 @@
 const MapDynamics = require("../models/MapDynamics");
 
-async function updateUserEndTime(mapId, userId, newEndTime) {
+const winHandler = async (req, res) => {
   try {
-    const result = await MapDynamics.updateOne(
-      { mapId: mapId, "users.userId": userId },
+    const { mapParsedIdRaw } = req.body;
+    if (!mapParsedIdRaw || !req.user?._id)
+      return res.json({ status: "error", message: "Invalid Argument" });
+
+    const endTime = new Date();
+    const getDoc = await MapDynamics.findOneAndUpdate(
       {
-        $set: {
-          "users.$[user].history.$[history].endTime": newEndTime,
-        },
+        mapId: mapParsedIdRaw,
+        "users.userId": req.user._id,
+      },
+      { $inc: { "users.$.lifes": +1 } }
+    );
+    if (!getDoc)
+      return res.json({ status: "error", message: "Document not found" });
+
+    const historyList = getDoc.users.find(
+      (d) => d.userId == req.user._id
+    )?.history;
+    if (!historyList)
+      return res.json({ status: "error", message: "History not found" });
+
+    const updateTime = historyList.pop();
+    if (!updateTime)
+      return res.json({ status: "error", message: "Update time not found" });
+
+    updateTime.endTime = endTime;
+    historyList.push(updateTime);
+
+    const result = await MapDynamics.updateOne(
+      {
+        mapId: mapParsedIdRaw,
+        "users.userId": req.user._id,
       },
       {
-        arrayFilters: [
-          { "user.userId": userId },
-          { "history.startTime": { $exists: true } },
-        ],
+        $push: {
+          "users.$.history": historyList,
+        },
       }
     );
+    if (!result.modifiedCount)
+      return res.json({ status: "error", message: "Update failed" });
 
-    if (result.nModified > 0) {
-      console.log("User endTime updated successfully!");
-    } else {
-      console.log("No document was updated.");
-    }
+    res.json(result);
   } catch (error) {
-    console.error("Error updating user endTime:", error);
+    console.error(error);
+    res.json({ status: "error", message: "Internal Server Error" });
   }
-}
-
-const winHandler = async (req, res) => {
-  const { mapParsedIdRaw } = req.body;
-  if (!mapParsedIdRaw || !req.user?._id)
-    return res.json({ status: "error", message: "Invalid Argument" });
-  const endTime = new Date();
-  // updateUserEndTime(mapParsedIdRaw, req.user._id, endTime);
-  const result = await MapDynamics.updateOne(
-    {
-      mapId: mapParsedIdRaw,
-      "users.userId": req.user._id,
-    },
-    { $inc: { "users.$.lifes": +1 } }
-  );
-  res.json(result.toObject());
 };
 
 const loseHandler = async (req, res) => {
