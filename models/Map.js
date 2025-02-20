@@ -25,6 +25,10 @@ const mapSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    playable: {
+      type: Boolean,
+      default: false,
+    },
     missions: [
       {
         redeemLink: {

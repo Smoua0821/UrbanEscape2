@@ -15,7 +15,7 @@ const MapDynamicSchema = new mongoose.Schema({
       },
       lifes: {
         type: Number,
-        default: 3,
+        default: 4,
         min: 0,
       },
       history: [

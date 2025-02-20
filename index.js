@@ -20,6 +20,7 @@ const adminBadgeRoutes = require("./routes/Admin/badgeFile");
 const adminUserRoutes = require("./routes/Admin/user");
 const loginRoutes = require("./routes/login");
 const userRoutes = require("./routes/user");
+const gameRoutes = require("./routes/game");
 const apiRoutes = require("./routes/api");
 
 const { authMiddleware, adminMiddleware } = require("./middlewares/auth");
@@ -30,6 +31,7 @@ app.use("/auth", loginRoutes);
 app.use("/api", apiRoutes);
 app.use("/", authMiddleware, staticRoutes);
 app.use("/user", userRoutes);
+app.use("/game", gameRoutes);
 app.use("/admin", adminMiddleware, adminRoutes);
 app.use("/admin/button", adminMiddleware, adminButtonRoutes);
 app.use("/admin/badges", adminMiddleware, adminBadgeRoutes);

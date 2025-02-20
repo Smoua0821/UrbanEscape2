@@ -60,7 +60,7 @@ router.get("/map/:mapId", async (req, res) => {
             (ci) => ci.mapId.toString() === map._id.toString()
           );
           if (!imgexist) imgexist = [];
-          if (gameStarted) {
+          if (gameStarted && map?.playable) {
             const map_Id = map._id;
             const userId = user._id;
 
@@ -77,7 +77,7 @@ router.get("/map/:mapId", async (req, res) => {
                   $push: {
                     users: {
                       userId: userId,
-                      lifes: 2,
+                      lifes: 4,
                       history: [{ startTime: new Date() }],
                     },
                   },
@@ -128,12 +128,14 @@ router.get("/map/:mapId", async (req, res) => {
     apiKey: "AIzaSyBaQ334LSpDNZXU8flkT1VjGpdj7f3_BZI",
     user: user,
     mapParsed: mapId,
+    mapParsedIdRaw: map._id,
     title: map.name,
     missions: map.missions,
     imageExist: imgexist,
     timeFuture: dateInFuture(map.launchTime),
     lifes: lifes,
     gameStarted: gameStarted,
+    playable: map?.playable,
   });
 });
 

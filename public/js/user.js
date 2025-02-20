@@ -147,7 +147,10 @@ let profileImages = [];
 let isFirstTimeFetchProfilePicture = 1;
 const capturedPolygons = [];
 let positionRadius, positionCircle;
-const gameStartedServer = document.getElementById("gameStarted").value;
+const gameStartedServer = document.getElementById("gameStarted")?.value;
+const mapParsedIdRaw = document.getElementById("mapParsedIdRaw")?.value;
+document.getElementById("mapParsedIdRaw")?.remove();
+document.getElementById("gameStarted")?.remove();
 
 function renderCapturedImage() {
   if (!profileImages) {

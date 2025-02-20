@@ -18,12 +18,13 @@
   </div>
   <div class="navbar-container">
     <input type="hidden" id="userLifeCount" value="lifes" />
-    <% if(user && lifes>0 && gameStarted){ %>
+    <% if(user && lifes>0 && gameStarted && playable){ %>
+    <input type="hidden" id="mapParsedIdRaw" value="<%= mapParsedIdRaw %>" />
     <div class="game-options pt-3 pb-2">
       <div class="row">
         <div class="col-4 col-md-4">
           <div class="text-center game-timer">
-            <div class="time-countdown">00:00</div>
+            <div class="time-countdown">00:00:00</div>
             <div class="title">Time Played</div>
           </div>
         </div>
@@ -119,14 +120,23 @@
 </style>
 <script>
   $(document).ready(() => {
-    let time = 0;
-    const timeIntval = setInterval(() => {
-      time++;
-      const minutes = parseInt(time / 60);
-      const seconds = time - minutes * 60;
+    const startTime = Date.now(); // Record the initial start time
+    const timeInterval = setInterval(() => {
+      const currentTime = Date.now();
+      const elapsedTime = Math.floor((currentTime - startTime) / 1000); // Calculate elapsed time in seconds
+
+      const hours = Math.floor(elapsedTime / 3600);
+      const minutes = Math.floor((elapsedTime % 3600) / 60);
+      const seconds = elapsedTime % 60;
+
+      // Format time as hh:mm:ss
+      const formattedHours = hours < 10 ? `0${hours}` : hours;
       const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
       const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
-      $(".time-countdown").text(`${formattedMinutes}:${formattedSeconds}`);
+
+      $(".time-countdown").text(
+        `${formattedHours}:${formattedMinutes}:${formattedSeconds}`
+      );
     }, 1000);
   });
 </script>
