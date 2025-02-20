@@ -36,11 +36,12 @@ const winHandler = async (req, res) => {
         "users.userId": req.user._id,
       },
       {
-        $push: {
+        $set: {
           "users.$.history": historyList,
         },
       }
     );
+
     if (!result.modifiedCount)
       return res.json({ status: "error", message: "Update failed" });
 
