@@ -6,6 +6,23 @@ const MapDynamicSchema = new mongoose.Schema({
     ref: "Map",
     required: true,
   },
+  Leaderboard: [
+    {
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+      timeTaken: {
+        type: Number,
+        required: true,
+      },
+      timeSaved: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
   users: [
     {
       userId: {

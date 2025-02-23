@@ -29,6 +29,9 @@ const winHandler = async (req, res) => {
 
     updateTime.endTime = endTime;
     historyList.push(updateTime);
+    const timeTaken = parseInt(
+      (updateTime.endTime - updateTime.startTime) / 1000
+    );
 
     const result = await MapDynamics.updateOne(
       {
@@ -38,6 +41,13 @@ const winHandler = async (req, res) => {
       {
         $set: {
           "users.$.history": historyList,
+        },
+        $push: {
+          Leaderboard: {
+            userId: req.user._id,
+            timeTaken: timeTaken,
+            timeSaved: Date.now(),
+          },
         },
       }
     );

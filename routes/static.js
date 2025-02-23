@@ -60,7 +60,7 @@ router.get("/map/:mapId", async (req, res) => {
             (ci) => ci.mapId.toString() === map._id.toString()
           );
           if (!imgexist) imgexist = [];
-          if (gameStarted && map?.playable) {
+          if (gameStarted && 1) {
             const map_Id = map._id;
             const userId = user._id;
 
@@ -135,7 +135,7 @@ router.get("/map/:mapId", async (req, res) => {
     timeFuture: dateInFuture(map.launchTime),
     lifes: lifes,
     gameStarted: gameStarted,
-    playable: map?.playable,
+    playable: 1,
   });
 });
 
