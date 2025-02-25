@@ -25,6 +25,22 @@ const mapSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    pacman: [
+      {
+        speed: {
+          type: Number,
+          default: 5,
+        },
+        distance: {
+          type: Number,
+          default: 1000,
+        },
+        direction: {
+          type: String,
+          default: "North",
+        },
+      },
+    ],
     playable: {
       type: Boolean,
       default: false,

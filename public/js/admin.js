@@ -99,6 +99,14 @@ const setMapRadiusNum = (event) => {
   circle.setMap(map);
   payloadData.radius = parseInt(event.value);
 };
+const showGameOptions = () => {
+  const div = document.getElementById("showGameOptions");
+  if (!div) return alert("No Target found to give Home!");
+};
+const hideGameOptions = () => {
+  $("#showGameOptions").empty();
+};
+
 let payloadData = {
   polygonCoords: polyCoords,
   image: beachFlagImg.src,

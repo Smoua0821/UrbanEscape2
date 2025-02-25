@@ -555,19 +555,6 @@ function initMap() {
     clickable: false,
   });
   showAllPolygons();
-
-  if (mapParsedIdRaw) {
-    const divOuter = document.createElement("div");
-    const divinner = document.createElement("div");
-    divinner.className = "pacman-inner";
-    divOuter.className = "pacman-outer";
-    divOuter.appendChild(divinner);
-    const pacmanMarker = new google.maps.marker.AdvancedMarkerElement({
-      content: divOuter,
-      map: map,
-      position: pos,
-    });
-  }
 }
 function markerClickTrack(event) {
   $(".popup-button").show();
