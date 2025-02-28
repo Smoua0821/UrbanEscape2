@@ -169,12 +169,6 @@
         const token = response.credential;
         pluginLogin("google", token);
       }
-      $(document).ready(() => {
-        $(".git_id_signin").click(() => {
-          const url = `https://github.com/login/oauth/authorize?client_id=<%= GitClientID %>&scope=user:email`;
-          window.location.href = url;
-        });
-      });
     </script>
   </body>
 </html>
