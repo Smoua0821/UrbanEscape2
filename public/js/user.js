@@ -262,10 +262,12 @@ $(document).ready(() => {
       const target = $(this).data("id");
       if (!target) return;
       if (target == "/missions") return $(".mission-popup").fadeIn();
-      const cnfOut = confirm(
-        "Game Progress will be destroyed and You will lose one life, Agree?"
-      );
-      if (!cnfOut) return;
+      if (mapParsedIdRaw) {
+        const cnfOut = confirm(
+          "Game Progress will be destroyed and You will lose one life, Agree?"
+        );
+        if (!cnfOut) return;
+      }
       window.location.href = target;
     });
   });
