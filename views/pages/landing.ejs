@@ -41,7 +41,7 @@
         </div>
         <% }else{ %>
         <div class="my-5"></div>
-        <%}%>
+        <%}%> <%if(locals.user){%>
         <div class="d-flex">
           <input
             id="mapId"
@@ -50,6 +50,18 @@
           />
           <button class="btn btn-warning ms-1" onclick="submitt()">Play</button>
         </div>
+        <div class="my-3">
+          <a
+            href="https://google.com"
+            target="_blank"
+            class="btn btn-success w-100 rounded-0 my-1"
+            >Homepage</a
+          >
+          <a href="/user/profile" class="btn btn-primary w-100 rounded-0 my-1"
+            >My Profile</a
+          >
+        </div>
+        <%}%>
         <div class="extra mt-2 text-center">
           <% if (locals.user) { %>
           <p class="alert alert-warning">
