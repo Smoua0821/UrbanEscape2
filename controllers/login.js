@@ -7,7 +7,9 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const Province = require("../models/Provinces");
 const PrimaryMap = require("../models/PrimaryMap");
 const axios = require("axios");
-
+const ActivationCode = require("../models/ActivationEmail");
+const { v4: uuidv4 } = require("uuid");
+const { sendEmail } = require("../config/email");
 dotenv.config();
 
 const loginPage = async (req, res) => {
@@ -16,7 +18,6 @@ const loginPage = async (req, res) => {
   if (!token)
     return res.render("pages/login", {
       GoogleClientID: process.env.GOOGLE_CLIENT_ID,
-      GitClientID: process.env.GIT_CLIENT_ID,
       error: error,
     });
 
@@ -31,15 +32,13 @@ const loginPage = async (req, res) => {
     } else {
       return res.status(401).render("pages/login", {
         GoogleClientID: process.env.GOOGLE_CLIENT_ID,
-        GitClientID: process.env.GIT_CLIENT_ID,
-        error: "Invalid user role",
+        error: "Invalid user Identity",
       });
     }
   } catch (error) {
     console.error("Error verifying token:", error);
     return res.status(401).render("pages/login", {
       GoogleClientID: process.env.GOOGLE_CLIENT_ID,
-      GitClientID: process.env.GIT_CLIENT_ID,
       error: "Invalid session",
     });
   }
@@ -53,13 +52,11 @@ const loginValidate = async (req, res) => {
     if (!user)
       return res.render("pages/login", {
         GoogleClientID: process.env.GOOGLE_CLIENT_ID,
-        GitClientID: process.env.GIT_CLIENT_ID,
         error: "Invalid Email",
       });
     if (!user.password)
       return res.render("pages/login", {
         GoogleClientID: process.env.GOOGLE_CLIENT_ID,
-        GitClientID: process.env.GIT_CLIENT_ID,
         error: `This Login Method not supported for Your Account, Please try with ${
           user.loginType ? user.loginType : "Other Options"
         } and generate your password from the profile!`,
@@ -67,7 +64,6 @@ const loginValidate = async (req, res) => {
     if (!password)
       return res.render("pages/login", {
         GoogleClientID: process.env.GOOGLE_CLIENT_ID,
-        GitClientID: process.env.GIT_CLIENT_ID,
         error: "No Password Provided!!",
       });
 
@@ -79,9 +75,22 @@ const loginValidate = async (req, res) => {
     if (!isMatched)
       return res.render("pages/login", {
         GoogleClientID: process.env.GOOGLE_CLIENT_ID,
-        GitClientID: process.env.GIT_CLIENT_ID,
         error: "Invalid Password",
       });
+
+    if (user.status != "verified") {
+      if (user.status == "pending") {
+        return res.render("pages/login", {
+          GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+          error: `${user.name}, Your Account is not verified, Please verify it by clicking on verification link sent to your email ${user.email}`,
+        });
+      }
+
+      return res.render("pages/login", {
+        GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        error: "Your Account is deactivated, Please contact Admin!",
+      });
+    }
 
     const token = jwt.sign(user, process.env.JWT_SECRET);
     res.cookie("sessionId", token, {
@@ -106,38 +115,29 @@ const loginValidate = async (req, res) => {
 };
 
 const newUser = async (req, res) => {
-  const { name, email, password, state, ppolicy } = req.body;
-
-  if (!ppolicy)
-    return res.render("pages/login", {
-      GoogleClientID: process.env.GOOGLE_CLIENT_ID,
-      GitClientID: process.env.GIT_CLIENT_ID,
-      error: "Privacy Policy must be accepted!",
-    });
-
-  if (!name || !email || !password || !state) {
-    return res.status(400).render("pages/postRegister", {
-      message: "All fields are required",
-      type: "danger",
-    });
-  }
-
   try {
-    const existingUser = await User.findOne({ email: email });
-    if (existingUser) {
-      return res.status(400).render("pages/postRegister", {
-        message: "Email already in use. Please use a different email.",
-        type: "danger",
-        user: existingUser,
-      });
-    }
-    const province = await Province.findOne({ name: state });
-    if (!province)
+    const { name, email, password, state } = req.body;
+
+    if (!name || !email || !password || !state) {
       return res.render("pages/login", {
         GoogleClientID: process.env.GOOGLE_CLIENT_ID,
-        GitClientID: process.env.GIT_CLIENT_ID,
-        error: "Invalid State Choosen",
+        error: "All fields are required",
       });
+    }
+
+    const existingUser = await User.findOne({ email: email });
+    if (existingUser) {
+      if (existingUser.status == "verified") {
+        return res.render("pages/login", {
+          GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+          error: `User with ${email} already exists, Try logging in using email and password!`,
+        });
+      } else {
+        await User.deleteOne({ email: email });
+      }
+    }
+    let province = await Province.findOne({ name: state });
+    if (!province) province = "other";
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newuser = await User.create({
@@ -146,9 +146,82 @@ const newUser = async (req, res) => {
       password: hashedPassword,
       state: state,
     });
+    const codeId = uuidv4();
+    const activation = await ActivationCode.create({
+      email: email,
+      codeId: codeId,
+    });
+    const html_data = `<!DOCTYPE html>
+                            <html>
+                            <head>
+                                <meta charset="UTF-8">
+                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <title>Verify Your Email</title>
+                                <style>
+                                    body {
+                                        font-family: Arial, sans-serif;
+                                        background-color: #f4f4f4;
+                                        margin: 0;
+                                        padding: 0;
+                                    }
+                                    .container {
+                                        max-width: 500px;
+                                        background: #ffffff;
+                                        padding: 20px;
+                                        margin: 30px auto;
+                                        border-radius: 10px;
+                                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                                        text-align: center;
+                                    }
+                                    h2 {
+                                        color: #333;
+                                    }
+                                    p {
+                                        color: #555;
+                                        font-size: 16px;
+                                    }
+                                    .button {
+                                        display: inline-block;
+                                        background: #007BFF;
+                                        color: #ffffff;
+                                        text-decoration: none;
+                                        padding: 12px 20px;
+                                        border-radius: 5px;
+                                        font-weight: bold;
+                                        margin-top: 15px;
+                                    }
+                                    .button:hover {
+                                        background: #0056b3;
+                                    }
+                                    .footer {
+                                        margin-top: 20px;
+                                        font-size: 14px;
+                                        color: #777;
+                                    }
+                                </style>
+                            </head>
+                            <body>
+                                <div class="container">
+                                    <h2>Verify Your Email Address</h2>
+                                    <p>Thank you for signing up on <b>UrbanEscape</b>! Please confirm your email address by clicking the button below.</p>
+                                    <a href="${process.env.BASE_URL}/auth/verify/${codeId}" class="button">Verify Email</a>
+                                    <p>If you didn’t request this, you can ignore this email.</p>
+                                    <p class="footer">If the button above doesn't work, copy and paste the following link in your browser:</p>
+                                    <p class="footer">${process.env.BASE_URL}/auth/verify/${codeId}</p>
+                                </div>
+                            </body>
+                            </html>`;
+    const info = await sendEmail(
+      email,
+      "UrbanEscape Account Activation",
+      html_data,
+      "Verify"
+    );
+    console.log(info);
     return res.status(200).render("pages/postRegister", {
-      message: "Account Created Successfully!",
+      message: `Activation Link sent to ${email}`,
       type: "success",
+      action: "email",
       user: newuser,
     });
   } catch (err) {
@@ -198,8 +271,15 @@ const pluginLoginController = async (req, res) => {
           email: payload.email,
           loginType: type,
           picture: payload.picture,
+          status: "verified",
         });
+      } else if (user.status != "verified") {
+        await User.updateOne(
+          { email: payload.email },
+          { $set: { status: "verified" } }
+        );
       }
+
       const tokenSigned = jwt.sign(user.toObject(), process.env.JWT_SECRET);
 
       return res.json({
@@ -292,6 +372,62 @@ const gitOAuthVerify = async (req, res) => {
   }
 };
 
+const verifyActivationEmail = async (req, res) => {
+  try {
+    const { codeId } = req.params;
+    if (!codeId)
+      return res.render("pages/login", {
+        GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        error: "No Verification Token Found!",
+      });
+
+    const activation = await ActivationCode.findOne({ codeId: codeId });
+    if (!activation)
+      return res.render("pages/login", {
+        GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        error: "Invalid Verification Link!",
+      });
+
+    const user = await User.findOne({ email: activation.email });
+    if (!user)
+      return res.render("pages/login", {
+        GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        error: "No Corresponding User Found to activate",
+      });
+
+    if (user.status == "verified")
+      return res.render("pages/login", {
+        GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        error:
+          "You are already verified, Please login using Email and password!",
+      });
+
+    try {
+      await User.updateOne(
+        { email: activation.email },
+        { $set: { status: "verified" } }
+      );
+      return res.status(200).render("pages/postRegister", {
+        message: `${user.name}, Your account is activated login with your email ${activation.email} and password!`,
+        type: "success",
+        action: "email",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.render("pages/login", {
+        GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        error: "Activation failed!",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.render("pages/login", {
+      GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+      error: "Something gone wrong!",
+    });
+  }
+};
+
 module.exports = {
   loginPage,
   loginValidate,
@@ -300,4 +436,5 @@ module.exports = {
   pluginLoginController,
   setPluginLogin,
   gitOAuthVerify,
+  verifyActivationEmail,
 };

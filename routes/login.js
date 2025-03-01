@@ -8,13 +8,16 @@ const {
   pluginLoginController,
   setPluginLogin,
   gitOAuthVerify,
+  verifyActivationEmail,
 } = require("../controllers/login");
 
 router.get("/", loginPage);
 
 router.post("/", loginValidate);
 
-// router.post("/new", newUser);
+router.get("/verify/:codeId", verifyActivationEmail);
+
+router.post("/signup", newUser);
 
 router.get("/countries", provinceList);
 

@@ -28,6 +28,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: "other",
     },
+    status: {
+      type: String,
+      default: "pending",
+    },
     radius: {
       type: Number,
       default: 0,
