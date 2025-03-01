@@ -328,12 +328,10 @@ const badgeDelete = async (req, res) => {
     );
 
     if (result.modifiedCount === 0) {
-      return res
-        .status(404)
-        .json({
-          status: "error",
-          message: "Badge not found or already removed",
-        });
+      return res.status(404).json({
+        status: "error",
+        message: "Badge not found or already removed",
+      });
     }
 
     return res
