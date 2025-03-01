@@ -305,8 +305,13 @@ const setPluginLogin = (req, res) => {
   if (!token)
     return res.render("pages/login", {
       GoogleClientID: process.env.GOOGLE_CLIENT_ID,
-      GitClientID: process.env.GIT_CLIENT_ID,
       error: "Login Failed!",
+    });
+
+  if (!jwt.verify(token, process.env.JWT_SECRET))
+    return res.render("pages/login", {
+      GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+      error: "invalid Token Assigned!",
     });
   return res
     .cookie("sessionId", token, {
