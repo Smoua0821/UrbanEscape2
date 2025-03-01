@@ -29,16 +29,17 @@
         backdrop-filter: blur(5px);
         border-radius: 5px;
         border: 2px solid white;
+        overflow: hidden;
       }
 
-      .login-box .classic-login {
+      .login-box form {
         padding: 5px;
         margin: 10px 0;
         padding-bottom: 15px;
         border-bottom: 2px solid #ffffff2e;
       }
 
-      .login-box .classic-login input.c-input {
+      .login-box form input.c-input {
         display: inline-block;
         width: 100%;
         margin: 5px 0;
@@ -53,21 +54,50 @@
         letter-spacing: 3px;
       }
 
-      .login-box .classic-login input.c-input:focus {
+      .login-box form input.c-input:focus {
         border-bottom: 2px solid white;
         color: white;
       }
 
-      .login-box h3 {
-        text-align: center;
-        color: white;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #ffffff4a;
-        font-size: 2rem;
+      .login-box form input.c-input::placeholder {
+        color: #ffffff8f;
       }
 
-      .login-box .classic-login input.c-input::placeholder {
-        color: #ffffff8f;
+      .login-box .tab-toggle {
+        width: 100%;
+        display: inline-flex;
+      }
+
+      .login-box .tab-toggle h3 {
+        transition: 0.1s;
+        width: 50%;
+        text-align: center;
+        text-transform: uppercase;
+        cursor: pointer;
+        padding: 10px 0;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .login-box .tab-toggle h3:hover {
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .login-box .tab-toggle h3.active {
+        color: white;
+        background: rgba(0, 0, 0, 0.3);
+      }
+
+      select#citySelector.form-control_v {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background: transparent;
+        color: white;
+        margin-top: 10px;
+      }
+
+      select#citySelector.form-control_v option {
+        color: black;
       }
     </style>
     <link
@@ -95,31 +125,68 @@
           >
             <div class="animated-box">
               <div class="login-box w-100">
-                <h3>Login</h3>
+                <div class="tab-toggle">
+                  <h3 data-id="login" class="active">Login</h3>
+                  <h3 data-id="register">Register</h3>
+                </div>
                 <form
                   method="POST"
                   action="/auth"
-                  class="classic-login animate__animated animate__bounce animate__delay-1s"
+                  class="classic-login animate__animated animate__fadeInLeft"
                 >
                   <input
                     required
                     type="email"
                     name="email"
                     placeholder="user@gmail.com"
-                    class="c-input animate__animated animate__backInRight animate__delay-1s"
+                    class="c-input"
                   />
                   <input
                     required
                     type="password"
                     name="password"
                     placeholder="******"
-                    class="c-input animate__animated animate__backInLeft animate__delay-1s"
+                    class="c-input"
                   />
-                  <button
-                    class="btn btn-secondary w-100 mt-2 animate__animated animate__backInUp animate__delay-1s"
-                  >
-                    SUBMIT
-                  </button>
+                  <button class="btn btn-secondary w-100 mt-2">SUBMIT</button>
+                </form>
+                <form
+                  method="POST"
+                  action="/auth/signup"
+                  style="display: none"
+                  class="classic-signup animate__animated animate__fadeInRight"
+                >
+                  <input
+                    required
+                    type="text"
+                    name="name"
+                    placeholder="Enter Your Name"
+                    class="c-input"
+                  />
+                  <input
+                    required
+                    type="email"
+                    name="email"
+                    placeholder="user@gmail.com"
+                    class="c-input"
+                  />
+                  <input
+                    required
+                    type="password"
+                    name="password"
+                    placeholder="******"
+                    class="c-input"
+                  />
+                  <div class="form-group mb-2">
+                    <select
+                      class="form-control_v"
+                      id="citySelector"
+                      name="state"
+                    >
+                      <option value="">Choose State--</option>
+                    </select>
+                  </div>
+                  <button class="btn btn-secondary w-100 mt-2">REGISTER</button>
                 </form>
                 <div class="login-responses">
                   <% if(locals.error){ %>
@@ -132,7 +199,7 @@
                   <div class="row">
                     <div class="col-lg-12 my-1">
                       <div
-                        class="login-card google-login animate__animated animate__backInRight animate__delay-1s"
+                        class="login-card google-login animate__animated animate__backInUp animate__delay-1s"
                       >
                         <div
                           class="g_id_signin my-2"
@@ -142,6 +209,18 @@
                     </div>
                   </div>
                 </div>
+                <p
+                  class="text-white text-center m-0 animate__animated animate__backInUp animate__delay-1s"
+                >
+                  By using our services, you agree to our
+                  <a
+                    href="/privacy-policy"
+                    target="_blank"
+                    class="text-blue-400 underline hover:text-blue-300"
+                  >
+                    Privacy Policy </a
+                  >.
+                </p>
               </div>
             </div>
           </div>
@@ -169,6 +248,43 @@
         const token = response.credential;
         pluginLogin("google", token);
       }
+      $(document).ready(() => {
+        $(".login-box .tab-toggle h3").click(function () {
+          if ($(this).hasClass("active")) return;
+          $(".login-box .tab-toggle h3").removeClass("active");
+          $(this).addClass("active");
+          const tgtTgl = $(this).data("id");
+          $(".login-box form").hide();
+          if (tgtTgl == "login") {
+            $(".login-box form.classic-login").show();
+          } else {
+            $(".login-box form.classic-signup").show();
+          }
+        });
+
+        $.get("/auth/countries", (data) => {
+          if (data.status == "success") {
+            const countries = data.countries;
+            $("#citySelector").empty();
+            $("#citySelector").html(
+              "<option value=''>Select State/Province</option>"
+            );
+
+            countries.forEach((country) => {
+              $("#citySelector").append(
+                `<option value="${country.name}">${country.name}</option>`
+              );
+            });
+
+            $("#citySelector").on("change", (event) => {
+              if (!event.target.value) return $("#registerBtn").hide();
+              x = $("#ppolicyCheck")[0];
+              if (!x.checked) return;
+              return $("#registerBtn").show();
+            });
+          }
+        });
+      });
     </script>
   </body>
 </html>
