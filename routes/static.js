@@ -46,7 +46,7 @@ router.get("/map/:mapId", async (req, res) => {
   curTime.setHours(curTime.getHours() - 2);
 
   if (launchTime.getTime() <= curTime.getTime()) gameStarted = 1;
-  const user = req.user;
+  let user = req.user;
 
   let imgexist = [];
   const token = req.cookies.sessionId;
@@ -54,7 +54,7 @@ router.get("/map/:mapId", async (req, res) => {
     try {
       const userO = jwt.verify(token, process.env.JWT_SECRET);
       if (userO) {
-        const user = await User.findOne({ email: userO.email });
+        user = await User.findOne({ email: userO.email });
         if (user) {
           imgexist = user.capturedImages.find(
             (ci) => ci.mapId.toString() === map._id.toString()
