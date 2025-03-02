@@ -17,11 +17,11 @@
     <div
       class="w-100 d-inline-flex vh-100 justify-content-center align-items-center msg-<%= type %>"
     >
-      <div class="shadow-lg mx-3 bg-white">
+      <div class="shadow-lg mx-3 boxhandle">
         <h3 class="text-center py-2 border-bottom"><%=title%></h3>
         <div class="body py-2 px-2 px-sm-4">
           <p class="text-center mb-3">
-            <span class="fa fa-4x fa-<%=icon%> opacity-50"></span>
+            <span class="fa fa-4x fa-<%=icon%> mainicon"></span>
           </p>
           <p class="text-center lead"><%=message%></p>
         </div>
@@ -45,6 +45,33 @@
 
       .msg-success .shadow-lg {
         border: 2px solid #00ff2f5c;
+      }
+
+      body {
+        background: url(/images/login-bg.avif) fixed;
+        background-size: cover;
+        background-position: center;
+      }
+
+      .boxhandle {
+        backdrop-filter: blur(10px);
+        color: white;
+        background: rgba(0, 0, 0, 0.7);
+      }
+
+      .msg-success .boxhandle h3 {
+        color: lime;
+      }
+
+      .msg-danger .boxhandle h3 {
+        color: red;
+      }
+
+      .boxhandle .mainicon {
+        padding: 20px;
+        color: #fff;
+        border-radius: 50%;
+        border: 2px solid #ffffff80;
       }
     </style>
   </body>

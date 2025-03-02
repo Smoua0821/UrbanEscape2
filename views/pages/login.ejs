@@ -99,6 +99,40 @@
       select#citySelector.form-control_v option {
         color: black;
       }
+
+      .fgt-pss a {
+        color: orange;
+        display: inline-block;
+        text-decoration: none;
+        font-style: oblique;
+        transition: 0.1s;
+        position: relative;
+        overflow: hidden;
+        height: 30px;
+      }
+
+      .fgt-pss a:hover {
+        color: #f80;
+      }
+
+      .fgt-pss a:before {
+        content: " ";
+        position: absolute;
+        width: 100%;
+        background: linear-gradient(90deg, red, green, yellow);
+        height: 2px;
+        display: block;
+        left: -100%;
+        transition: 0.2s;
+        top: 0;
+        border-radius: 20px;
+      }
+
+      .fgt-pss a:hover:before {
+        left: 0;
+        top: calc(100% - 3px);
+        transition: 0.5s;
+      }
     </style>
     <link
       rel="stylesheet"
@@ -149,6 +183,9 @@
                     class="c-input"
                   />
                   <button class="btn btn-secondary w-100 mt-2">SUBMIT</button>
+                  <p class="text-end m-0 mt-3 fgt-pss">
+                    <a href="/auth/password/recovery">forgot password?</a>
+                  </p>
                 </form>
                 <form
                   method="POST"
