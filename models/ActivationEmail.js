@@ -7,12 +7,12 @@ const ActivationCodeSchema = new mongoose.Schema({
   },
   codeId: {
     type: String,
-    required: true, // Fixed the typo here
+    required: true,
   },
   createdAt: {
     type: Date,
     default: Date.now,
-    expires: 3600, // Automatically deletes after 1 hour (TTL index)
+    expires: 3600,
   },
 });
 
