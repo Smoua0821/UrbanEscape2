@@ -581,7 +581,7 @@ const setPasswordRecovery = async (req, res) => {
     { email: user.email },
     { $set: { password: hashedPassword } }
   );
-  console.log(updateUser);
+  await ActivationCode.deleteOne({ codeId });
   res.clearCookie("sessionId", {
     httpOnly: true,
     sameSite: "strict",
