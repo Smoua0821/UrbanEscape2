@@ -200,11 +200,10 @@ router.get("/map/background/:tarId", (req, res) => {
 });
 
 router.get("/test", (req, res) => {
-  return res.status(200).render("pages/postRegister", {
-    message: `Activation Link sent to thakurvijayofficial@gmail.com`,
-    title: "Email",
-    icon: "envelope",
-    type: "success",
+  return res.status(200).render("pages/passwordRecovery", {
+    title: "Password Recovery",
+    CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+    type: "request",
   });
 });
 
