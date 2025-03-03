@@ -21,10 +21,13 @@ const generateActivationLink = async (
   type = "verification",
   user = {}
 ) => {
+  const allowedTypes = ["verification", "recovery"];
+  if (!allowedTypes.includes(type)) type = "verification";
   const codeId = uuidv4();
   const activation = await ActivationCode.create({
     email: email,
     codeId: codeId,
+    type: type,
   });
 
   let tempelate = html_data(codeId);
@@ -163,7 +166,10 @@ const newUser = async (req, res) => {
           error: `User with ${email} already exists, Try logging in using email and password!`,
         });
       } else {
-        const checkActivation = await ActivationCode.findOne({ email: email });
+        const checkActivation = await ActivationCode.findOne({
+          email: email,
+          type: "verification",
+        });
         if (checkActivation)
           return res.render("pages/postRegister", {
             title: "Verification Pending",
@@ -369,7 +375,10 @@ const verifyActivationEmail = async (req, res) => {
         error: "No Verification Token Found!",
       });
 
-    const activation = await ActivationCode.findOne({ codeId: codeId });
+    const activation = await ActivationCode.findOne({
+      codeId: codeId,
+      type: "verification",
+    });
     if (!activation)
       return res.render("pages/login", {
         GoogleClientID: process.env.GOOGLE_CLIENT_ID,
@@ -451,24 +460,32 @@ const requestPasswordRecovery = async (req, res) => {
     });
 
   if (user.status != "verified") {
-    const activationCheck = await ActivationCode.findOne({ email: email });
-    let error =
-      "Verification link sent to your email address, please verify your email!";
+    const activationCheck = await ActivationCode.findOne({
+      email: email,
+      type: "recovery",
+    });
     if (!activationCheck) {
       await generateActivationLink(email);
     }
     return res.render("pages/passwordRecovery", {
       error: error,
-      title: "Verification Pending!",
+      title:
+        "Verification link sent to your email address, please verify your email!",
       CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
       type: "request",
     });
+  } else {
+    const activationCheck = await ActivationCode.findOne({
+      email: email,
+      type: "recovery",
+    });
+    if (!activationCheck) {
+      await generateActivationLink(email, "recovery", {
+        name: user.name,
+        email: user.email,
+      });
+    }
   }
-
-  await generateActivationLink(email, "recovery", {
-    name: user.name,
-    email: user.email,
-  });
 
   return res.render("pages/passwordRecovery", {
     success:
