@@ -11,21 +11,33 @@ const ActivationCode = require("../models/ActivationEmail");
 const { v4: uuidv4 } = require("uuid");
 const { sendEmail } = require("../config/email");
 const html_data = require("../config/emailActivationTempelate");
+const verifyCaptcha = require("../config/verifyCaptcha");
+const password_recovery_email = require("../config/password_recovery_email");
+
 dotenv.config();
 
-const generateActivationLink = async (email) => {
+const generateActivationLink = async (
+  email,
+  type = "verification",
+  user = {}
+) => {
   const codeId = uuidv4();
   const activation = await ActivationCode.create({
     email: email,
     codeId: codeId,
   });
 
-  const info = await sendEmail(
-    email,
-    "UrbanEscape Account Activation",
-    html_data(codeId),
-    "Verify"
-  );
+  let tempelate = html_data(codeId);
+  let subject = "UrbanEscape Account Activation";
+  let from = "Verify";
+
+  if (type == "recovery" && user && user.name && user.email) {
+    tempelate = password_recovery_email(user.name, user.email, codeId);
+    subject = "UrbanEscape Password Recovery";
+    from = "Security";
+  }
+
+  const info = await sendEmail(email, subject, tempelate, from);
 
   console.log(info);
 };
@@ -182,7 +194,7 @@ const newUser = async (req, res) => {
       state: state,
     });
 
-    generateActivationLink(email);
+    await generateActivationLink(email);
 
     console.log(info);
     return res.status(200).render("pages/postRegister", {
@@ -410,6 +422,63 @@ const verifyActivationEmail = async (req, res) => {
   }
 };
 
+const requestPasswordRecovery = async (req, res) => {
+  const { email, "g-recaptcha-response": gcaptcha } = req.body;
+  if (!email || !gcaptcha)
+    return res.status(200).render("pages/passwordRecovery", {
+      title: "Password Recovery",
+      CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+      type: "request",
+      error: "All field are required!",
+    });
+
+  const verifiedcaptcha = await verifyCaptcha(gcaptcha);
+  if (!verifiedcaptcha)
+    return res.render("pages/passwordRecovery", {
+      title: "Captcha Error",
+      error: "Captcha Verification failed",
+      CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+      type: "request",
+    });
+
+  const user = await User.findOne({ email: email });
+  if (!user)
+    return res.render("pages/passwordRecovery", {
+      error: `No Account found with ${email}, please create a new account`,
+      title: "No Account found!",
+      CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+      type: "request",
+    });
+
+  if (user.status != "verified") {
+    const activationCheck = await ActivationCode.findOne({ email: email });
+    let error =
+      "Verification link sent to your email address, please verify your email!";
+    if (!activationCheck) {
+      await generateActivationLink(email);
+    }
+    return res.render("pages/passwordRecovery", {
+      error: error,
+      title: "Verification Pending!",
+      CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+      type: "request",
+    });
+  }
+
+  await generateActivationLink(email, "recovery", {
+    name: user.name,
+    email: user.email,
+  });
+
+  return res.render("pages/passwordRecovery", {
+    success:
+      "Password link sent to your Email Address, Please Click on the link and set your password from there!",
+    title: "Link Sent",
+    CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+    type: "request",
+  });
+};
+
 module.exports = {
   loginPage,
   loginValidate,
@@ -419,4 +488,5 @@ module.exports = {
   setPluginLogin,
   gitOAuthVerify,
   verifyActivationEmail,
+  requestPasswordRecovery,
 };

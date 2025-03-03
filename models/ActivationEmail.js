@@ -9,6 +9,10 @@ const ActivationCodeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  type: {
+    type: String,
+    default: "verification",
+  },
   createdAt: {
     type: Date,
     default: Date.now,

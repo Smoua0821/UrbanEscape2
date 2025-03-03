@@ -9,6 +9,7 @@ const {
   setPluginLogin,
   gitOAuthVerify,
   verifyActivationEmail,
+  requestPasswordRecovery,
 } = require("../controllers/login");
 
 router.get("/", loginPage);
@@ -19,11 +20,13 @@ router.get("/verify/:codeId", verifyActivationEmail);
 
 router.get("/password/recovery", (req, res) => {
   return res.render("pages/passwordRecovery", {
-    title: "Set Password",
-    type: "setpassword",
+    title: "Password Recovery",
+    type: "request",
     CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
   });
 });
+
+router.post("/password/recovery/request", requestPasswordRecovery);
 
 router.post("/signup", newUser);
 
