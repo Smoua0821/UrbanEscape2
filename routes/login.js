@@ -10,6 +10,8 @@ const {
   gitOAuthVerify,
   verifyActivationEmail,
   requestPasswordRecovery,
+  handlePasswordRecovery,
+  setPasswordRecovery,
 } = require("../controllers/login");
 
 router.get("/", loginPage);
@@ -27,6 +29,8 @@ router.get("/password/recovery", (req, res) => {
 });
 
 router.post("/password/recovery/request", requestPasswordRecovery);
+router.get("/password/recovery/verify/:codeId", handlePasswordRecovery);
+router.post("/password/recovery/verify/:codeId", setPasswordRecovery);
 
 router.post("/signup", newUser);
 

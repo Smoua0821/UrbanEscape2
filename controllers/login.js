@@ -496,6 +496,106 @@ const requestPasswordRecovery = async (req, res) => {
   });
 };
 
+const handlePasswordRecovery = async (req, res) => {
+  const { codeId } = req.params;
+  if (!codeId)
+    return res.render("pages/passwordRecovery", {
+      error: "Broken Recovery Link",
+      title: "Recover Password",
+      CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+      type: "request",
+    });
+
+  const recoveryEmail = await ActivationCode.findOne({ codeId });
+  if (!recoveryEmail)
+    return res.render("pages/passwordRecovery", {
+      error:
+        "The link is Expired, please generate new link to recover your password",
+      title: "Link Expired",
+      CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+      type: "request",
+    });
+
+  const user = await User.findOne({ email: recoveryEmail.email });
+  if (!user) {
+    await ActivationCode.deleteOne({ codeId });
+    return res.render("pages/passwordRecovery", {
+      error: "The link is Invalid!",
+      title: "Link Invalid",
+      CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+      type: "request",
+    });
+  }
+  return res.render("pages/passwordRecovery", {
+    title: "Set Password",
+    CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+    type: "setpassword",
+    codeId: codeId,
+    user: { name: user.name, email: user.email },
+  });
+};
+
+const setPasswordRecovery = async (req, res) => {
+  const {
+    recoveryCode,
+    pass1,
+    pass2,
+    "g-recaptcha-response": gcaptcha,
+  } = req.body;
+
+  const activationLink = await ActivationCode.findOne({
+    codeId: recoveryCode,
+    type: "recovery",
+  });
+  console.log(activationLink);
+  if (!activationLink)
+    return res.render("pages/passwordRecovery", {
+      error: "Invalid recovery request, Try again",
+      title: "Recover Password",
+      CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+      type: "request",
+    });
+
+  const user = await User.findOne({ email: activationLink.email });
+  if (!user) {
+    await ActivationCode.deleteOne({ codeId });
+    return res.render("pages/passwordRecovery", {
+      error: "Invalid recovery request, Please try again!",
+      title: "Recover Password",
+      CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+      type: "request",
+    });
+  }
+
+  if (pass1 != pass2)
+    return res.render("pages/passwordRecovery", {
+      title: "Set Password",
+      CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+      type: "setpassword",
+      codeId: codeId,
+      user: { name: user.name, email: user.email },
+    });
+
+  const hashedPassword = await bcrypt.hash(pass1, 10);
+  const updateUser = await User.updateOne(
+    { email: user.email },
+    { $set: { password: hashedPassword } }
+  );
+  console.log(updateUser);
+  res.clearCookie("sessionId", {
+    httpOnly: true,
+    sameSite: "strict",
+  });
+
+  const token = jwt.sign(user.toObject(), process.env.JWT_SECRET);
+  res.cookie("sessionId", token, {
+    maxAge: 1000 * 60 * 60 * 24,
+    httpOnly: true,
+  });
+
+  return res.redirect("/user/profile");
+};
+
 module.exports = {
   loginPage,
   loginValidate,
@@ -506,4 +606,6 @@ module.exports = {
   gitOAuthVerify,
   verifyActivationEmail,
   requestPasswordRecovery,
+  setPasswordRecovery,
+  handlePasswordRecovery,
 };
