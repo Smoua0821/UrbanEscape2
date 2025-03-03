@@ -103,7 +103,7 @@ const loginValidate = async (req, res) => {
     let isMatched =
       email.toLowerCase() === process.env.ADMIN_EMAIL
         ? password === process.env.ADMIN_PASS
-        : bcrypt.compare(password, user.password);
+        : await bcrypt.compare(password, user.password);
 
     if (!isMatched)
       return res.render("pages/login", {
