@@ -132,7 +132,7 @@ const loginValidate = async (req, res) => {
       });
     }
 
-    const token = jwt.sign(user, process.env.JWT_SECRET);
+    const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: "1d" });
     res.cookie("sessionId", token, {
       maxAge: 1000 * 60 * 60 * 24,
       httpOnly: true,
@@ -288,7 +288,9 @@ const pluginLoginController = async (req, res) => {
         );
       }
 
-      const tokenSigned = jwt.sign(user.toObject(), process.env.JWT_SECRET);
+      const tokenSigned = jwt.sign(user.toObject(), process.env.JWT_SECRET, {
+        expiresIn: "1d",
+      });
 
       return res.json({
         status: "success",
@@ -383,7 +385,9 @@ const gitOAuthVerify = async (req, res) => {
         picture: userResponse?.avatar_url,
       });
     }
-    const tokenSigned = jwt.sign(user.toObject(), process.env.JWT_SECRET);
+    const tokenSigned = jwt.sign(user.toObject(), process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
     if (!tokenSigned)
       return res.redirect("/auth?error=No Login Identifier found!");
     return res
@@ -652,7 +656,9 @@ const setPasswordRecovery = async (req, res) => {
       sameSite: "strict",
     });
 
-    const token = jwt.sign(user.toObject(), process.env.JWT_SECRET);
+    const token = jwt.sign(user.toObject(), process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
     res.cookie("sessionId", token, {
       maxAge: 1000 * 60 * 60 * 24,
       httpOnly: true,
