@@ -10,12 +10,19 @@ const app = express();
 connectDB(); // Assuming this is your DB connection
 
 app.use(mongoSanitize());
+
 app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "https://trusted-source.com"],
+        scriptSrc: [
+          "'self'",
+          "https://code.jquery.com",
+          "https://cdn.jsdelivr.net",
+          "https://maps.googleapis.com",
+          "https://cdn.datatables.net",
+        ],
       },
     },
   })
