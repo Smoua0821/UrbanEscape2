@@ -4,29 +4,11 @@ const connectDB = require("./config/db");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 const mongoSanitize = require("express-mongo-sanitize");
-const helmet = require("helmet");
 
 const app = express();
 connectDB(); // Assuming this is your DB connection
 
 app.use(mongoSanitize());
-
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: [
-          "'self'",
-          "https://code.jquery.com",
-          "https://cdn.jsdelivr.net",
-          "https://maps.googleapis.com",
-          "https://cdn.datatables.net",
-        ],
-      },
-    },
-  })
-);
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
