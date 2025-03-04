@@ -37,7 +37,7 @@ const generateActivationLink = async (
   if (type == "recovery" && user && user.name && user.email) {
     tempelate = password_recovery_email(user.name, user.email, codeId);
     subject = "UrbanEscape Password Recovery";
-    from = "Security";
+    from = "Account Manager";
   }
 
   const info = await sendEmail(email, subject, tempelate, from);
