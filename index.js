@@ -10,7 +10,16 @@ const app = express();
 connectDB(); // Assuming this is your DB connection
 
 app.use(mongoSanitize());
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "https://trusted-source.com"],
+      },
+    },
+  })
+);
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
