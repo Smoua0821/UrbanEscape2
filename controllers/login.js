@@ -23,26 +23,33 @@ const generateActivationLink = async (
 ) => {
   const allowedTypes = ["verification", "recovery"];
   if (!allowedTypes.includes(type)) type = "verification";
-  const codeId = uuidv4();
-  const activation = await ActivationCode.create({
-    email: email,
-    codeId: codeId,
-    type: type,
-  });
 
-  let tempelate = html_data(codeId);
-  let subject = "UrbanEscape Account Activation";
-  let from = "Verify";
+  try {
+    const codeId = uuidv4();
+    const activation = await ActivationCode.create({
+      email: email,
+      codeId: codeId,
+      type: type,
+    });
 
-  if (type == "recovery" && user && user.name && user.email) {
-    tempelate = password_recovery_email(user.name, user.email, codeId);
-    subject = "UrbanEscape Password Recovery";
-    from = "Account Manager";
+    let template = html_data(codeId);
+    let subject = "UrbanEscape Account Activation";
+    let from = "Verify";
+
+    if (type === "recovery" && user && user.name && user.email) {
+      template = password_recovery_email(user.name, user.email, codeId);
+      subject = "UrbanEscape Password Recovery";
+      from = "Account Manager";
+    }
+
+    const info = await sendEmail(email, subject, template, from);
+    console.log(info);
+  } catch (error) {
+    console.error("Error generating activation link:", error);
+    throw new Error(
+      "An error occurred while generating the activation link. Please try again later."
+    );
   }
-
-  const info = await sendEmail(email, subject, tempelate, from);
-
-  console.log(info);
 };
 
 const loginPage = async (req, res) => {
@@ -230,9 +237,21 @@ const newUser = async (req, res) => {
 };
 
 const provinceList = async (req, res) => {
-  const data = await Province.find({});
-  if (!data) return res.json({ status: "success", countries: [] });
-  return res.json({ status: "success", countries: data });
+  try {
+    const data = await Province.find({});
+
+    if (!data || data.length === 0) {
+      return res.json({ status: "success", countries: [] });
+    }
+
+    return res.json({ status: "success", countries: data });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: "error",
+      message: "An unexpected error occurred. Please try again later.",
+    });
+  }
 };
 
 const pluginLoginController = async (req, res) => {
@@ -287,23 +306,37 @@ const pluginLoginController = async (req, res) => {
 
 const setPluginLogin = (req, res) => {
   const { token } = req.query;
-  if (!token)
-    return res.render("pages/login", {
-      GoogleClientID: process.env.GOOGLE_CLIENT_ID,
-      error: "Login Failed!",
-    });
 
-  if (!jwt.verify(token, process.env.JWT_SECRET))
+  try {
+    if (!token) {
+      return res.render("pages/login", {
+        GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        error: "Login Failed! Token is missing.",
+      });
+    }
+
+    try {
+      jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
+      return res.render("pages/login", {
+        GoogleClientID: process.env.GOOGLE_CLIENT_ID,
+        error: "Invalid Token Assigned!",
+      });
+    }
+
+    return res
+      .cookie("sessionId", token, {
+        maxAge: 1000 * 60 * 60 * 24,
+        httpOnly: true,
+      })
+      .redirect("/");
+  } catch (error) {
+    console.error(error);
     return res.render("pages/login", {
       GoogleClientID: process.env.GOOGLE_CLIENT_ID,
-      error: "invalid Token Assigned!",
+      error: "An unexpected error occurred. Please try again later.",
     });
-  return res
-    .cookie("sessionId", token, {
-      maxAge: 1000 * 60 * 60 * 24,
-      httpOnly: true,
-    })
-    .redirect("/");
+  }
 };
 
 const gitOAuthVerify = async (req, res) => {
@@ -433,108 +466,131 @@ const verifyActivationEmail = async (req, res) => {
 
 const requestPasswordRecovery = async (req, res) => {
   const { email, "g-recaptcha-response": gcaptcha } = req.body;
-  if (!email || !gcaptcha)
-    return res.status(200).render("pages/passwordRecovery", {
+
+  try {
+    if (!email || !gcaptcha)
+      return res.status(200).render("pages/passwordRecovery", {
+        title: "Password Recovery",
+        CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+        type: "request",
+        error: "All fields are required!",
+      });
+
+    const verifiedcaptcha = await verifyCaptcha(gcaptcha);
+    if (!verifiedcaptcha)
+      return res.render("pages/passwordRecovery", {
+        title: "Captcha Error",
+        error: "Captcha Verification failed",
+        CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+        type: "request",
+      });
+
+    const user = await User.findOne({ email: email });
+    if (!user)
+      return res.render("pages/passwordRecovery", {
+        error: `No Account found with ${email}, please create a new account`,
+        title: "No Account found!",
+        CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+        type: "request",
+      });
+
+    if (user.status != "verified") {
+      const activationCheck = await ActivationCode.findOne({
+        email: email,
+        type: "recovery",
+      });
+      if (!activationCheck) {
+        await generateActivationLink(email);
+      }
+      return res.render("pages/passwordRecovery", {
+        error:
+          "Verification link sent to your email address, please verify your email!",
+        title: "Verification Pending",
+        CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+        type: "request",
+      });
+    } else {
+      const activationCheck = await ActivationCode.findOne({
+        email: email,
+        type: "recovery",
+      });
+      if (!activationCheck) {
+        await generateActivationLink(email, "recovery", {
+          name: user.name,
+          email: user.email,
+        });
+      }
+    }
+
+    return res.render("pages/passwordRecovery", {
+      success:
+        "Password link sent to your Email Address, Please Click on the link and set your password from there!",
+      title: "Link Sent",
+      CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+      type: "request",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.render("pages/passwordRecovery", {
+      error: "An unexpected error occurred. Please try again later.",
       title: "Password Recovery",
       CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
       type: "request",
-      error: "All field are required!",
     });
-
-  const verifiedcaptcha = await verifyCaptcha(gcaptcha);
-  if (!verifiedcaptcha)
-    return res.render("pages/passwordRecovery", {
-      title: "Captcha Error",
-      error: "Captcha Verification failed",
-      CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
-      type: "request",
-    });
-
-  const user = await User.findOne({ email: email });
-  if (!user)
-    return res.render("pages/passwordRecovery", {
-      error: `No Account found with ${email}, please create a new account`,
-      title: "No Account found!",
-      CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
-      type: "request",
-    });
-
-  if (user.status != "verified") {
-    const activationCheck = await ActivationCode.findOne({
-      email: email,
-      type: "recovery",
-    });
-    if (!activationCheck) {
-      await generateActivationLink(email);
-    }
-    return res.render("pages/passwordRecovery", {
-      error: error,
-      title:
-        "Verification link sent to your email address, please verify your email!",
-      CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
-      type: "request",
-    });
-  } else {
-    const activationCheck = await ActivationCode.findOne({
-      email: email,
-      type: "recovery",
-    });
-    if (!activationCheck) {
-      await generateActivationLink(email, "recovery", {
-        name: user.name,
-        email: user.email,
-      });
-    }
   }
-
-  return res.render("pages/passwordRecovery", {
-    success:
-      "Password link sent to your Email Address, Please Click on the link and set your password from there!",
-    title: "Link Sent",
-    CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
-    type: "request",
-  });
 };
 
 const handlePasswordRecovery = async (req, res) => {
   const { codeId } = req.params;
-  const cerr = req.query?.error;
-  if (!codeId)
+  const errorMessage = req.query?.error;
+
+  try {
+    if (!codeId)
+      return res.render("pages/passwordRecovery", {
+        error: "Broken Recovery Link",
+        title: "Recover Password",
+        CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+        type: "request",
+      });
+
+    const recoveryEmail = await ActivationCode.findOne({ codeId });
+    if (!recoveryEmail)
+      return res.render("pages/passwordRecovery", {
+        error:
+          "The link is Expired, please generate new link to recover your password",
+        title: "Link Expired",
+        CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+        type: "request",
+      });
+
+    const user = await User.findOne({ email: recoveryEmail.email });
+    if (!user) {
+      await ActivationCode.deleteOne({ codeId });
+      return res.render("pages/passwordRecovery", {
+        error: "The link is Invalid!",
+        title: "Link Invalid",
+        CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+        type: "request",
+      });
+    }
+
     return res.render("pages/passwordRecovery", {
-      error: "Broken Recovery Link",
+      title: "Set Password",
+      CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+      type: "setpassword",
+      codeId: codeId,
+      user: { name: user.name, email: user.email },
+      error: errorMessage,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.render("pages/passwordRecovery", {
+      error: "An unexpected error occurred. Please try again later.",
       title: "Recover Password",
       CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
       type: "request",
     });
-
-  const recoveryEmail = await ActivationCode.findOne({ codeId });
-  if (!recoveryEmail)
-    return res.render("pages/passwordRecovery", {
-      error:
-        "The link is Expired, please generate new link to recover your password",
-      title: "Link Expired",
-      CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
-      type: "request",
-    });
-
-  const user = await User.findOne({ email: recoveryEmail.email });
-  if (!user) {
-    await ActivationCode.deleteOne({ codeId });
-    return res.render("pages/passwordRecovery", {
-      error: "The link is Invalid!",
-      title: "Link Invalid",
-      CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
-      type: "request",
-    });
   }
-  return res.render("pages/passwordRecovery", {
-    title: "Set Password",
-    CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
-    type: "setpassword",
-    codeId: codeId,
-    user: { name: user.name, email: user.email },
-    error: cerr,
-  });
 };
 
 const setPasswordRecovery = async (req, res) => {
@@ -545,63 +601,73 @@ const setPasswordRecovery = async (req, res) => {
     "g-recaptcha-response": gcaptcha,
   } = req.body;
 
-  const verifiedcaptcha = await verifyCaptcha(gcaptcha);
-  if (!verifiedcaptcha)
-    return res.redirect(
-      `/auth/password/recovery/verify/${recoveryCode}?error=Invalid Captcha`
-    );
+  try {
+    const verifiedcaptcha = await verifyCaptcha(gcaptcha);
+    if (!verifiedcaptcha)
+      return res.redirect(
+        `/auth/password/recovery/verify/${recoveryCode}?error=Invalid Captcha`
+      );
 
-  const activationLink = await ActivationCode.findOne({
-    codeId: recoveryCode,
-    type: "recovery",
-  });
-  console.log(activationLink);
-  if (!activationLink)
-    return res.render("pages/passwordRecovery", {
-      error: "Invalid recovery request, Try again",
-      title: "Recover Password",
-      CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
-      type: "request",
+    const activationLink = await ActivationCode.findOne({
+      codeId: recoveryCode,
+      type: "recovery",
     });
 
-  const user = await User.findOne({ email: activationLink.email });
-  if (!user) {
-    await ActivationCode.deleteOne({ codeId });
+    if (!activationLink)
+      return res.render("pages/passwordRecovery", {
+        error: "Invalid recovery request, Try again",
+        title: "Recover Password",
+        CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+        type: "request",
+      });
+
+    const user = await User.findOne({ email: activationLink.email });
+    if (!user) {
+      await ActivationCode.deleteOne({ codeId });
+      return res.render("pages/passwordRecovery", {
+        error: "Invalid recovery request, Please try again!",
+        title: "Recover Password",
+        CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+        type: "request",
+      });
+    }
+
+    if (pass1 != pass2)
+      return res.render("pages/passwordRecovery", {
+        title: "Set Password",
+        CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
+        type: "setpassword",
+        codeId: codeId,
+        user: { name: user.name, email: user.email },
+      });
+
+    const hashedPassword = await bcrypt.hash(pass1, 10);
+    const updateUser = await User.updateOne(
+      { email: user.email },
+      { $set: { password: hashedPassword } }
+    );
+    await ActivationCode.deleteOne({ recoveryCode });
+    res.clearCookie("sessionId", {
+      httpOnly: true,
+      sameSite: "strict",
+    });
+
+    const token = jwt.sign(user.toObject(), process.env.JWT_SECRET);
+    res.cookie("sessionId", token, {
+      maxAge: 1000 * 60 * 60 * 24,
+      httpOnly: true,
+    });
+
+    return res.redirect("/user/profile");
+  } catch (error) {
+    console.error(error);
     return res.render("pages/passwordRecovery", {
-      error: "Invalid recovery request, Please try again!",
+      error: "An unexpected error occurred. Please try again later.",
       title: "Recover Password",
       CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
       type: "request",
     });
   }
-
-  if (pass1 != pass2)
-    return res.render("pages/passwordRecovery", {
-      title: "Set Password",
-      CAPTCHA_KEY: process.env.CAPTCHA_SITE_KEY,
-      type: "setpassword",
-      codeId: codeId,
-      user: { name: user.name, email: user.email },
-    });
-
-  const hashedPassword = await bcrypt.hash(pass1, 10);
-  const updateUser = await User.updateOne(
-    { email: user.email },
-    { $set: { password: hashedPassword } }
-  );
-  await ActivationCode.deleteOne({ codeId });
-  res.clearCookie("sessionId", {
-    httpOnly: true,
-    sameSite: "strict",
-  });
-
-  const token = jwt.sign(user.toObject(), process.env.JWT_SECRET);
-  res.cookie("sessionId", token, {
-    maxAge: 1000 * 60 * 60 * 24,
-    httpOnly: true,
-  });
-
-  return res.redirect("/user/profile");
 };
 
 module.exports = {
