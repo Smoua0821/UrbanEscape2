@@ -6,7 +6,7 @@ const password_recovery_email = (userName, userEmail, token) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Password Recovery</title>
+      <title>Update Your Password</title>
       <style>
           body {
               font-family: Arial, sans-serif;
@@ -32,7 +32,7 @@ const password_recovery_email = (userName, userEmail, token) => {
           }
           .button {
               display: inline-block;
-              background: #007BFF;
+              background: #28a745;
               color: #ffffff;
               text-decoration: none;
               padding: 12px 20px;
@@ -41,7 +41,7 @@ const password_recovery_email = (userName, userEmail, token) => {
               margin-top: 15px;
           }
           .button:hover {
-              background: #0056b3;
+              background: #218838;
           }
           .footer {
               margin-top: 20px;
@@ -52,13 +52,13 @@ const password_recovery_email = (userName, userEmail, token) => {
     </head>
     <body>
         <div class="container">
-            <h2>Password Recovery for ${userName}</h2>
+            <h2>Password Update Request</h2>
             <p>Hi <b>${userName}</b>,</p>
-            <p>We received a request to reset the password for your account associated with the email address <b>${userEmail}</b>.</p>
-            <p>If you made this request, click the button below to reset your password:</p>
-            <a href="${process.env.BASE_URL}/auth/password/recovery/verify/${token}" class="button">Reset Password</a>
-            <p>If you didn’t request a password reset, you can safely ignore this email.</p>
-            <p class="footer">For security reasons, this link will expire in 60 minutes. If you need further assistance, please contact our support team.</p>
+            <p>We received a request to update the password for your account linked to <b>${userEmail}</b>.</p>
+            <p>If this was you, click the button below:</p>
+            <a href="${process.env.BASE_URL}/auth/password/recovery/verify/${token}" class="button">Update Password</a>
+            <p>If you didn’t request this, feel free to ignore this email.</p>
+            <p class="footer">Need help? <a href="${process.env.BASE_URL}/support">Contact Support</a></p>
         </div>
     </body>
     </html>`;
