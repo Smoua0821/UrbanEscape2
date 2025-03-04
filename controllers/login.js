@@ -498,6 +498,7 @@ const requestPasswordRecovery = async (req, res) => {
 
 const handlePasswordRecovery = async (req, res) => {
   const { codeId } = req.params;
+  const cerr = req.query?.error;
   if (!codeId)
     return res.render("pages/passwordRecovery", {
       error: "Broken Recovery Link",
@@ -532,6 +533,7 @@ const handlePasswordRecovery = async (req, res) => {
     type: "setpassword",
     codeId: codeId,
     user: { name: user.name, email: user.email },
+    error: cerr,
   });
 };
 
@@ -542,6 +544,12 @@ const setPasswordRecovery = async (req, res) => {
     pass2,
     "g-recaptcha-response": gcaptcha,
   } = req.body;
+
+  const verifiedcaptcha = await verifyCaptcha(gcaptcha);
+  if (!verifiedcaptcha)
+    return res.redirect(
+      `/auth/password/recovery/verify/${recoveryCode}?error=Invalid Captcha`
+    );
 
   const activationLink = await ActivationCode.findOne({
     codeId: recoveryCode,
