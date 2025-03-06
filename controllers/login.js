@@ -208,8 +208,6 @@ const newUser = async (req, res) => {
     });
 
     await generateActivationLink(email);
-
-    console.log(info);
     return res.status(200).render("pages/postRegister", {
       message: `Activation Link sent to ${email}`,
       type: "success",
