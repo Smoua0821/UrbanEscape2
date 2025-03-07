@@ -135,11 +135,12 @@
             <div class="link-container mt-3 text-center">
               <% if (locals.primaryMap && primaryMap.map && primaryMap.map.id) {
               %>
-              <a
-                href="/map/<%= primaryMap.map.id %>"
-                class="btn btn-success ms-2"
-                >Back to Map</a
+              <button
+                data-target="<%= primaryMap.map.id %>"
+                class="btn btn-success ms-2 backBTN"
               >
+                Back to Map
+              </button>
               <% } %> <% if (user.role.current=="admin") { %>
               <a href="/admin" class="btn btn-success ms-2">Admin</a>
               <% } %>
@@ -238,6 +239,11 @@
     ></script>
     <script>
       $(document).ready(() => {
+        $(".backBTN").click(function () {
+          let tgt = localStorage.lastMap;
+          if (!tgt) tgt = $(this).data("target");
+          window.location.href = `/map/${tgt}`;
+        });
         $(".unit-badge").on("click", function () {
           if (confirm("Badge will be deleted forever! Are you sure?")) {
             const badgeId = $(this).data("src");

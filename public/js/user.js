@@ -152,6 +152,10 @@ const mapParsedIdRaw = document.getElementById("mapParsedIdRaw")?.value;
 document.getElementById("mapParsedIdRaw")?.remove();
 document.getElementById("gameStarted")?.remove();
 
+if (mapParsedId) {
+  localStorage.setItem("lastMap", mapParsedId);
+}
+
 function renderCapturedImage() {
   if (!profileImages) {
     $("div.captured_image").html(
