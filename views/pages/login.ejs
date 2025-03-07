@@ -283,10 +283,12 @@
           }
         });
       };
+
       function handleCredentialResponse(response) {
         const token = response.credential;
         pluginLogin("google", token);
       }
+      
       $(document).ready(() => {
         $(".login-box .tab-toggle h3").click(function () {
           if ($(this).hasClass("active")) return;
