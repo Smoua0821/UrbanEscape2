@@ -265,6 +265,8 @@ $(document).ready(() => {
     $(".user-navbar .navbar-container ul li").click(function () {
       const target = $(this).data("id");
       if (!target) return;
+      if (target == "/auth")
+        localStorage.setItem("forceRedirect", window.location.href);
       if (target == "/missions") return $(".mission-popup").fadeIn();
       // const cnfOut = confirm(
       //   "Game Progress will be destroyed and You will lose one life, Agree?"

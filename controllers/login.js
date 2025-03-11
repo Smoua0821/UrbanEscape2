@@ -140,9 +140,6 @@ const loginValidate = async (req, res) => {
 
     if (user.role.current === "admin") return res.redirect("/admin");
 
-    const primaryMap = await PrimaryMap.findOne().populate("map").lean();
-    if (primaryMap?.map) return res.redirect(`/map/${primaryMap.map.id}`);
-
     return res.redirect("/");
   } catch (error) {
     console.error(error);
