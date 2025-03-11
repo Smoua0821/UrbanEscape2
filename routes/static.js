@@ -6,7 +6,6 @@ const LoopRoute = require("../models/LoopRoute");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
-const PrimaryMap = require("../models/PrimaryMap");
 const MapDynamics = require("../models/MapDynamics");
 
 router.get("/", async (req, res) => {

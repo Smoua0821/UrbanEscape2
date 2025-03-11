@@ -14,8 +14,6 @@ const {
   newMapMission,
   removeMapMission,
   exportExcel,
-  fetchPrimaryMap,
-  handlePrimaryMap,
   changeMarker,
   getMarkerImage,
   deleteMarkerImage,
@@ -117,9 +115,6 @@ router.get("/map", fetchMaps);
 router.post("/map", newMap);
 
 router.post("/map/update/launch", updateMapDate);
-
-router.get("/map/primary", fetchPrimaryMap);
-router.post("/map/primary", handlePrimaryMap);
 
 router.post("/map/duplicate", duplicateMap);
 router.post("/map/delete", deleteMap);

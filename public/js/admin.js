@@ -16,7 +16,6 @@ let loopRouteOptions = {
   smessage: "New Route added successfully!",
   mode: "new",
 };
-let primaryMap = [];
 let badgeDirs = [];
 let badgeDirName = "";
 let badgeDirFileName = "";
@@ -696,26 +695,6 @@ $(document).ready(() => {
   });
   fetchMaps();
   renderProvince();
-  fetchPrimaryMap();
-  $(".primaryMapSelector").on("change", function () {
-    if (!primaryMap.map) return $(".primaryUpdateBtn").show();
-    const tarId = $(this).val();
-    if (primaryMap.map) $(".primaryUpdateBtn").hide();
-    if (primaryMap.map && tarId == primaryMap.map._id) return false;
-    $(".primaryUpdateBtn").show();
-  });
-  $(".primaryUpdateBtn").on("click", () => {
-    const tarId = $(".primaryMapSelector").val();
-    if (primaryMap.map && tarId == primaryMap.map._id)
-      return notyf.error("Map Already Selected");
-    $.post("/admin/map/primary", { mapId: tarId }, async (data) => {
-      if (data.success) {
-        await fetchPrimaryMap();
-        if (primaryMap.map) $(".primaryUpdateBtn").hide();
-        return notyf.success(`Map "${primaryMap.map.name}" set to Primary`);
-      }
-    });
-  });
   $(".datatable.user").DataTable({
     paging: false,
     searching: true,
@@ -1178,13 +1157,9 @@ function fetchMaps() {
     maps = data;
     $("tbody.map_list").empty();
     const myData = data.maps.reverse();
-    $(".primaryMapSelector").empty();
     myData.forEach((d) => {
       $("tbody.map_list").append(
         `<tr><td>${d.name}</td><td><a target='_blank' href='/map/${d.id}'>View Map</a></td><td><button class='btn btn-info me-1 edit_map' data-id='${d.id}'>Edit</button><button class='me-1 btn btn-danger delete_map' data-id='${d.id}'>delete</button><button class='btn btn-warning setupMissions' data-id='${d.id}'>Missions</button><button class='btn btn-info ms-2 setUpDuplicate' data-id='${d.id}'>Duplicate</button><button data-id='${d.id}' class='mapBgUpload btn btn-warning'>Background</button></td></tr>`
-      );
-      $(".primaryMapSelector").append(
-        `<option value='${d._id}'>${d.name}</option>`
       );
     });
     $(".delete_map")
@@ -1308,30 +1283,6 @@ document.addEventListener("DOMContentLoaded", () => {
     observer.observe(image);
   });
 });
-
-const fetchPrimaryMap = async () => {
-  try {
-    const data = await new Promise((resolve, reject) => {
-      $.get("/admin/map/primary", (data) => {
-        if (data.success) {
-          resolve(data);
-        } else {
-          reject(new Error("Failed to fetch primary map"));
-        }
-      });
-    });
-
-    primaryMap = data.primaryMap;
-    if (primaryMap.map) {
-      $(".primaryMapSelector").val(primaryMap.map._id);
-      $(".primary-map-card p").text(primaryMap.map.name.toUpperCase());
-    } else {
-      $(".primaryUpdateBtn").show();
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
 
 const renderProvince = () => {
   $.get("/auth/countries", (data) => {

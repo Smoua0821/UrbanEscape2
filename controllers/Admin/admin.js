@@ -10,18 +10,10 @@ const fs = require("fs");
 const User = require("../../models/User");
 const LoopRoute = require("../../models/LoopRoute");
 const Map = require("../../models/Map");
-const PrimaryMap = require("../../models/PrimaryMap");
 const Setting = require("../../models/Settings");
 
 const cleanUp = async (rawId, mapId) => {
   try {
-    const primaryMap = await PrimaryMap.findOne({ map: rawId });
-
-    if (primaryMap) {
-      await primaryMap.deleteOne();
-      console.log(`PrimaryMap deleted because the associated Map was deleted.`);
-    }
-
     const deletionResult = await User.updateMany(
       { "capturedImages.mapId": mapId },
       { $pull: { capturedImages: { mapId: mapId } } }
@@ -407,65 +399,6 @@ const exportExcel = async (req, res) => {
   }
 };
 
-const fetchPrimaryMap = async (req, res) => {
-  try {
-    const primaryMap = await PrimaryMap.findOne().populate("map");
-    if (!primaryMap) {
-      return res.status(404).json({ message: "PrimaryMap not found" });
-    }
-    return res.status(200).json({
-      success: true,
-      primaryMap,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
-  }
-};
-
-const handlePrimaryMap = async (req, res) => {
-  const { mapId } = req.body;
-
-  try {
-    const mapExists = await Map.findById(mapId);
-
-    if (!mapExists) {
-      return res.status(404).json({
-        success: false,
-        message: "Map with the provided ID does not exist.",
-      });
-    }
-
-    let primaryMap = await PrimaryMap.findOne();
-
-    if (primaryMap) {
-      primaryMap.map = mapId;
-      await primaryMap.save();
-      return res.status(200).json({
-        success: true,
-        message: "PrimaryMap updated successfully",
-        primaryMap,
-      });
-    } else {
-      primaryMap = new PrimaryMap({
-        map: mapId,
-      });
-      await primaryMap.save();
-      return res.status(201).json({
-        success: true,
-        message: "PrimaryMap created successfully",
-        primaryMap,
-      });
-    }
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ success: false, message: "Server error" });
-  }
-};
-
 const changeMarker = async (req, res) => {
   try {
     if (!req.file) {
@@ -821,8 +754,6 @@ module.exports = {
   duplicateMap,
   removeMapMission,
   exportExcel,
-  fetchPrimaryMap,
-  handlePrimaryMap,
   changeMarker,
   getMarkerImage,
   deleteMarkerImage,
