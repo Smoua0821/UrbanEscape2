@@ -356,6 +356,18 @@ img {
   border-radius: 50%;
   rotate: -50deg;
   background: conic-gradient(#3498db 0deg 300deg, #00000000 300deg 360deg);
+  animation: 1s eating infinite;
+}
+
+@keyframes eating {
+  0%,
+  100% {
+    background: conic-gradient(#3498db 0deg 300deg, #00000000 300deg 360deg);
+  }
+  50% {
+    rotate: -80deg;
+    background: conic-gradient(#3498db 0deg 330deg, #00000000 330deg 360deg);
+  }
 }
 
 @keyframes changeBackgroundColor {
