@@ -4,7 +4,7 @@ const winHandler = async (req, res) => {
   try {
     const { mapParsedIdRaw } = req.body;
     if (!mapParsedIdRaw || !req.user?._id)
-      return res.json({ status: "error", message: "Invalid Argument" });
+      return await res.json({ status: "error", message: "Invalid Argument" });
 
     const endTime = new Date();
     const getDoc = await MapDynamics.findOneAndUpdate(
@@ -15,17 +15,20 @@ const winHandler = async (req, res) => {
       { $inc: { "users.$.lifes": +1 } }
     );
     if (!getDoc)
-      return res.json({ status: "error", message: "Document not found" });
+      return await res.json({ status: "error", message: "Document not found" });
 
     const historyList = getDoc.users.find(
       (d) => d.userId == req.user._id
     )?.history;
     if (!historyList)
-      return res.json({ status: "error", message: "History not found" });
+      return await res.json({ status: "error", message: "History not found" });
 
     const updateTime = historyList.pop();
-    if (!updateTime)
-      return res.json({ status: "error", message: "Update time not found" });
+    if (!updateTime || !updateTime.startTime)
+      return await res.json({
+        status: "error",
+        message: "Update time not found",
+      });
 
     updateTime.endTime = endTime;
     historyList.push(updateTime);
@@ -53,12 +56,12 @@ const winHandler = async (req, res) => {
     );
 
     if (!result.modifiedCount)
-      return res.json({ status: "error", message: "Update failed" });
+      return await res.json({ status: "error", message: "Update failed" });
 
-    res.json(result);
+    await res.json(result);
   } catch (error) {
     console.error(error);
-    res.json({ status: "error", message: "Internal Server Error" });
+    await res.json({ status: "error", message: "Internal Server Error" });
   }
 };
 
@@ -66,7 +69,7 @@ const loseHandler = async (req, res) => {
   try {
     const { mapParsedIdRaw } = req.body;
     if (!mapParsedIdRaw || !req.user?._id)
-      return res.json({ status: "error", message: "Invalid Argument" });
+      return await res.json({ status: "error", message: "Invalid Argument" });
 
     const endTime = new Date();
     const getDoc = await MapDynamics.findOne({
@@ -74,17 +77,20 @@ const loseHandler = async (req, res) => {
       "users.userId": req.user._id,
     });
     if (!getDoc)
-      return res.json({ status: "error", message: "Document not found" });
+      return await res.json({ status: "error", message: "Document not found" });
 
     const historyList = getDoc.users.find(
       (d) => d.userId == req.user._id
     )?.history;
     if (!historyList)
-      return res.json({ status: "error", message: "History not found" });
+      return await res.json({ status: "error", message: "History not found" });
 
     const updateTime = historyList.pop();
-    if (!updateTime)
-      return res.json({ status: "error", message: "Update time not found" });
+    if (!updateTime || !updateTime.startTime)
+      return await res.json({
+        status: "error",
+        message: "Update time not found",
+      });
 
     updateTime.endTime = endTime;
     historyList.push(updateTime);
@@ -112,12 +118,12 @@ const loseHandler = async (req, res) => {
     );
 
     if (!result.modifiedCount)
-      return res.json({ status: "error", message: "Update failed" });
+      return await res.json({ status: "error", message: "Update failed" });
 
-    res.json(result);
+    await res.json(result);
   } catch (error) {
     console.error(error);
-    res.json({ status: "error", message: "Internal Server Error" });
+    await res.json({ status: "error", message: "Internal Server Error" });
   }
 };
 
