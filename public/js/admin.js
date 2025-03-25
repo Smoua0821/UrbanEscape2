@@ -711,12 +711,26 @@ $(document).ready(() => {
     });
     return false;
   });
+  let mapPlayableFlag = false;
+  $("form.new_map_form #GameModeToggle").click(function () {
+    mapPlayableFlag = !mapPlayableFlag;
+    if (mapPlayableFlag) {
+      $(this).removeClass("btn-primary");
+      $(this).addClass("btn-danger");
+      $(this).html('<span class="fa fa-gamepad"></span> Disable Game Mode');
+      $(".new_map_form").addClass("bg_enable");
+    } else {
+      $(this).removeClass("btn-danger");
+      $(this).addClass("btn-primary");
+      $(this).html('<span class="fa fa-gamepad"></span> Enable Game Mode');
+      $(".new_map_form").removeClass("bg_enable");
+    }
+  });
   $("form.new_map_form").submit(function () {
     const mapName = $("form.new_map_form input#name").val();
     const mapLaunchDate = $("form.new_map_form input#mapLaunchDate").val();
     const mapLaunchTime = $("form.new_map_form input#mapLaunchTime").val();
 
-    mapLaunchTime;
     if (!mapName) alert("Please Enter a Valid Name");
     $.post(
       "/admin/map",
@@ -724,6 +738,7 @@ $(document).ready(() => {
         name: mapName,
         mapLaunchDate: mapLaunchDate,
         mapLaunchTime: mapLaunchTime,
+        playable: mapPlayableFlag,
       },
       (data) => {
         if (data.status == "success") {

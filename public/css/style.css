@@ -385,3 +385,9 @@ img {
     background-color: yellow;
   }
 }
+
+::selection {
+  color: #1e00fff0;
+  background: #cc00ff3b;
+  backdrop-filter: blur(5px);
+}

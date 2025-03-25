@@ -32,7 +32,7 @@
       <div class="col-md-4 col-lg-3 vh-100 sidebar-container">
         <div class="sidebar">
           <div class="logo text-center p-2">
-            <h1 onclick="window.open('/', '_self')">Mappy</h1>
+            <h1 onclick="window.open('/', '_self')">Urban Escape</h1>
           </div>
           <div class="menu">
             <ul style="list-style: none">
@@ -161,7 +161,13 @@
               </div>
             </div>
             <div class="vj_dynamic maplist">
-              <div class="justify-content-center">
+              <div
+                class="justify-content-center"
+                style="
+                  background: url(/images/game_mode.jpg) no-repeat;
+                  background-size: cover;
+                "
+              >
                 <form class="form my-5 bg-light p-3 m-0 new_map_form">
                   <h3 class="text-center m-0 mb-3">New Map</h3>
                   <div class="row">
@@ -193,6 +199,7 @@
                       <button class="w-100 btn btn-warning">Create</button>
                     </div>
                     <div class="col-12">
+                      <input type="hidden" id="mapPlayableFlag" value="false" />
                       <a class="btn btn-primary" href="#" id="GameModeToggle">
                         <span class="fa fa-gamepad"></span> Enable Game Mode
                       </a>

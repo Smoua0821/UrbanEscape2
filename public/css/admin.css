@@ -266,3 +266,25 @@
   cursor: pointer;
   background: linear-gradient(0, #d5d5d5, #ffffff, #ffffff);
 }
+
+.new_map_form.bg_enable {
+  background: linear-gradient(45deg, #ffff9dc9, #ffffffc2) !important;
+}
+
+.new_map_form h3 {
+  color: black;
+  font-weight: 700;
+  -webkit-text-stroke: 0.5px white;
+  font-size: 3rem;
+  transition: 0.2s;
+}
+.new_map_form.bg_enable h3 {
+  color: white;
+  -webkit-text-stroke: 0.5px black;
+}
+
+::selection {
+  color: #1e00fff0;
+  background: #cc00ff3b;
+  backdrop-filter: blur(5px);
+}
