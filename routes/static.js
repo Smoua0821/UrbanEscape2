@@ -135,6 +135,7 @@ router.get("/map/:mapId", async (req, res) => {
     lifes: lifes,
     gameStarted: gameStarted,
     playable: map?.playable,
+    pacman: map.pacman,
   });
 });
 

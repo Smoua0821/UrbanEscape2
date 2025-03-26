@@ -386,6 +386,23 @@ iconMarker.addEventListener("click", () => {
 });
 
 let polyIndex = 0;
+let pacmanPositionCoords = document.getElementById("pacmanCoordinates");
+let pacmanPositionCoord = { lat: 0, lng: 0 };
+
+if (pacmanPositionCoords) {
+  try {
+    pacmanPositionCoords = pacmanPositionCoords.value?.split(",");
+    if (pacmanPositionCoords && pacmanPositionCoords.length == 2) {
+      pacmanPositionCoord = {
+        lat: parseFloat(pacmanPositionCoords[0]),
+        lng: parseFloat(pacmanPositionCoords[1]),
+      };
+    }
+  } catch (error) {
+    console.error("Invalid pacman coordinates format:", error);
+  }
+}
+document.getElementById("pacmanCoordinates").remove();
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     zoom: 15,
@@ -571,7 +588,7 @@ function initMap() {
     const pacmanMarker = new google.maps.marker.AdvancedMarkerElement({
       content: divOuter,
       map: map,
-      position: pos,
+      position: pacmanPositionCoord,
     });
   }
 }

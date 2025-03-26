@@ -40,7 +40,13 @@
     </script>
     <% } %>
     <input type="hidden" value="<%=timeFuture%>" id="countdownTimec" />
-    <%if(user && user.radius){%>
+    <% if(pacman && pacman.coords){ %>
+    <input
+      type="hidden"
+      value="<%= pacman.coords?.lat %>,<%= pacman.coords?.lng %>"
+      id="pacmanCoordinates"
+    />
+    <%}%> <%if(user && user.radius){%>
     <input type="hidden" value="<%=user.radius%>" id="userLocationRadius" />
     <%}%> <%if(timeFuture>=0){%>
     <div
