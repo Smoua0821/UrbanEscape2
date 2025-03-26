@@ -56,10 +56,6 @@ const mapSchema = new mongoose.Schema(
         },
       },
     },
-    playable: {
-      type: Boolean,
-      default: false,
-    },
     missions: [
       {
         redeemLink: {
