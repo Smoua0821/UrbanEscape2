@@ -293,7 +293,8 @@
   position: fixed;
   bottom: 0;
   right: 20px;
-  background: white;
+  background: url(/images/game_mode.jpg);
+  background-size: cover;
   min-width: 400px;
   overflow: hidden;
   border-top-left-radius: 5px;
@@ -313,6 +314,8 @@
 
 .game-mode-controller .game-settings {
   padding: 10px 20px;
+  background: linear-gradient(135deg, #f8ffa3, #aa7effc9);
+  backdrop-filter: blur(2px);
 }
 
 .game-mode-controller .game-settings .header {
