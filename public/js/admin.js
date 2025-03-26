@@ -1031,6 +1031,44 @@ function renderMapMissions() {
 }
 
 function renderRoutes() {
+  let isReadyToSetPacMarker = false;
+  let PacmanMarker = new google.maps.marker.AdvancedMarkerElement({
+    position: pos,
+  });
+  const pacmanSettings = {
+    activate: false,
+    coords: {},
+    speed: 0,
+    radius: 0,
+  };
+  $("#pacmanGameActivationStatus").on("change", () => {
+    pacmanSettings.activate = !pacmanSettings.activate;
+    console.log(pacmanSettings);
+  });
+  $(".toggle-pacman-marker").click(function () {
+    isReadyToSetPacMarker = !isReadyToSetPacMarker;
+    if (isReadyToSetPacMarker) {
+      $(this).text("Click on Map to set Pacman Position");
+      $(this).addClass("btn-danger");
+    } else {
+      $(this).text("Set Initial Position");
+      $(this).removeClass("btn-danger");
+    }
+  });
+  $(".radius-control").on("input", (event) => {
+    let radius = event.target.value;
+    if (radius > 100) radius = 100;
+    if (radius < 0) radius = 0;
+    pacmanSettings.radius = radius;
+    $("#radius-control").text(radius);
+  });
+  $(".speed-control").on("input", (event) => {
+    let speed = event.target.value;
+    if (speed > 100) speed = 100;
+    if (speed < 0) speed = 0;
+    pacmanSettings.speed = speed;
+    $("#speed-control").text(speed);
+  });
   map = new google.maps.Map(document.getElementsByClassName("g-map")[0], {
     zoom: 15,
     center: pos,
@@ -1054,6 +1092,22 @@ function renderRoutes() {
   });
   polygon.setMap(null);
   google.maps.event.addListener(map, "click", (event) => {
+    const clickedLocation = event.latLng;
+    const lng = clickedLocation.lng();
+    const lat = clickedLocation.lat();
+    const tmp = {
+      lat: lat,
+      lng: lng,
+    };
+    if (isReadyToSetPacMarker) {
+      PacmanMarker.setMap(map);
+      PacmanMarker.position = tmp;
+      pacmanSettings.coords = tmp;
+      isReadyToSetPacMarker = false;
+      $(".toggle-pacman-marker").text("Set Initial Position");
+      $(".toggle-pacman-marker").removeClass("btn-danger");
+      return false;
+    }
     loopRouteOptions.mode = "new";
     loopRouteOptions.url = "/admin/looproute";
     loopRouteOptions.smessage = "New Route added successfully!";
@@ -1066,22 +1120,10 @@ function renderRoutes() {
       iconMarker.setMap(null);
       $(".btn.undo").fadeIn();
     }
-    const clickedLocation = event.latLng;
-    const lng = clickedLocation.lng();
-    const lat = clickedLocation.lat();
-    const tmp = {
-      lat: lat,
-      lng: lng,
-    };
     polyCoords.push(tmp);
     marker.position = tmp;
     marker.setMap(map);
     $(".map-controller").hide();
-    setTimeout(() => {
-      if (polyCoords.length == 1) {
-        const cnf = confirm("Make this Pacman starting point?");
-      }
-    }, 100);
     if (polyCoords.length > 1) {
       $(".map-controller").show();
       polygon.setPath(polyCoords);
@@ -1175,6 +1217,28 @@ function renderRoutes() {
     });
   });
 }
+let isShownController = true;
+$(".game-mode-controller .game-settings .header button").click(function () {
+  if (isShownController) {
+    isShownController = false;
+    $(".game-mode-controller .game-settings .header button span").removeClass(
+      "fa-arrow-down"
+    );
+    $(".game-mode-controller .game-settings .header button span").addClass(
+      "fa-arrow-up"
+    );
+    $(".game-mode-controller .game-settings .toggle-hide").hide();
+  } else {
+    isShownController = true;
+    $(".game-mode-controller .game-settings .header button span").removeClass(
+      "fa-arrow-up"
+    );
+    $(".game-mode-controller .game-settings .header button span").addClass(
+      "fa-arrow-down"
+    );
+    $(".game-mode-controller .game-settings .toggle-hide").show();
+  }
+});
 function fetchMaps() {
   $.get("/admin/map", (data) => {
     maps = data;

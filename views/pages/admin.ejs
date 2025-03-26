@@ -160,16 +160,71 @@
                 </div>
                 <div class="game-mode-controller">
                   <div class="game-settings">
-                    <div class="position-controller">
-                      <button class="btn btn-success">
-                        Set Initial Position
+                    <div class="header">
+                      <h3>Pacman Settings</h3>
+                      <button class="btn btn-secondary">
+                        <span class="fa fa-arrow-down"></span>
                       </button>
                     </div>
-                    <div class="speed-controller">
-                      <input type="range" class="form-control" />
-                    </div>
-                    <div class="radius-controller">
-                      <input type="range" class="radius-control" />
+                    <div class="toggle-hide border-top mt-2 pt-2">
+                      <div class="pacman-toggle-status">
+                        <label class="custom-switch">
+                          <input
+                            type="checkbox"
+                            id="pacmanGameActivationStatus"
+                          />
+                          <div class="custom-slider">
+                            <div class="custom-slider-btn">
+                              <div class="custom-light"></div>
+                              <div class="custom-texture"></div>
+                              <div class="custom-texture"></div>
+                              <div class="custom-texture"></div>
+                              <div class="custom-light"></div>
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+                      <div class="position-controller mb-2">
+                        <button class="btn btn-success toggle-pacman-marker">
+                          Set Initial Position
+                        </button>
+                      </div>
+                      <div class="speed-controller mb-2">
+                        <p class="m-0">
+                          <label
+                            >Pacman Speed (<span id="speed-control">0</span
+                            >)</label
+                          >
+                        </p>
+                        <input
+                          type="range"
+                          class="speed-control w-100"
+                          min="0"
+                          value="0"
+                          max="100"
+                        />
+                      </div>
+                      <div class="radius-controller">
+                        <p class="m-0">
+                          <label
+                            >Pacman Attack Radius (<span id="radius-control"
+                              >0</span
+                            >)</label
+                          >
+                        </p>
+                        <input
+                          min="0"
+                          max="100"
+                          value="0"
+                          type="range"
+                          class="radius-control w-100"
+                        />
+                      </div>
+                      <div class="my-2">
+                        <button class="btn btn-info w-100">
+                          Update Settings
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
