@@ -5,6 +5,7 @@ const mapSchema = new mongoose.Schema(
     id: {
       type: String,
       unique: true,
+      required: true,
       lowercase: true,
       trim: true,
     },
@@ -24,23 +25,37 @@ const mapSchema = new mongoose.Schema(
     launchTime: {
       type: Date,
       required: true,
+      default: Date.now,
     },
-    pacman: [
-      {
+    pacman: {
+      type: {
         speed: {
           type: Number,
-          default: 5,
+          default: 0,
         },
-        distance: {
+        radius: {
           type: Number,
-          default: 1000,
+          default: 100,
         },
-        direction: {
-          type: String,
-          default: "North",
+        activate: {
+          type: Boolean,
+          default: false,
+        },
+        coords: {
+          type: {
+            lat: {
+              type: Number,
+              default: 0,
+            },
+            lng: {
+              type: Number,
+              default: 0,
+            },
+          },
+          default: { lat: 0, lng: 0 },
         },
       },
-    ],
+    },
     playable: {
       type: Boolean,
       default: false,
@@ -49,9 +64,11 @@ const mapSchema = new mongoose.Schema(
       {
         redeemLink: {
           type: String,
+          default: "",
         },
         name: {
           type: String,
+          default: "",
         },
         mtype: {
           type: String,
@@ -62,6 +79,12 @@ const mapSchema = new mongoose.Schema(
         images: [
           {
             type: String,
+            validate: {
+              validator: function (v) {
+                return /^(http|https):\/\/[^ "]+$/.test(v);
+              },
+              message: "Invalid URL format",
+            },
           },
         ],
       },
@@ -73,6 +96,7 @@ const mapSchema = new mongoose.Schema(
 );
 
 mapSchema.index({ id: 1 });
+mapSchema.index({ name: 1 });
 
 const Map = mongoose.model("Map", mapSchema);
 
