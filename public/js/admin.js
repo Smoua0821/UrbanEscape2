@@ -1048,18 +1048,29 @@ function renderRoutes() {
       pacmanSettings.activate = !pacmanSettings.activate;
       console.log(pacmanSettings);
     });
-
+  let isUpdating = false;
   $(".updatePacmanSettings")
     .off("click")
     .on("click", () => {
-      $.post("/admin/settings/update/pacman", pacmanSettings, (data) => {
-        if (data.status == "success") {
-          notyf.success(data.message);
-        } else {
-          notyf.error(data.message);
-        }
-      });
+      if (isUpdating) return;
+      isUpdating = true;
+
+      $.post("/admin/settings/update/pacman", pacmanSettings)
+        .done((data) => {
+          isUpdating = false;
+          if (data.status == "success") {
+            notyf.success(data.message);
+            $(".game-mode-controller .game-settings .header button").html();
+          } else {
+            notyf.error(data.message);
+          }
+        })
+        .fail(() => {
+          isUpdating = false; // Reset on failure
+          notyf.error("Failed to update Pacman settings. Please try again.");
+        });
     });
+
   $(".toggle-pacman-marker")
     .off("click")
     .click(function () {
