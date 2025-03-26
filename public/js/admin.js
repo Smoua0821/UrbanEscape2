@@ -1077,6 +1077,11 @@ function renderRoutes() {
     marker.position = tmp;
     marker.setMap(map);
     $(".map-controller").hide();
+    setTimeout(() => {
+      if (polyCoords.length == 1) {
+        const cnf = confirm("Make this Pacman starting point?");
+      }
+    }, 100);
     if (polyCoords.length > 1) {
       $(".map-controller").show();
       polygon.setPath(polyCoords);
@@ -1088,10 +1093,13 @@ function renderRoutes() {
   if (bulkCircle) bulkCircle.setMap(null);
   if (bulkMarker) {
     bulkMarker.setMap(null);
-    bulkMarker.remo;
+    bulkMarker.remove();
   }
   $.get(`/api/looproute/${mapId}`, (data) => {
     console.log(data);
+    if (data && data[0] && data[0].polygonCoords && data[0].polygonCoords[0]) {
+      map.setCenter(data[0].polygonCoords[0]);
+    }
     data.forEach((path) => {
       bulkPolyLine = new google.maps.Polyline({
         map: map,
