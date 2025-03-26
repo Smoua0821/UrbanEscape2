@@ -1,3 +1,4 @@
+const Map = require("../models/Map");
 const MapDynamics = require("../models/MapDynamics");
 
 const updateUserHistory = async (req, res, incrementLifes) => {
@@ -73,4 +74,47 @@ const loseHandler = async (req, res) => {
   await updateUserHistory(req, res, false);
 };
 
-module.exports = { loseHandler, winHandler };
+const updateGameSettings = async (req, res) => {
+  try {
+    let { activate, coords, radius, speed, mapId } = req.body;
+    if (!activate || !coords || !radius || !speed || !mapId) {
+      return await res
+        .status(400)
+        .json({ status: "error", message: "Invalid Argument" });
+    }
+    activate = activate === "true";
+    radius = parseInt(radius);
+    speed = parseInt(speed);
+    if (radius > 100) radius = 100;
+    if (speed > 100) speed = 100;
+    if (radius < 0) radius = 0;
+    if (speed < 0) speed = 0;
+    if (!coords || !coords.lat || !coords.lng) {
+      return await res
+        .status(400)
+        .json({ status: "error", message: "Invalid Coordinates" });
+    }
+    await Map.updateOne(
+      {
+        id: mapId,
+      },
+      {
+        $set: {
+          "pacman.activate": activate,
+          "pacman.coords": coords,
+          "pacman.radius": radius,
+          "pacman.speed": speed,
+          playable: activate,
+        },
+      }
+    );
+    return await res
+      .status(200)
+      .json({ status: "success", message: "Updated" });
+  } catch (error) {
+    console.error(error);
+    await res.json({ status: "error", message: "Internal Server Error" });
+  }
+};
+
+module.exports = { loseHandler, winHandler, updateGameSettings };

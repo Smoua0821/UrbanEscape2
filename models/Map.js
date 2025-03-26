@@ -27,6 +27,10 @@ const mapSchema = new mongoose.Schema(
       required: true,
       default: Date.now,
     },
+    playable: {
+      type: Boolean,
+      default: false,
+    },
     pacman: {
       type: {
         speed: {

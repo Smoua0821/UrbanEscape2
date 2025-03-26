@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const { updateGameSettings } = require("../../controllers/game");
 const {
   adminPage,
   deleteUser,
@@ -155,5 +156,7 @@ router.post(
 );
 
 router.post("/settings/update", settingsUpdate);
+
+router.post("/settings/update/pacman", updateGameSettings);
 
 module.exports = router;

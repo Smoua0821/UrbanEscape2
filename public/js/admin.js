@@ -1036,39 +1036,60 @@ function renderRoutes() {
     position: pos,
   });
   const pacmanSettings = {
+    mapId: mapId,
     activate: false,
     coords: {},
     speed: 0,
     radius: 0,
   };
-  $("#pacmanGameActivationStatus").on("change", () => {
-    pacmanSettings.activate = !pacmanSettings.activate;
-    console.log(pacmanSettings);
-  });
-  $(".toggle-pacman-marker").click(function () {
-    isReadyToSetPacMarker = !isReadyToSetPacMarker;
-    if (isReadyToSetPacMarker) {
-      $(this).text("Click on Map to set Pacman Position");
-      $(this).addClass("btn-danger");
-    } else {
-      $(this).text("Set Initial Position");
-      $(this).removeClass("btn-danger");
-    }
-  });
-  $(".radius-control").on("input", (event) => {
-    let radius = event.target.value;
-    if (radius > 100) radius = 100;
-    if (radius < 0) radius = 0;
-    pacmanSettings.radius = radius;
-    $("#radius-control").text(radius);
-  });
-  $(".speed-control").on("input", (event) => {
-    let speed = event.target.value;
-    if (speed > 100) speed = 100;
-    if (speed < 0) speed = 0;
-    pacmanSettings.speed = speed;
-    $("#speed-control").text(speed);
-  });
+  $("#pacmanGameActivationStatus")
+    .off("change")
+    .on("change", () => {
+      pacmanSettings.activate = !pacmanSettings.activate;
+      console.log(pacmanSettings);
+    });
+
+  $(".updatePacmanSettings")
+    .off("click")
+    .on("click", () => {
+      $.post("/admin/settings/update/pacman", pacmanSettings, (data) => {
+        if (data.status == "success") {
+          notyf.success(data.message);
+        } else {
+          notyf.error(data.message);
+        }
+      });
+    });
+  $(".toggle-pacman-marker")
+    .off("click")
+    .click(function () {
+      isReadyToSetPacMarker = !isReadyToSetPacMarker;
+      if (isReadyToSetPacMarker) {
+        $(this).text("Click on Map to set Pacman Position");
+        $(this).addClass("btn-danger");
+      } else {
+        $(this).text("Set Initial Position");
+        $(this).removeClass("btn-danger");
+      }
+    });
+  $(".radius-control")
+    .off("input")
+    .on("input", (event) => {
+      let radius = event.target.value;
+      if (radius > 100) radius = 100;
+      if (radius < 0) radius = 0;
+      pacmanSettings.radius = radius;
+      $("#radius-control").text(radius);
+    });
+  $(".speed-control")
+    .off("input")
+    .on("input", (event) => {
+      let speed = event.target.value;
+      if (speed > 100) speed = 100;
+      if (speed < 0) speed = 0;
+      pacmanSettings.speed = speed;
+      $("#speed-control").text(speed);
+    });
   map = new google.maps.Map(document.getElementsByClassName("g-map")[0], {
     zoom: 15,
     center: pos,
