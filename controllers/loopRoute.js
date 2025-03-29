@@ -42,7 +42,11 @@ async function fetchLoopRoutes(req, res) {
   const filteredImages = data.filter(
     (d) => !imgexist.images?.includes(d._id) && !blockedImages.includes(d._id)
   );
-  res.json(filteredImages);
+  res.json({
+    status: "success",
+    mapGameSetting: map.pacman,
+    route: filteredImages,
+  });
 }
 
 async function saveLoopRoutes(req, res) {

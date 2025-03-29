@@ -1031,6 +1031,7 @@ function renderMapMissions() {
 }
 
 function renderRoutes() {
+  $(".game-mode-controller").hide();
   let isReadyToSetPacMarker = false;
   let PacmanMarker = new google.maps.marker.AdvancedMarkerElement({
     position: pos,
@@ -1169,8 +1170,37 @@ function renderRoutes() {
     bulkMarker.setMap(null);
     bulkMarker.remove();
   }
-  $.get(`/api/looproute/${mapId}`, (data) => {
-    console.log(data);
+  $.get(`/api/looproute/${mapId}`, (dataa) => {
+    const data = dataa?.route;
+    $(".game-mode-controller").show();
+    let gameStngs = dataa?.mapGameSetting;
+    if (!gameStngs || !gameStngs.coords) {
+      gameStngs = {
+        speed: 0,
+        radius: 0,
+        activate: false,
+        coords: {},
+      };
+    } else {
+      PacmanMarker.position = dataa.mapGameSetting.coords;
+      PacmanMarker.setMap(map);
+    }
+    $(".speed-control")[0].value = gameStngs.speed;
+    $(".radius-control")[0].value = gameStngs.radius;
+    pacmanSettings.activate = gameStngs.activate;
+    pacmanSettings.coords = gameStngs.coords;
+    pacmanSettings.radius = gameStngs.radius;
+    pacmanSettings.speed = gameStngs.speed;
+
+    document.getElementById("speed-control").innerText = gameStngs.speed;
+    document.getElementById("radius-control").innerText = gameStngs.radius;
+
+    if (gameStngs.activate) {
+      $("#pacmanGameActivationStatus").prop("checked", true);
+    } else {
+      $("#pacmanGameActivationStatus").prop("checked", false);
+    }
+
     if (data && data[0] && data[0].polygonCoords && data[0].polygonCoords[0]) {
       map.setCenter(data[0].polygonCoords[0]);
     }
