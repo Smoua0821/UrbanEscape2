@@ -643,11 +643,13 @@ function initMap() {
       );
     }, 1000);
 
-    function gameOverHandler() {
+    function gameOverHandler(type = "win") {
       clearInterval(timeInterval);
       clearInterval(movingPing);
       pacmanMarker.position = pos;
       console.log("Game Over!");
+      if (type == "lose") {
+      }
     }
   }
 }
