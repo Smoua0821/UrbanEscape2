@@ -603,19 +603,22 @@ function initMap() {
 
     // Moving Pacman Towards User
     let movingPing;
+    let gameoverSafe = true;
     movingPing = setInterval(() => {
       if (!pacmanData.speed) pacmanData.speed = 10;
       if (!pacmanData.radius) pacmanData.radius = 10;
       const distance = haversineDistance(pos, pacmanPositionCoord);
       const segments = (distance * 1000) / pacmanData.speed;
       let steps = 1 / segments;
-      if (steps >= 1) {
+      if (steps >= 1 && gameoverSafe) {
         gameOverHandler("lose");
+        gameoverSafe = false;
         steps = 1;
       }
       pacmanPositionCoord = interpolate(pacmanPositionCoord, pos, steps);
       pacmanMarker.position = pacmanPositionCoord;
-      if (hasPacmanAttackedUser(0.1)) {
+      if (hasPacmanAttackedUser(0.1) && gameoverSafe) {
+        gameoverSafe = false;
         gameOverHandler("lose");
       }
       console.log(distance, segments, steps);
