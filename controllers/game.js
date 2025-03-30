@@ -1,9 +1,42 @@
 const Map = require("../models/Map");
 const MapDynamics = require("../models/MapDynamics");
+const { ObjectId } = require("mongodb");
+
+const getRank = async (mapId, gameId = null) => {
+  const pipeline = [
+    { $match: { mapId: new ObjectId(mapId) } }, // Match the specific map
+    { $unwind: "$Leaderboard" }, // Expand the leaderboard array
+    { $sort: { "Leaderboard.timeTaken": 1 } }, // Sort by timeTaken (ascending)
+    {
+      $group: {
+        _id: "$_id",
+        leaderboard: { $push: "$Leaderboard" },
+      },
+    },
+    {
+      $unwind: { path: "$leaderboard", includeArrayIndex: "rank" }, // Assign ranks
+    },
+    {
+      $project: {
+        _id: 0,
+        gameId: "$leaderboard.gameId",
+        timeTaken: "$leaderboard.timeTaken",
+        rank: { $add: ["$rank", 1] }, // Convert index to rank
+      },
+    },
+  ];
+
+  if (gameId) {
+    pipeline.push({ $match: { gameId } }); // Apply filtering only if gameId is provided
+  }
+
+  const result = await MapDynamics.aggregate(pipeline);
+  return gameId ? (result.length > 0 ? result[0].rank : null) : result;
+};
 
 const updateUserHistory = async (req, res, incrementLifes) => {
   try {
-    const { mapParsedIdRaw } = req.body;
+    const { mapParsedIdRaw, time } = req.body;
     if (!mapParsedIdRaw || !req.user?._id)
       return await res.json({ status: "error", message: "Invalid Argument" });
 
@@ -33,9 +66,14 @@ const updateUserHistory = async (req, res, incrementLifes) => {
 
     updateTime.endTime = endTime;
     historyList.push(updateTime);
-    const timeTaken = parseInt(
+    let timeTaken = parseInt(
       (updateTime.endTime - updateTime.startTime) / 1000
     );
+    const gameId = historyList[historyList.length - 1]._id;
+
+    if (time && timeTaken - time < 10) {
+      timeTaken = time;
+    }
 
     const result = await MapDynamics.updateOne(
       {
@@ -50,7 +88,7 @@ const updateUserHistory = async (req, res, incrementLifes) => {
           Leaderboard: {
             userId: req.user._id,
             timeTaken: timeTaken,
-            timeSaved: Date.now(),
+            gameId: gameId,
           },
         },
       }
@@ -59,7 +97,9 @@ const updateUserHistory = async (req, res, incrementLifes) => {
     if (!result.modifiedCount)
       return await res.json({ status: "error", message: "Update failed" });
 
-    await res.json(result);
+    const rank = await getRank(mapParsedIdRaw, gameId);
+
+    await res.json({ status: "success", rank });
   } catch (error) {
     console.error(error);
     await res.json({ status: "error", message: "Internal Server Error" });

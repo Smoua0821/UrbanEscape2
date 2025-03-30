@@ -8,6 +8,10 @@ const MapDynamicSchema = new mongoose.Schema({
   },
   Leaderboard: [
     {
+      gameId: {
+        type: mongoose.Schema.Types.ObjectId,
+        require: true,
+      },
       userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",

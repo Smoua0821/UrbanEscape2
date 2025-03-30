@@ -603,31 +603,29 @@ function initMap() {
 
     // Moving Pacman Towards User
     let movingPing;
-    setTimeout(() => {
-      console.log("Start Moving!");
-      movingPing = setInterval(() => {
-        if (!pacmanData.speed) pacmanData.speed = 10;
-        if (!pacmanData.radius) pacmanData.radius = 10;
-        const distance = haversineDistance(pos, pacmanPositionCoord);
-        const segments = (distance * 1000) / pacmanData.speed;
-        let steps = 1 / segments;
-        if (steps >= 1) {
-          gameOverHandler();
-          steps = 1;
-        }
-        pacmanPositionCoord = interpolate(pacmanPositionCoord, pos, steps);
-        pacmanMarker.position = pacmanPositionCoord;
-        if (hasPacmanAttackedUser(0.1)) {
-          gameOverHandler();
-        }
-        console.log(distance, segments, steps);
-      }, 100);
-    }, 5000);
+    movingPing = setInterval(() => {
+      if (!pacmanData.speed) pacmanData.speed = 10;
+      if (!pacmanData.radius) pacmanData.radius = 10;
+      const distance = haversineDistance(pos, pacmanPositionCoord);
+      const segments = (distance * 1000) / pacmanData.speed;
+      let steps = 1 / segments;
+      if (steps >= 1) {
+        gameOverHandler("lose");
+        steps = 1;
+      }
+      pacmanPositionCoord = interpolate(pacmanPositionCoord, pos, steps);
+      pacmanMarker.position = pacmanPositionCoord;
+      if (hasPacmanAttackedUser(0.1)) {
+        gameOverHandler("lose");
+      }
+      console.log(distance, segments, steps);
+    }, 100);
 
     const startTime = Date.now(); // Record the initial start time
+    let elapsedTime = 0;
     const timeInterval = setInterval(() => {
       const currentTime = Date.now();
-      const elapsedTime = Math.floor((currentTime - startTime) / 1000); // Calculate elapsed time in seconds
+      elapsedTime = Math.floor((currentTime - startTime) / 1000);
 
       const hours = Math.floor(elapsedTime / 3600);
       const minutes = Math.floor((elapsedTime % 3600) / 60);
@@ -643,13 +641,33 @@ function initMap() {
       );
     }, 1000);
 
-    function gameOverHandler(type = "win") {
+    async function leaderboardinfo(type = "lose") {
+      let url = "/game/lose";
+      if (type == "win") {
+        url = "/game/win";
+      }
+
+      try {
+        const response = await $.post(url, {
+          mapParsedIdRaw,
+          time: elapsedTime,
+          type,
+        });
+        return response; // Properly return response
+      } catch (error) {
+        console.error("Request failed:", error);
+        return { status: "error", message: "Something went wrong!" };
+      }
+    }
+
+    async function gameOverHandler(type = "win") {
       clearInterval(timeInterval);
       clearInterval(movingPing);
       pacmanMarker.position = pos;
       console.log("Game Over!");
-      if (type == "lose") {
-      }
+
+      let data = await leaderboardinfo(type);
+      console.log(data);
     }
   }
 }
