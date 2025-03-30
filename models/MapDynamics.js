@@ -17,9 +17,10 @@ const MapDynamicSchema = new mongoose.Schema({
         type: Number,
         required: true,
       },
-      timeSaved: {
-        type: Date,
-        default: Date.now,
+      result: {
+        type: String,
+        enum: ["lose", "win"],
+        default: "lose",
       },
     },
   ],
