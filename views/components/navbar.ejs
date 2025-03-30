@@ -118,25 +118,3 @@
     font-size: 0.78rem;
   }
 </style>
-<script>
-  $(document).ready(() => {
-    const startTime = Date.now(); // Record the initial start time
-    const timeInterval = setInterval(() => {
-      const currentTime = Date.now();
-      const elapsedTime = Math.floor((currentTime - startTime) / 1000); // Calculate elapsed time in seconds
-
-      const hours = Math.floor(elapsedTime / 3600);
-      const minutes = Math.floor((elapsedTime % 3600) / 60);
-      const seconds = elapsedTime % 60;
-
-      // Format time as hh:mm:ss
-      const formattedHours = hours < 10 ? `0${hours}` : hours;
-      const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-      const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
-
-      $(".time-countdown").text(
-        `${formattedHours}:${formattedMinutes}:${formattedSeconds}`
-      );
-    }, 1000);
-  });
-</script>

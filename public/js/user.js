@@ -386,6 +386,15 @@ iconMarker.addEventListener("click", () => {
 });
 
 let polyIndex = 0;
+let pacmanData = {
+  coords: { lat: 0, lng: 0 },
+  speed: document.getElementById("pacmanSpeed")?.value
+    ? document.getElementById("pacmanSpeed")?.value
+    : 10,
+  radius: document.getElementById("pacmanRadius")?.value
+    ? document.getElementById("pacmanRadius")?.value
+    : 10,
+};
 let pacmanPositionCoords = document.getElementById("pacmanCoordinates");
 let pacmanPositionCoord = { lat: 0, lng: 0 };
 
@@ -397,12 +406,13 @@ if (pacmanPositionCoords) {
         lat: parseFloat(pacmanPositionCoords[0]),
         lng: parseFloat(pacmanPositionCoords[1]),
       };
+      pacmanData.coords = pacmanPositionCoord;
     }
   } catch (error) {
     console.error("Invalid pacman coordinates format:", error);
   }
 }
-document.getElementById("pacmanCoordinates").remove();
+document.getElementById("pacmanCoordinates")?.remove();
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     zoom: 15,
@@ -578,18 +588,67 @@ function initMap() {
     clickable: false,
   });
   showAllPolygons();
-
+  let pacmanMarker;
   if (mapParsedIdRaw) {
     const divOuter = document.createElement("div");
     const divinner = document.createElement("div");
     divinner.className = "pacman-inner";
     divOuter.className = "pacman-outer";
     divOuter.appendChild(divinner);
-    const pacmanMarker = new google.maps.marker.AdvancedMarkerElement({
+    pacmanMarker = new google.maps.marker.AdvancedMarkerElement({
       content: divOuter,
       map: map,
       position: pacmanPositionCoord,
     });
+
+    // Moving Pacman Towards User
+    let movingPing;
+    setTimeout(() => {
+      console.log("Start Moving!");
+      movingPing = setInterval(() => {
+        if (!pacmanData.speed) pacmanData.speed = 10;
+        if (!pacmanData.radius) pacmanData.radius = 10;
+        const distance = haversineDistance(pos, pacmanPositionCoord);
+        const segments = (distance * 1000) / pacmanData.speed;
+        let steps = 1 / segments;
+        if (steps >= 1) {
+          gameOverHandler();
+          steps = 1;
+        }
+        pacmanPositionCoord = interpolate(pacmanPositionCoord, pos, steps);
+        pacmanMarker.position = pacmanPositionCoord;
+        if (hasPacmanAttackedUser(0.1)) {
+          gameOverHandler();
+        }
+        console.log(distance, segments, steps);
+      }, 100);
+    }, 5000);
+
+    const startTime = Date.now(); // Record the initial start time
+    const timeInterval = setInterval(() => {
+      const currentTime = Date.now();
+      const elapsedTime = Math.floor((currentTime - startTime) / 1000); // Calculate elapsed time in seconds
+
+      const hours = Math.floor(elapsedTime / 3600);
+      const minutes = Math.floor((elapsedTime % 3600) / 60);
+      const seconds = elapsedTime % 60;
+
+      // Format time as hh:mm:ss
+      const formattedHours = hours < 10 ? `0${hours}` : hours;
+      const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+      const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+
+      $(".time-countdown").text(
+        `${formattedHours}:${formattedMinutes}:${formattedSeconds}`
+      );
+    }, 1000);
+
+    function gameOverHandler() {
+      clearInterval(timeInterval);
+      clearInterval(movingPing);
+      pacmanMarker.position = pos;
+      console.log("Game Over!");
+    }
   }
 }
 function markerClickTrack(event) {
@@ -609,7 +668,7 @@ function markerClickTrack(event) {
 function showAllPolygons() {
   $.get(`/api/looproute/${mapParsedId}`, (data, success) => {
     if (!success) return;
-    polygonCoordinates = data;
+    polygonCoordinates = data?.route;
     polygonCoordinates.forEach((pl) => {
       const img = document.createElement("img");
       img.src = pl.image;
@@ -769,6 +828,13 @@ function interpolate(start, end, factor) {
     lng: start.lng + (end.lng - start.lng) * factor,
   };
 }
+
+const hasPacmanAttackedUser = (radius) => {
+  if (haversineDistance(pos, pacmanPositionCoord) <= radius) {
+    return true;
+  }
+  return false;
+};
 
 function gameWon() {
   markerElement.setMap(null);

@@ -46,6 +46,9 @@
       value="<%= pacman.coords?.lat %>,<%= pacman.coords?.lng %>"
       id="pacmanCoordinates"
     />
+    <input type="hidden" value="<%= pacman.speed %>" id="pacmanSpeed" />
+    <input type="hidden" value="<%= pacman.radius %>" id="pacmanRadius" />
+
     <%}%> <%if(user && user.radius){%>
     <input type="hidden" value="<%=user.radius%>" id="userLocationRadius" />
     <%}%> <%if(timeFuture>=0){%>
