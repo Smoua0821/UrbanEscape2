@@ -161,7 +161,29 @@
         </p>
       </div>
     </div>
-    <div class="WinScreen" style="display: none"></div>
+    <div class="WinScreen" style="display: none">
+      <div class="row p-o m-0 justify-content-center">
+        <div
+          class="vh-100 d-inline-flex col-sm-10 col-md-8 col-lg-6 justify-content-center align-items-center"
+        >
+          <div class="text-center shadow-lg bg-white p-4">
+            <h2 class="pb-3 mb-3 border-bottom text-danger">Game Over</h2>
+            <p class="lead text-center">
+              You have eaten by Pacman which cause <b>Game-Over</b> You can
+              Restart the Game to Score more and win the Game!
+            </p>
+            <div class="my-3 text-center">
+              <h1 class="text-warning" id="userRankAfterGameOver">1</h1>
+              <p class="lead">Your Ranking</p>
+            </div>
+            <a href="" class="btn btn-info me-2">Restart Game</a>
+            <a href="/user/profile" class="btn btn-secondary me-2"
+              >Go Back to Profile</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
     <%- include('../components/navbar') %>
     <div
       class="modal fade"

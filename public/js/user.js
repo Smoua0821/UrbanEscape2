@@ -670,7 +670,8 @@ function initMap() {
       console.log("Game Over!");
 
       let data = await leaderboardinfo(type);
-      console.log(data);
+      $("#userRankAfterGameOver").html(data.rank);
+      $(".WinScreen").show();
     }
   }
 }
