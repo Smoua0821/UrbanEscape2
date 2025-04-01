@@ -450,9 +450,15 @@ const getMarkerImage = async (req, res) => {
   );
   const MapMarker = await Setting.findOne({ name: "mapMarker" });
   if (!MapMarker) return res.sendFile(defaultImage);
-  return res.sendFile(
-    path.join(__dirname, "../../public/images", MapMarker.content)
+  let markerPath = path.join(
+    __dirname,
+    "../../public/images",
+    MapMarker.content
   );
+  if (!fs.existsSync(markerPath)) {
+    markerPath = path.join(__dirname, "../../public/images", "map_marker.png");
+  }
+  return res.sendFile(markerPath);
 };
 
 const deleteMarkerImage = async (req, res) => {
