@@ -619,7 +619,7 @@ function initMap() {
       }
       pacmanPositionCoord = interpolate(pacmanPositionCoord, pos, steps);
       pacmanMarker.position = pacmanPositionCoord;
-      if (hasPacmanAttackedUser(0.1) && gameoverSafe) {
+      if (hasPacmanAttackedUser(pacmanData.radius / 100) && gameoverSafe) {
         gameoverSafe = false;
         gameOverHandler("lose");
       }
