@@ -605,10 +605,12 @@ function initMap() {
     let movingPing;
     let gameoverSafe = true;
     movingPing = setInterval(() => {
-      if (!pacmanData.speed) pacmanData.speed = 10;
-      if (!pacmanData.radius) pacmanData.radius = 10;
+      if (!pacmanData.speed) pacmanData.speed = 1;
+      if (!pacmanData.radius) pacmanData.radius = 1;
       const distance = haversineDistance(pos, pacmanPositionCoord);
-      const segments = (distance * 1000) / pacmanData.speed;
+      let segments = (distance * 1000) / pacmanData.speed;
+      if (segments <= 0) segments = 1; // Ensure no Zero can be there
+      segments *= 40; // Correcting Speed to 0.25 meter per second
       let steps = 1 / segments;
       if (steps >= 1 && gameoverSafe) {
         gameOverHandler("lose");
