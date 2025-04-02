@@ -185,9 +185,37 @@
                         </label>
                       </div>
                       <div class="position-controller mb-2">
-                        <button class="btn btn-success toggle-pacman-marker">
-                          Set Initial Position
-                        </button>
+                        <div class="angle-handler">
+                          <p class="m-0">
+                            <label
+                              >Angle from North (<span id="angle-value">0</span
+                              >)</label
+                            >
+                          </p>
+                          <input
+                            type="range"
+                            class="angle-control w-100"
+                            min="0"
+                            value="0"
+                            max="360"
+                          />
+                        </div>
+                        <div class="distance-handler">
+                          <p class="m-0">
+                            <label
+                              >Distance From User (<span id="distance-value"
+                                >0</span
+                              >m)</label
+                            >
+                          </p>
+                          <input
+                            type="range"
+                            class="distance-control w-100"
+                            min="0"
+                            value="0"
+                            max="100"
+                          />
+                        </div>
                       </div>
                       <div class="speed-controller mb-2">
                         <p class="m-0">

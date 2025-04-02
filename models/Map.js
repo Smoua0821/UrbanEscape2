@@ -47,16 +47,16 @@ const mapSchema = new mongoose.Schema(
         },
         coords: {
           type: {
-            lat: {
+            distance: {
               type: Number,
-              default: 0,
+              default: 1,
             },
-            lng: {
+            angle: {
               type: Number,
               default: 0,
             },
           },
-          default: { lat: 0, lng: 0 },
+          default: { distance: 1, angle: 0 },
         },
       },
     },

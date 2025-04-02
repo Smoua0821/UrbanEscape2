@@ -381,11 +381,40 @@ let speed = 10;
 let gameStarted = 0;
 iconMarker.width = 50;
 let isFullScreen = 0;
+let polyIndex = 0;
 iconMarker.addEventListener("click", () => {
   InfoModal(polygonCoordinates[polyIndex]._id);
 });
 
-let polyIndex = 0;
+function getPointAtDistance(lat, lng, distanceKm, angleDeg) {
+  const R = 6371;
+  const latRad = (lat * Math.PI) / 180;
+  const lngRad = (lng * Math.PI) / 180;
+  const bearingRad = (angleDeg * Math.PI) / 180;
+
+  const newLatRad = Math.asin(
+    Math.sin(latRad) * Math.cos(distanceKm / R) +
+      Math.cos(latRad) * Math.sin(distanceKm / R) * Math.cos(bearingRad)
+  );
+
+  const newLngRad =
+    lngRad +
+    Math.atan2(
+      Math.sin(bearingRad) * Math.sin(distanceKm / R) * Math.cos(latRad),
+      Math.cos(distanceKm / R) - Math.sin(latRad) * Math.sin(newLatRad)
+    );
+
+  const newLat = (newLatRad * 180) / Math.PI;
+  const newLng = (newLngRad * 180) / Math.PI;
+  const normalizedLng = ((newLng + 540) % 360) - 180;
+
+  return {
+    lat: newLat,
+    lng: normalizedLng,
+  };
+}
+
+let pacmanPositionCoord = { lat: 0, lng: 0 };
 let pacmanData = {
   coords: { lat: 0, lng: 0 },
   speed: document.getElementById("pacmanSpeed")?.value
@@ -395,24 +424,122 @@ let pacmanData = {
     ? document.getElementById("pacmanRadius")?.value
     : 10,
 };
-let pacmanPositionCoords = document.getElementById("pacmanCoordinates");
-let pacmanPositionCoord = { lat: 0, lng: 0 };
 
-if (pacmanPositionCoords) {
-  try {
-    pacmanPositionCoords = pacmanPositionCoords.value?.split(",");
-    if (pacmanPositionCoords && pacmanPositionCoords.length == 2) {
-      pacmanPositionCoord = {
-        lat: parseFloat(pacmanPositionCoords[0]),
-        lng: parseFloat(pacmanPositionCoords[1]),
-      };
-      pacmanData.coords = pacmanPositionCoord;
+function deployPacmanOnMap() {
+  let pacmanPositionCoords = document.getElementById("pacmanCoordinates");
+
+  if (pacmanPositionCoords) {
+    try {
+      pacmanPositionCoords = pacmanPositionCoords.value?.split(",");
+      if (pacmanPositionCoords && pacmanPositionCoords.length == 2) {
+        pacmanPositionCoord = getPointAtDistance(
+          pos.lat,
+          pos.lng,
+          pacmanPositionCoords[0] / 1000,
+          pacmanPositionCoords[1]
+        );
+        pacmanData.coords = pacmanPositionCoord;
+      }
+    } catch (error) {
+      console.error("Invalid pacman coordinates format:", error);
     }
-  } catch (error) {
-    console.error("Invalid pacman coordinates format:", error);
+  }
+  document.getElementById("pacmanCoordinates")?.remove();
+  startMovingPacman();
+}
+
+function startMovingPacman() {
+  let pacmanMarker;
+  if (mapParsedIdRaw) {
+    const divOuter = document.createElement("div");
+    const divinner = document.createElement("div");
+    divinner.className = "pacman-inner";
+    divOuter.className = "pacman-outer";
+    divOuter.appendChild(divinner);
+    pacmanMarker = new google.maps.marker.AdvancedMarkerElement({
+      content: divOuter,
+      map: map,
+      position: pacmanPositionCoord,
+    });
+
+    // Moving Pacman Towards User
+    let movingPing;
+    let gameoverSafe = true;
+    movingPing = setInterval(() => {
+      if (!pacmanData.speed) pacmanData.speed = 1;
+      if (!pacmanData.radius) pacmanData.radius = 1;
+      const distance = haversineDistance(pos, pacmanPositionCoord);
+      let segments = (distance * 1000) / pacmanData.speed;
+      if (segments <= 0) segments = 1; // Ensure no Zero can be there
+      segments *= 40; // Correcting Speed to 0.25 meter per second
+      let steps = 1 / segments;
+      if (steps >= 1 && gameoverSafe) {
+        gameOverHandler("lose");
+        gameoverSafe = false;
+        steps = 1;
+      }
+      pacmanPositionCoord = interpolate(pacmanPositionCoord, pos, steps);
+      pacmanMarker.position = pacmanPositionCoord;
+      if (hasPacmanAttackedUser(pacmanData.radius / 1000) && gameoverSafe) {
+        gameoverSafe = false;
+        gameOverHandler("lose");
+      }
+      console.log(distance, segments, steps);
+    }, 100);
+
+    const startTime = Date.now(); // Record the initial start time
+    let elapsedTime = 0;
+    const timeInterval = setInterval(() => {
+      const currentTime = Date.now();
+      elapsedTime = Math.floor((currentTime - startTime) / 1000);
+
+      const hours = Math.floor(elapsedTime / 3600);
+      const minutes = Math.floor((elapsedTime % 3600) / 60);
+      const seconds = elapsedTime % 60;
+
+      // Format time as hh:mm:ss
+      const formattedHours = hours < 10 ? `0${hours}` : hours;
+      const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+      const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+
+      $(".time-countdown").text(
+        `${formattedHours}:${formattedMinutes}:${formattedSeconds}`
+      );
+    }, 1000);
+
+    async function leaderboardinfo(type = "lose") {
+      let url = "/game/lose";
+      if (type == "win") {
+        url = "/game/win";
+      }
+
+      try {
+        const response = await $.post(url, {
+          mapParsedIdRaw,
+          time: elapsedTime,
+          type,
+        });
+        return response; // Properly return response
+      } catch (error) {
+        console.error("Request failed:", error);
+        return { status: "error", message: "Something went wrong!" };
+      }
+    }
+
+    async function gameOverHandler(type = "win") {
+      gameoverSafe = false;
+      clearInterval(timeInterval);
+      clearInterval(movingPing);
+      pacmanMarker.position = pos;
+      console.log("Game Over!");
+
+      let data = await leaderboardinfo(type);
+      $("#userRankAfterGameOver").html(data.rank);
+      $(".WinScreen").show();
+    }
   }
 }
-document.getElementById("pacmanCoordinates")?.remove();
+
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     zoom: 15,
@@ -588,94 +715,6 @@ function initMap() {
     clickable: false,
   });
   showAllPolygons();
-  let pacmanMarker;
-  if (mapParsedIdRaw) {
-    const divOuter = document.createElement("div");
-    const divinner = document.createElement("div");
-    divinner.className = "pacman-inner";
-    divOuter.className = "pacman-outer";
-    divOuter.appendChild(divinner);
-    pacmanMarker = new google.maps.marker.AdvancedMarkerElement({
-      content: divOuter,
-      map: map,
-      position: pacmanPositionCoord,
-    });
-
-    // Moving Pacman Towards User
-    let movingPing;
-    let gameoverSafe = true;
-    movingPing = setInterval(() => {
-      if (!pacmanData.speed) pacmanData.speed = 1;
-      if (!pacmanData.radius) pacmanData.radius = 1;
-      const distance = haversineDistance(pos, pacmanPositionCoord);
-      let segments = (distance * 1000) / pacmanData.speed;
-      if (segments <= 0) segments = 1; // Ensure no Zero can be there
-      segments *= 40; // Correcting Speed to 0.25 meter per second
-      let steps = 1 / segments;
-      if (steps >= 1 && gameoverSafe) {
-        gameOverHandler("lose");
-        gameoverSafe = false;
-        steps = 1;
-      }
-      pacmanPositionCoord = interpolate(pacmanPositionCoord, pos, steps);
-      pacmanMarker.position = pacmanPositionCoord;
-      if (hasPacmanAttackedUser(pacmanData.radius / 100) && gameoverSafe) {
-        gameoverSafe = false;
-        gameOverHandler("lose");
-      }
-      console.log(distance, segments, steps);
-    }, 100);
-
-    const startTime = Date.now(); // Record the initial start time
-    let elapsedTime = 0;
-    const timeInterval = setInterval(() => {
-      const currentTime = Date.now();
-      elapsedTime = Math.floor((currentTime - startTime) / 1000);
-
-      const hours = Math.floor(elapsedTime / 3600);
-      const minutes = Math.floor((elapsedTime % 3600) / 60);
-      const seconds = elapsedTime % 60;
-
-      // Format time as hh:mm:ss
-      const formattedHours = hours < 10 ? `0${hours}` : hours;
-      const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-      const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
-
-      $(".time-countdown").text(
-        `${formattedHours}:${formattedMinutes}:${formattedSeconds}`
-      );
-    }, 1000);
-
-    async function leaderboardinfo(type = "lose") {
-      let url = "/game/lose";
-      if (type == "win") {
-        url = "/game/win";
-      }
-
-      try {
-        const response = await $.post(url, {
-          mapParsedIdRaw,
-          time: elapsedTime,
-          type,
-        });
-        return response; // Properly return response
-      } catch (error) {
-        console.error("Request failed:", error);
-        return { status: "error", message: "Something went wrong!" };
-      }
-    }
-
-    async function gameOverHandler(type = "win") {
-      clearInterval(timeInterval);
-      clearInterval(movingPing);
-      pacmanMarker.position = pos;
-      console.log("Game Over!");
-
-      let data = await leaderboardinfo(type);
-      $("#userRankAfterGameOver").html(data.rank);
-      $(".WinScreen").show();
-    }
-  }
 }
 function markerClickTrack(event) {
   $(".popup-button").show();
@@ -795,6 +834,7 @@ function updateCurrentLocation() {
     pos.lng = position.coords.longitude;
     const newPos = { ...pos };
     locationMarkerUpdate(newPos);
+    deployPacmanOnMap();
   };
 
   const errorCallback = (error) => {

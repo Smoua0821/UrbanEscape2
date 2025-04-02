@@ -115,25 +115,24 @@ const loseHandler = async (req, res) => {
 };
 
 const updateGameSettings = async (req, res) => {
+  console.log(req.body);
   try {
-    let { activate, coords, radius, speed, mapId } = req.body;
+    let { activate, coords, radius, speed, mapId, distance, angle } = req.body;
     if (!activate || !coords || !radius || !speed || !mapId) {
       return await res
         .status(400)
         .json({ status: "error", message: "Invalid Argument" });
     }
     activate = activate === "true";
-    radius = parseInt(radius);
-    speed = parseInt(speed);
+    distance = parseInt(coords?.distance);
+    angle = parseInt(coords.angle);
     if (radius > 100) radius = 100;
     if (speed > 100) speed = 100;
     if (radius < 0) radius = 0;
     if (speed < 0) speed = 0;
-    if (!coords || !coords.lat || !coords.lng) {
-      return await res
-        .status(400)
-        .json({ status: "error", message: "Invalid Coordinates" });
-    }
+    if (!angle) angle = 0;
+    if (!distance) distance = 1;
+
     await Map.updateOne(
       {
         id: mapId,
@@ -141,7 +140,7 @@ const updateGameSettings = async (req, res) => {
       {
         $set: {
           "pacman.activate": activate,
-          "pacman.coords": coords,
+          "pacman.coords": { distance: distance, angle: angle },
           "pacman.radius": radius,
           "pacman.speed": speed,
           playable: activate,

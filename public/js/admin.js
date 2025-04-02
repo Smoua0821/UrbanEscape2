@@ -1032,10 +1032,6 @@ function renderMapMissions() {
 
 function renderRoutes() {
   $(".game-mode-controller").hide();
-  let isReadyToSetPacMarker = false;
-  let PacmanMarker = new google.maps.marker.AdvancedMarkerElement({
-    position: pos,
-  });
   const pacmanSettings = {
     mapId: mapId,
     activate: false,
@@ -1072,18 +1068,6 @@ function renderRoutes() {
         });
     });
 
-  $(".toggle-pacman-marker")
-    .off("click")
-    .click(function () {
-      isReadyToSetPacMarker = !isReadyToSetPacMarker;
-      if (isReadyToSetPacMarker) {
-        $(this).text("Click on Map to set Pacman Position");
-        $(this).addClass("btn-danger");
-      } else {
-        $(this).text("Set Initial Position");
-        $(this).removeClass("btn-danger");
-      }
-    });
   $(".radius-control")
     .off("input")
     .on("input", (event) => {
@@ -1101,6 +1085,22 @@ function renderRoutes() {
       if (speed < 0) speed = 0;
       pacmanSettings.speed = speed;
       $("#speed-control").text(speed);
+    });
+
+  $(".angle-control")
+    .off("input")
+    .on("input", (event) => {
+      let angle = event.target.value;
+      pacmanSettings.coords.angle = angle;
+      $("#angle-value").text(angle);
+    });
+
+  $(".distance-control")
+    .off("input")
+    .on("input", (event) => {
+      let distance = event.target.value;
+      pacmanSettings.coords.distance = distance;
+      $("#distance-value").text(distance);
     });
   map = new google.maps.Map(document.getElementsByClassName("g-map")[0], {
     zoom: 15,
@@ -1132,15 +1132,6 @@ function renderRoutes() {
       lat: lat,
       lng: lng,
     };
-    if (isReadyToSetPacMarker) {
-      PacmanMarker.setMap(map);
-      PacmanMarker.position = tmp;
-      pacmanSettings.coords = tmp;
-      isReadyToSetPacMarker = false;
-      $(".toggle-pacman-marker").text("Set Initial Position");
-      $(".toggle-pacman-marker").removeClass("btn-danger");
-      return false;
-    }
     loopRouteOptions.mode = "new";
     loopRouteOptions.url = "/admin/looproute";
     loopRouteOptions.smessage = "New Route added successfully!";
@@ -1179,21 +1170,29 @@ function renderRoutes() {
         speed: 0,
         radius: 0,
         activate: false,
-        coords: {},
+        coords: {
+          distance: 0,
+          angle: 0,
+        },
       };
-    } else {
-      PacmanMarker.position = dataa.mapGameSetting.coords;
-      PacmanMarker.setMap(map);
     }
     $(".speed-control")[0].value = gameStngs.speed;
     $(".radius-control")[0].value = gameStngs.radius;
+    $(".distance-control")[0].value = gameStngs.coords.distance;
+    $(".angle-control")[0].value = gameStngs.coords.angle;
+    $(".radius-control")[0].value = gameStngs.radius;
     pacmanSettings.activate = gameStngs.activate;
-    pacmanSettings.coords = gameStngs.coords;
+    pacmanSettings.coords.distance = gameStngs.coords.distance;
+    pacmanSettings.coords.angle = gameStngs.coords.angle;
     pacmanSettings.radius = gameStngs.radius;
     pacmanSettings.speed = gameStngs.speed;
 
     document.getElementById("speed-control").innerText = gameStngs.speed;
     document.getElementById("radius-control").innerText = gameStngs.radius;
+
+    document.getElementById("angle-value").innerText = gameStngs.coords.angle;
+    document.getElementById("distance-value").innerText =
+      gameStngs.coords.distance;
 
     if (gameStngs.activate) {
       $("#pacmanGameActivationStatus").prop("checked", true);

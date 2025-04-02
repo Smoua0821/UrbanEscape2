@@ -43,7 +43,7 @@
     <% if(pacman && pacman.coords){ %>
     <input
       type="hidden"
-      value="<%= pacman.coords?.lat %>,<%= pacman.coords?.lng %>"
+      value="<%= pacman.coords?.distance %>,<%= pacman.coords?.angle %>"
       id="pacmanCoordinates"
     />
     <input type="hidden" value="<%= pacman.speed %>" id="pacmanSpeed" />
