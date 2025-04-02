@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const { fetchLoopRoutes } = require("../controllers/loopRoute");
+const { findAllRanks } = require("../controllers/game");
 const {
   getMarkerImage,
   settingsImport,
@@ -17,4 +18,6 @@ router.get("/buttons", fetchAllButtons);
 router.post("/buttons", findButton);
 
 router.get("/settings/import", settingsImport);
+
+router.get("/game/leaderboard/:mapParsedIdRaw", findAllRanks);
 module.exports = router;

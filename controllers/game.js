@@ -3,35 +3,45 @@ const MapDynamics = require("../models/MapDynamics");
 const { ObjectId } = require("mongodb");
 
 const getRank = async (mapId, gameId = null) => {
-  const pipeline = [
-    { $match: { mapId: new ObjectId(mapId) } }, // Match the specific map
-    { $unwind: "$Leaderboard" }, // Expand the leaderboard array
-    { $sort: { "Leaderboard.timeTaken": 1 } }, // Sort by timeTaken (ascending)
-    {
-      $group: {
-        _id: "$_id",
-        leaderboard: { $push: "$Leaderboard" },
-      },
-    },
-    {
-      $unwind: { path: "$leaderboard", includeArrayIndex: "rank" }, // Assign ranks
-    },
-    {
-      $project: {
-        _id: 0,
-        gameId: "$leaderboard.gameId",
-        timeTaken: "$leaderboard.timeTaken",
-        rank: { $add: ["$rank", 1] }, // Convert index to rank
-      },
-    },
-  ];
-
-  if (gameId) {
-    pipeline.push({ $match: { gameId } }); // Apply filtering only if gameId is provided
+  if (!ObjectId.isValid(mapId)) {
+    return 0;
   }
+  try {
+    const pipeline = [
+      { $match: { mapId: new ObjectId(mapId) } }, // Match the specific map
+      { $unwind: "$Leaderboard" }, // Expand the leaderboard array
+      { $sort: { "Leaderboard.timeTaken": 1 } }, // Sort by timeTaken (ascending)
+      {
+        $group: {
+          _id: "$_id",
+          leaderboard: { $push: "$Leaderboard" },
+        },
+      },
+      {
+        $unwind: { path: "$leaderboard", includeArrayIndex: "rank" }, // Assign ranks
+      },
+      {
+        $project: {
+          _id: 0,
+          userId: "$leaderboard.userId",
+          userName: "$leaderboard.userName",
+          gameId: "$leaderboard.gameId",
+          timeTaken: "$leaderboard.timeTaken",
+          rank: { $add: ["$rank", 1] }, // Convert index to rank
+        },
+      },
+    ];
 
-  const result = await MapDynamics.aggregate(pipeline);
-  return gameId ? (result.length > 0 ? result[0].rank : null) : result;
+    if (gameId) {
+      pipeline.push({ $match: { gameId } }); // Apply filtering only if gameId is provided
+    }
+
+    const result = await MapDynamics.aggregate(pipeline);
+    return gameId ? (result.length > 0 ? result[0].rank : null) : result;
+  } catch (error) {
+    console.log(error);
+    return 0;
+  }
 };
 
 const updateUserHistory = async (req, res, incrementLifes) => {
@@ -87,6 +97,7 @@ const updateUserHistory = async (req, res, incrementLifes) => {
         $push: {
           Leaderboard: {
             userId: req.user._id,
+            userName: req.user.name,
             timeTaken: timeTaken,
             gameId: gameId,
           },
@@ -156,4 +167,16 @@ const updateGameSettings = async (req, res) => {
   }
 };
 
-module.exports = { loseHandler, winHandler, updateGameSettings };
+const findAllRanks = async (req, res) => {
+  const { mapParsedIdRaw } = req.params;
+  if (!mapParsedIdRaw)
+    return res.json({ status: "error", message: "Please Enter a Map ID" });
+  const rank = await getRank(mapParsedIdRaw);
+  if (!rank)
+    return res
+      .status(400)
+      .json({ status: "error", message: "Something went Wrong!" });
+  return res.json({ status: "success", data: rank });
+};
+
+module.exports = { loseHandler, winHandler, updateGameSettings, findAllRanks };

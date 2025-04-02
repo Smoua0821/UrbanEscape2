@@ -17,6 +17,10 @@ const MapDynamicSchema = new mongoose.Schema({
         ref: "User",
         required: true,
       },
+      userName: {
+        type: String,
+        default: "",
+      },
       timeTaken: {
         type: Number,
         required: true,
