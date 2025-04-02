@@ -451,13 +451,11 @@ function deployPacmanOnMap() {
 function startMovingPacman() {
   let pacmanMarker;
   if (mapParsedIdRaw) {
-    const divOuter = document.createElement("div");
-    const divinner = document.createElement("div");
-    divinner.className = "pacman-inner";
-    divOuter.className = "pacman-outer";
-    divOuter.appendChild(divinner);
+    const pacmanImage = document.createElement("img");
+    pacmanImage.src = `/api/pacman/character/${mapParsedId}`;
+    pacmanImage.width = 50;
     pacmanMarker = new google.maps.marker.AdvancedMarkerElement({
-      content: divOuter,
+      content: pacmanImage,
       map: map,
       position: pacmanPositionCoord,
     });

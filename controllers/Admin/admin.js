@@ -78,6 +78,7 @@ async function adminPage(req, res) {
 
 const mongoose = require("mongoose");
 const Settings = require("../../models/Settings");
+const { resolve4 } = require("dns");
 const deleteUser = async (req, res) => {
   const { id } = req.params;
 
@@ -461,6 +462,37 @@ const getMarkerImage = async (req, res) => {
   return res.sendFile(markerPath);
 };
 
+const getPacmanImage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Invalid Identity!" });
+    }
+
+    const dirPath = path.join(__dirname, "../../public/images/pacman/");
+    const filePath = path.join(dirPath, `${id}.gif`);
+
+    // Check if the file exists; if not, use default
+    const exists = await fs.promises
+      .access(filePath)
+      .then(() => true)
+      .catch(() => false);
+
+    return res.sendFile(
+      exists ? filePath : path.join(dirPath, "pacman_default.gif")
+    );
+  } catch (error) {
+    console.error("Error fetching Pacman image:", error);
+    return res
+      .status(500)
+      .json({ status: "error", message: "Internal Server Error" });
+  }
+};
+
+module.exports = getPacmanImage;
+
 const deleteMarkerImage = async (req, res) => {
   try {
     const marker = await Setting.findOneAndDelete({ name: "mapMarker" });
@@ -763,6 +795,7 @@ module.exports = {
   exportExcel,
   changeMarker,
   getMarkerImage,
+  getPacmanImage,
   deleteMarkerImage,
   exportImages,
   exportBadges,
