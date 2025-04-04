@@ -425,7 +425,11 @@ let pacmanData = {
     : 10,
 };
 
+let isPacmanDeployed = false;
+
 function deployPacmanOnMap() {
+  if (isPacmanDeployed) return false;
+  isPacmanDeployed = true;
   let pacmanPositionCoords = document.getElementById("pacmanCoordinates");
 
   if (pacmanPositionCoords) {
@@ -456,7 +460,7 @@ function startMovingPacman() {
     pacmanImage.width = 50;
     pacmanMarker = new google.maps.marker.AdvancedMarkerElement({
       content: pacmanImage,
-      map: map,
+      map,
       position: pacmanPositionCoord,
     });
 
