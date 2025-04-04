@@ -180,14 +180,11 @@ const findAllRanks = async (req, res) => {
     return res
       .status(400)
       .json({ status: "error", message: "Something went Wrong!" });
-  // return res.json({ status: "success", data: rank });
   console.log(rank);
-  return res
-    .status(200)
-    .render("pages/Leaderboard", {
-      rank,
-      isLoggedIn: req.user?.name ? true : false,
-    });
+  return res.status(200).render("pages/Leaderboard", {
+    rank,
+    isLoggedIn: req.user?.name ? true : false,
+  });
 };
 
 module.exports = { loseHandler, winHandler, updateGameSettings, findAllRanks };
