@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sumo's Gaming Records</title>
+    <title>Leaderboard of <%= title %> - UrbanEscape</title>
     <style>
       body {
         font-family: "Arial", sans-serif;
@@ -118,6 +118,7 @@
             <tr>
               <th>Rank</th>
               <th>Username</th>
+              <th>Result</th>
               <th>Time Taken (seconds)</th>
             </tr>
           </thead>
@@ -126,6 +127,7 @@
             <tr>
               <td class="rank-<%= element.rank %>"><%= element.rank %></td>
               <td><%= element.userName%></td>
+              <td><%= element.result.toUpperCase()%></td>
               <td><%= element.timeTaken %></td>
             </tr>
             <% }) %>

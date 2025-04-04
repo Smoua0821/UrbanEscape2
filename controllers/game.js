@@ -25,7 +25,7 @@ const getRank = async (mapId, gameId = null) => {
           _id: 0,
           userId: "$leaderboard.userId",
           userName: "$leaderboard.userName",
-          gameId: "$leaderboard.gameId",
+          result: "$leaderboard.result",
           timeTaken: "$leaderboard.timeTaken",
           rank: { $add: ["$rank", 1] }, // Convert index to rank
         },
@@ -188,6 +188,7 @@ const findAllRanks = async (req, res) => {
   return res.status(200).render("pages/Leaderboard", {
     rank,
     isLoggedIn: req.user?.name ? true : false,
+    title: map.name,
   });
 };
 

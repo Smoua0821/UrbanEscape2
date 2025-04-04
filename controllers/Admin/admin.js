@@ -10,6 +10,7 @@ const fs = require("fs");
 const User = require("../../models/User");
 const LoopRoute = require("../../models/LoopRoute");
 const Map = require("../../models/Map");
+const MapDynamics = require("../../models/MapDynamics");
 const Setting = require("../../models/Settings");
 
 const cleanUp = async (rawId, mapId) => {
@@ -28,6 +29,9 @@ const cleanUp = async (rawId, mapId) => {
       }
       console.log("File deleted successfully");
     });
+
+    await MapDynamics.deleteMany({ mapId: rawId });
+    console.log("Deleted Dynamic Map");
   } catch (err) {
     console.error("Error Cleanup: ", err);
   }
