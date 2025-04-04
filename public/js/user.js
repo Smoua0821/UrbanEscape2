@@ -528,17 +528,24 @@ function startMovingPacman() {
       }
     }
 
-    async function gameOverHandler(type = "win") {
+    gameOverHandler = async (type = "win") => {
       gameoverSafe = false;
       clearInterval(timeInterval);
       clearInterval(movingPing);
       pacmanMarker.position = pos;
-      console.log("Game Over!");
+      if (type == "win") {
+        $(".WinScreen h2")
+          .text("Congratulations!")
+          .removeClass("text-danger")
+          .addClass("text-success");
+
+        $(".WinScreen").attr("style", "background: lightblue;");
+      }
 
       let data = await leaderboardinfo(type);
       $("#userRankAfterGameOver").html(data.rank);
       $(".WinScreen").show();
-    }
+    };
   }
 }
 
@@ -657,7 +664,7 @@ function initMap() {
               $("#CapturedImagePopUp").fadeIn();
               $("#bsModalTitle").text(data.title);
               $("#bsModal").modal("show");
-              if (polygonCoordinates.length > 0) {
+              if (polygonCoordinates.length >= 0) {
                 removeObjectByIndex(polygonCoordinates, polyIndex);
                 if (polygonCoordinates.length == 0) return gameWon();
                 polyIndex = nearestPolygon().index;
@@ -679,7 +686,7 @@ function initMap() {
             xhr.responseJSON?.message || "An unexpected error occurred.";
           const errorCode = xhr.responseJSON?.code;
 
-          if (errorCode === YOUR_SPECIFIC_ERROR_CODE) {
+          if (errorCode === 302) {
             // Redirect only if specific error code is returned
             setTimeout(() => {
               window.location.href = "/auth";
@@ -904,9 +911,12 @@ const hasPacmanAttackedUser = (radius) => {
   return false;
 };
 
+let gameOverHandler;
+
 function gameWon() {
   markerElement.setMap(null);
   circle.setMap(null);
+  gameOverHandler("win");
   return notyf.success("You Won the Game!");
 }
 function animateMarker() {
