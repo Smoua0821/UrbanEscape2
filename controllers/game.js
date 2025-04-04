@@ -168,15 +168,26 @@ const updateGameSettings = async (req, res) => {
 };
 
 const findAllRanks = async (req, res) => {
-  const { mapParsedIdRaw } = req.params;
-  if (!mapParsedIdRaw)
+  const { mapId } = req.params;
+  if (!mapId)
     return res.json({ status: "error", message: "Please Enter a Map ID" });
-  const rank = await getRank(mapParsedIdRaw);
-  if (!rank)
+  const map = await Map.findOne({ id: mapId });
+  if (!map)
+    return res.status(404).json({ status: "error", message: "No Map found!" });
+
+  const rank = await getRank(map._id);
+  if (!rank || rank.length <= 0)
     return res
       .status(400)
       .json({ status: "error", message: "Something went Wrong!" });
-  return res.json({ status: "success", data: rank });
+  // return res.json({ status: "success", data: rank });
+  console.log(rank);
+  return res
+    .status(200)
+    .render("pages/Leaderboard", {
+      rank,
+      isLoggedIn: req.user?.name ? true : false,
+    });
 };
 
 module.exports = { loseHandler, winHandler, updateGameSettings, findAllRanks };

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sumo's Gaming Records</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        margin: 0;
+        padding: 40px;
+        color: #ffffff;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(10px);
+        overflow: hidden;
+      }
+
+      .inner {
+        padding: 30px;
+      }
+
+      .important-buttons {
+        display: inline-flex;
+        justify-content: center;
+        width: 100%;
+      }
+
+      .important-buttons a.mbtn {
+        padding: 10px;
+        width: 51%;
+        margin: 0;
+        cursor: pointer;
+        font-size: 20px;
+        background: #ffffff1c;
+        color: white;
+        outline: 0;
+        border: 0;
+        transition: 0.2s;
+        text-decoration: none;
+        text-align: center;
+      }
+
+      .important-buttons a.mbtn:hover {
+        background: grey;
+      }
+
+      h1 {
+        text-align: center;
+        color: #00d4ff;
+        text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        margin-bottom: 30px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      th,
+      td {
+        padding: 15px;
+        text-align: center;
+      }
+
+      th {
+        background: #00d4ff;
+        color: #1a1a2e;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      tr:nth-child(even) {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      tr:hover {
+        background: rgba(0, 212, 255, 0.1);
+        transition: background 0.3s ease;
+      }
+
+      .rank-1 {
+        color: #ffd700;
+        font-weight: bold;
+      }
+      buttons .rank-2 {
+        color: #c0c0c0;
+      }
+      .rank-3 {
+        color: #cd7f32;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="important-buttons">
+        <a class="mbtn" href="javascript:history.back()">Back</a>
+        <% if(isLoggedIn){ %>
+        <a class="mbtn" href="/user/profile">Profile</a>
+        <% }else{ %>
+        <a class="mbtn" href="/auth">Login</a>
+        <%}%>
+      </div>
+      <div class="inner">
+        <h1>Sumo's Gaming Records</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Username</th>
+              <th>Time Taken (seconds)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% rank.forEach(element => { %>
+            <tr>
+              <td class="rank-<%= element.rank %>"><%= element.rank %></td>
+              <td><%= element.userName%></td>
+              <td><%= element.timeTaken %></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

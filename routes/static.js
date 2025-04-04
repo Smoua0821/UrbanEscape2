@@ -202,4 +202,8 @@ router.get("/test", (req, res) => {
   });
 });
 
+const { findAllRanks } = require("../controllers/game");
+
+router.get("/leaderboard/:mapId", findAllRanks);
+
 module.exports = router;
