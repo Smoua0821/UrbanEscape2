@@ -486,7 +486,6 @@ function startMovingPacman() {
         gameoverSafe = false;
         gameOverHandler("lose");
       }
-      console.log(distance, segments, steps);
     }, 100);
 
     const startTime = Date.now(); // Record the initial start time
