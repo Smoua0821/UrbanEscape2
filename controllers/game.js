@@ -81,7 +81,11 @@ const updateUserHistory = async (req, res, incrementLifes) => {
     );
     const gameId = historyList[historyList.length - 1]._id;
 
-    if (time && timeTaken - time < 10) {
+    // if (time && timeTaken - time < 10) {
+    //   timeTaken = time;
+    // }
+
+    if (time) {
       timeTaken = time;
     }
 
