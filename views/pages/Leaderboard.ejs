@@ -9,7 +9,7 @@
         font-family: "Arial", sans-serif;
         background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
         margin: 0;
-        padding: 40px;
+        padding: 40px 5px;
         color: #ffffff;
       }
 
@@ -25,6 +25,22 @@
 
       .inner {
         padding: 30px;
+      }
+
+      .table-wrapper {
+        overflow-x: scroll;
+      }
+
+      @media screen and (max-width: 520px) {
+        .table-wrapper {
+          font-size: 0.8rem;
+        }
+      }
+
+      @media screen and (max-width: 450px) {
+        .table-wrapper {
+          font-size: 0.6rem;
+        }
       }
 
       .important-buttons {
@@ -99,6 +115,10 @@
       .rank-3 {
         color: #cd7f32;
       }
+
+      ::-webkit-scrollbar {
+        display: none;
+      }
     </style>
   </head>
   <body>
@@ -112,27 +132,29 @@
         <%}%>
       </div>
       <div class="inner">
-        <h1>Sumo's Gaming Records</h1>
-        <table>
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Username</th>
-              <th>Result</th>
-              <th>Time Taken (seconds)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% rank.forEach(element => { %>
-            <tr>
-              <td class="rank-<%= element.rank %>"><%= element.rank %></td>
-              <td><%= element.userName%></td>
-              <td><%= element.result.toUpperCase()%></td>
-              <td><%= element.timeTaken %></td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
+        <h1><%= title.toUpperCase()%> - Leaderboard</h1>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Username</th>
+                <th>Result</th>
+                <th>Time Taken</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% rank.forEach(element => { %>
+              <tr>
+                <td class="rank-<%= element.rank %>"><%= element.rank %></td>
+                <td><%= element.userName%></td>
+                <td><%= element.result.toUpperCase()%></td>
+                <td><%= element.timeTaken %></td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </body>
