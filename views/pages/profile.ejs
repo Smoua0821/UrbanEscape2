@@ -133,15 +133,8 @@
               </tr>
             </table>
             <div class="link-container mt-3 text-center">
-              <% if (locals.primaryMap && primaryMap.map && primaryMap.map.id) {
-              %>
-              <button
-                data-target="<%= primaryMap.map.id %>"
-                class="btn btn-success ms-2 backBTN"
-              >
-                Back to Map
-              </button>
-              <% } %> <% if (user.role.current=="admin") { %>
+              <button class="btn btn-success ms-2 backBTN">Back to Map</button
+              ><% if (user.role.current=="admin") { %>
               <a href="/admin" class="btn btn-success ms-2">Admin</a>
               <% } %>
               <button

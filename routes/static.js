@@ -163,9 +163,10 @@ router.get("/static/image/:id", async (req, res) => {
     if (!data) return res.status(404).end("404 - Not Found!");
     const imgPath = path.join(__dirname, "../public/", data.image);
     fs.access(imgPath, fs.constants.F_OK, (err) => {
+      console.log(err);
       if (err) {
         console.error("Image not found:", imgPath);
-        return res.status(404).send("Image not found");
+        return res.status(404).send("Image not foundat the specified path");
       }
       res.sendFile(imgPath, (err) => {
         if (err) {

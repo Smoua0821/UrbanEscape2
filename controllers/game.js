@@ -8,9 +8,16 @@ const getRank = async (mapId, gameId = null) => {
   }
   try {
     const pipeline = [
-      { $match: { mapId: new ObjectId(mapId) } }, // Match the specific map
-      { $unwind: "$Leaderboard" }, // Expand the leaderboard array
-      { $sort: { "Leaderboard.timeTaken": 1 } }, // Sort by timeTaken (ascending)
+      { $match: { mapId: new ObjectId(mapId) } },
+      { $unwind: "$Leaderboard" },
+    ];
+
+    if (gameId) {
+      pipeline.push({ $match: { "Leaderboard.gameId": gameId } });
+    }
+
+    pipeline.push(
+      { $sort: { "Leaderboard.timeTaken": 1 } },
       {
         $group: {
           _id: "$_id",
@@ -18,7 +25,7 @@ const getRank = async (mapId, gameId = null) => {
         },
       },
       {
-        $unwind: { path: "$leaderboard", includeArrayIndex: "rank" }, // Assign ranks
+        $unwind: { path: "$leaderboard", includeArrayIndex: "rank" },
       },
       {
         $project: {
@@ -27,14 +34,10 @@ const getRank = async (mapId, gameId = null) => {
           userName: "$leaderboard.userName",
           result: "$leaderboard.result",
           timeTaken: "$leaderboard.timeTaken",
-          rank: { $add: ["$rank", 1] }, // Convert index to rank
+          rank: { $add: ["$rank", 1] },
         },
-      },
-    ];
-
-    if (gameId) {
-      pipeline.push({ $match: { gameId } }); // Apply filtering only if gameId is provided
-    }
+      }
+    );
 
     const result = await MapDynamics.aggregate(pipeline);
     return gameId ? (result.length > 0 ? result[0].rank : null) : result;
@@ -104,6 +107,7 @@ const updateUserHistory = async (req, res, incrementLifes) => {
             userName: req.user.name,
             timeTaken: timeTaken,
             gameId: gameId,
+            result: incrementLifes ? "win" : "lose",
           },
         },
       }
@@ -130,7 +134,6 @@ const loseHandler = async (req, res) => {
 };
 
 const updateGameSettings = async (req, res) => {
-  console.log(req.body);
   try {
     let { activate, coords, radius, speed, mapId, distance, angle } = req.body;
     if (!activate || !coords || !radius || !speed || !mapId) {
@@ -184,7 +187,6 @@ const findAllRanks = async (req, res) => {
     return res
       .status(400)
       .json({ status: "error", message: "Something went Wrong!" });
-  console.log(rank);
   return res.status(200).render("pages/Leaderboard", {
     rank,
     isLoggedIn: req.user?.name ? true : false,

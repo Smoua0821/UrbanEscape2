@@ -215,6 +215,9 @@ $(document).ready(() => {
     positionCircle.setMap(map);
     console.log(positionCircle);
   }
+  $(".ldrbrd_btn").click(() => {
+    window.location.href = `/leaderboard/${mapParsedId}`;
+  });
   $(".refresh").click(() => {
     $(".refresh span").addClass("fa-spin");
     window.location.reload();
