@@ -1,9 +1,13 @@
 const jwt = require("jsonwebtoken");
 const publicRoutes = ["/", "/home", "/privacy-policy", "/marker"];
+const globalRoutes = ["/map", "/leaderboard/"];
 
 const authMiddleware = (req, res, next) => {
   try {
-    if (publicRoutes.includes(req.path) || req.path.startsWith("/map/")) {
+    if (
+      publicRoutes.includes(req.path) ||
+      globalRoutes.some((prefix) => req.path.startsWith(prefix))
+    ) {
       const token = req.cookies.sessionId;
       if (token) {
         jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {

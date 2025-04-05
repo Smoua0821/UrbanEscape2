@@ -187,6 +187,11 @@ const findAllRanks = async (req, res) => {
     return res
       .status(400)
       .json({ status: "error", message: "Something went Wrong!" });
+
+  //ENABLING IFRAME ACCESSIBILITY
+  res.removeHeader("X-Frame-Options");
+  res.setHeader("Content-Security-Policy", "frame-ancestors *");
+  res.removeHeader("Cross-Origin-Embedder-Policy");
   return res.status(200).render("pages/Leaderboard", {
     rank,
     isLoggedIn: req.user?.name ? true : false,
