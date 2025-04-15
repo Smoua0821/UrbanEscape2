@@ -317,7 +317,7 @@ $(document).ready(() => {
               $(".hideMissionsPopup").click();
               notyf.success("Badge Saved Successfully!");
             } else {
-              window.location.href = response.redeemLink;
+              window.open(response.redeemLink);
               if (xhr.status === 200) {
                 notyf.success(response.message);
               }

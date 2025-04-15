@@ -13,9 +13,7 @@
         display: none;
       }
       body {
-        background: url(/images/login-bg.avif);
-        background-size: cover;
-        background-position: center;
+        background: linear-gradient(45deg, #a8ffeb, #b1b6ff);
       }
 
       .form-control_v {
@@ -25,13 +23,6 @@
         outline: 0;
         padding: 5px 20px;
         border: 1px solid lightgrey;
-      }
-
-      .form-container form {
-        background: #ffffff52 !important;
-        backdrop-filter: blur(5px);
-        border: 1px solid #d3d3d363;
-        animation: 3s circularShadow infinite;
       }
 
       form.profile table {
@@ -78,22 +69,6 @@
         overflow-y: scroll;
       }
 
-      @keyframes circularShadow {
-        0%,
-        100% {
-          box-shadow: 2px 2px 20px 5px green;
-        }
-        25% {
-          box-shadow: 2px -2px 20px 5px green;
-        }
-        50% {
-          box-shadow: -2px -2px 20px 5px green;
-        }
-        75% {
-          box-shadow: -2px 2px 20px 5px green;
-        }
-      }
-
       tr.unit-badge {
         cursor: pointer;
         border: 2px solid transparent;
@@ -109,7 +84,7 @@
     <div class="body-container">
       <div class="d-flex justify-content-center align-items-center vh-100">
         <div class="form-container col-lg-4 col-md-6 col-12 col-sm-8">
-          <form class="py-2 container profile rounded-2">
+          <form class="py-2 container profile rounded-2 bg-white">
             <h1
               class="m-0 text-center"
               style="

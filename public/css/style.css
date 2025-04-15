@@ -222,7 +222,7 @@ body {
 
 .currentLocationBtn {
   position: fixed;
-  z-index: 99;
+  z-index: 2;
   right: 10px;
   bottom: 60px;
   background: #ffffff;
