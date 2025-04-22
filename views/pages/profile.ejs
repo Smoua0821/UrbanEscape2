@@ -81,6 +81,54 @@
     </style>
   </head>
   <body>
+    <div
+      class="modal fade"
+      id="backToMapModal"
+      tabindex="-1"
+      aria-labelledby="backToMapModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3
+              class="m-0 text-center w-100 text-success"
+              id="exampleModalLabel"
+            >
+              Game On
+            </h3>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="py-5">
+              <p class="lead m-0 text-center">
+                Click <span class="text-success"><b>Start Game</b></span> to
+                play.
+              </p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <div class="text-center">
+              <button class="me-2 btn btn-info backBTN" data-id="restartgame">
+                Restart Game
+              </button>
+              <button class="me-2 btn btn-secondary" data-bs-dismiss="modal">
+                Go Back to Profile
+              </button>
+              <button class="btn btn-warning backBTN" data-id="leaderboard">
+                Leaderboard
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="body-container">
       <div class="d-flex justify-content-center align-items-center vh-100">
         <div class="form-container col-lg-4 col-md-6 col-12 col-sm-8">
@@ -108,7 +156,12 @@
               </tr>
             </table>
             <div class="link-container mt-3 text-center">
-              <button class="btn btn-success ms-2 backBTN">Back to Map</button
+              <button
+                class="btn btn-success ms-2"
+                data-bs-toggle="modal"
+                data-bs-target="#backToMapModal"
+              >
+                Back to Map</button
               ><% if (user.role.current=="admin") { %>
               <a href="/admin" class="btn btn-success ms-2">Admin</a>
               <% } %>
@@ -200,17 +253,18 @@
       </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
       $(document).ready(() => {
         $(".backBTN").click(function () {
+          const curID = $(this).data("id");
+          let actTo = "leaderboard";
+          if (curID == "restartgame") {
+            actTo = "map";
+          }
           let tgt = localStorage.lastMap;
           if (!tgt) tgt = $(this).data("target");
-          window.location.href = `/map/${tgt}`;
+          window.location.href = `/${actTo}/${tgt}`;
         });
         $(".unit-badge").on("click", function () {
           if (confirm("Badge will be deleted forever! Are you sure?")) {
