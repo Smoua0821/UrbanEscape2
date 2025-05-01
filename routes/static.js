@@ -123,7 +123,7 @@ router.get("/map/:mapId", async (req, res) => {
     console.log(`${now} --- ${givenDate}`);
     return givenDate - now;
   }
-  res.render("pages/home", {
+  const dataOutput = {
     apiKey: "AIzaSyBaQ334LSpDNZXU8flkT1VjGpdj7f3_BZI",
     user: user,
     mapParsed: mapId,
@@ -136,7 +136,8 @@ router.get("/map/:mapId", async (req, res) => {
     gameStarted: gameStarted,
     playable: map?.playable,
     pacman: map.pacman,
-  });
+  };
+  res.render("pages/home", dataOutput);
 });
 
 router.get("/logout", async (req, res) => {
