@@ -1468,3 +1468,44 @@ const renderProvince = () => {
       });
   });
 };
+
+function uploadPacmanImage() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/png,image/jpeg,image/gif";
+
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    const validTypes = ["image/png", "image/jpeg", "image/gif"];
+    if (!validTypes.includes(file.type)) {
+      alert("Only PNG, JPG, and GIF images are allowed.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("pacman-image", file);
+
+    try {
+      const response = await fetch(`/admin/map/upload/pacman?mapId=${mapId}`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        notyf.success("Image uploaded successfully");
+        console.log(result);
+      } else {
+        notyf.error("Upload failed");
+        console.error(result);
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
+      notyf.error("An error occurred during upload");
+    }
+  };
+
+  input.click();
+}

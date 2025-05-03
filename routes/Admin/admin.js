@@ -159,4 +159,25 @@ router.post("/settings/update", settingsUpdate);
 
 router.post("/settings/update/pacman", updateGameSettings);
 
+const storageMarkerPacman = multer.diskStorage({
+  destination: function (req, file, cb) {
+    console.log(req.body);
+    cb(null, "./public/images/pacman");
+  },
+  filename: function (req, file, cb) {
+    const newFilename = `${req.query.mapId}.gif`;
+
+    cb(null, newFilename);
+  },
+});
+const uploadMarkerPacman = multer({ storage: storageMarkerPacman });
+router.post(
+  "/map/upload/pacman",
+  uploadMarkerPacman.single("pacman-image"),
+  (req, res) => {
+    console.log(req.query);
+    res.json({ status: "ok", body: req.body });
+  }
+);
+
 module.exports = router;
