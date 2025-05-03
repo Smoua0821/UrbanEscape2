@@ -60,6 +60,10 @@ const mapSchema = new mongoose.Schema(
         },
       },
     },
+    unlimitedLifes: {
+      type: Boolean,
+      default: false,
+    },
     missions: [
       {
         redeemLink: {

@@ -727,28 +727,32 @@ $(document).ready(() => {
     }
   });
   $("form.new_map_form").submit(function () {
-    const mapName = $("form.new_map_form input#name").val();
-    const mapLaunchDate = $("form.new_map_form input#mapLaunchDate").val();
-    const mapLaunchTime = $("form.new_map_form input#mapLaunchTime").val();
+    try {
+      const mapName = $("form.new_map_form input#name").val();
+      const mapLaunchDate = $("form.new_map_form input#mapLaunchDate").val();
+      const mapLaunchTime = $("form.new_map_form input#mapLaunchTime").val();
+      const unlimitedLifesCheck = $(
+        "form.new_map_form input#unlimited-lifes-check"
+      ).is(":checked");
+      if (!mapName) alert("Please Enter a Valid Name");
+      const customData = {};
 
-    if (!mapName) alert("Please Enter a Valid Name");
-    $.post(
-      "/admin/map",
-      {
-        name: mapName,
-        mapLaunchDate: mapLaunchDate,
-        mapLaunchTime: mapLaunchTime,
-        playable: mapPlayableFlag,
-      },
-      (data) => {
+      customData.name = mapName;
+      customData.mapLaunchDate = mapLaunchDate;
+      customData.mapLaunchTime = mapLaunchTime;
+      customData.playable = mapPlayableFlag;
+      customData.unlimitedLifesCheck = unlimitedLifesCheck;
+      $.post("/admin/map", customData, (data) => {
         if (data.status == "success") {
           notyf.success(`Form '${mapName}' created successfully!`);
           fetchMaps();
           $("form.new_map_form input#name").val("");
         }
-      }
-    );
-    return false;
+      });
+      return false;
+    } catch (error) {
+      console.log(error);
+    }
   });
   $("#image-upload").on("change", function (e) {
     const file = e.target.files[0];

@@ -131,7 +131,8 @@ const fetchMaps = async (req, res) => {
   });
 };
 const newMap = async (req, res) => {
-  const { name, mapLaunchTime, mapLaunchDate, playable } = req.body;
+  const { name, mapLaunchTime, mapLaunchDate, playable, unlimitedLifesCheck } =
+    req.body;
 
   if (!name || !mapLaunchTime || !mapLaunchDate) {
     return res
@@ -149,6 +150,7 @@ const newMap = async (req, res) => {
       zoom: 15,
       launchTime: ISODate,
       playable: playable ? true : false,
+      unlimitedLifes: unlimitedLifesCheck ? true : false,
     });
 
     const destinationFile = `public/images/map_countdown/${uniqueId}.jpg`;

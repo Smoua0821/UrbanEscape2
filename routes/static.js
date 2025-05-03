@@ -84,20 +84,34 @@ router.get("/map/:mapId", async (req, res) => {
                 { upsert: true }
               );
             } else {
-              console.log(
-                "User found. Deducting life and setting startTime..."
-              );
-              MapDynamicsData = await MapDynamics.updateOne(
-                {
-                  mapId: map_Id,
-                  "users.userId": userId,
-                  "users.lifes": { $gt: 0 },
-                }, // Prevent negative lives
-                {
-                  $inc: { "users.$.lifes": -1 }, // Deduct 1 life
-                  $push: { "users.$.history": { startTime: new Date() } }, // Set startTime
-                }
-              );
+              if (!map?.unlimitedLifes) {
+                console.log(
+                  "User found. Deducting life and setting startTime..."
+                );
+                MapDynamicsData = await MapDynamics.updateOne(
+                  {
+                    mapId: map_Id,
+                    "users.userId": userId,
+                    "users.lifes": { $gt: 0 },
+                  }, // Prevent negative lives
+                  {
+                    $inc: { "users.$.lifes": -1 }, // Deduct 1 life
+                    $push: { "users.$.history": { startTime: new Date() } }, // Set startTime
+                  }
+                );
+              } else {
+                console.log("Unlimited Lifes game started!");
+                MapDynamicsData = await MapDynamics.updateOne(
+                  {
+                    mapId: map_Id,
+                    "users.userId": userId,
+                    "users.lifes": { $gt: 0 },
+                  }, // Prevent negative lives
+                  {
+                    $push: { "users.$.history": { startTime: new Date() } }, // Set startTime
+                  }
+                );
+              }
             }
 
             let updatedData = await MapDynamics.findOne(
@@ -123,7 +137,7 @@ router.get("/map/:mapId", async (req, res) => {
     console.log(`${now} --- ${givenDate}`);
     return givenDate - now;
   }
-  res.render("pages/home", {
+  const dataOutput = {
     apiKey: "AIzaSyBaQ334LSpDNZXU8flkT1VjGpdj7f3_BZI",
     user: user,
     mapParsed: mapId,
@@ -132,11 +146,13 @@ router.get("/map/:mapId", async (req, res) => {
     missions: map.missions,
     imageExist: imgexist,
     timeFuture: dateInFuture(map.launchTime),
-    lifes: lifes,
+    lifes: map.unlimitedLifes ? 4 : lifes,
     gameStarted: gameStarted,
     playable: map?.playable,
     pacman: map.pacman,
-  });
+  };
+  console.log(dataOutput);
+  res.render("pages/home", dataOutput);
 });
 
 router.get("/logout", async (req, res) => {
