@@ -84,20 +84,34 @@ router.get("/map/:mapId", async (req, res) => {
                 { upsert: true }
               );
             } else {
-              console.log(
-                "User found. Deducting life and setting startTime..."
-              );
-              MapDynamicsData = await MapDynamics.updateOne(
-                {
-                  mapId: map_Id,
-                  "users.userId": userId,
-                  "users.lifes": { $gt: 0 },
-                }, // Prevent negative lives
-                {
-                  $inc: { "users.$.lifes": -1 }, // Deduct 1 life
-                  $push: { "users.$.history": { startTime: new Date() } }, // Set startTime
-                }
-              );
+              if (!map?.unlimitedLifes) {
+                console.log(
+                  "User found. Deducting life and setting startTime..."
+                );
+                MapDynamicsData = await MapDynamics.updateOne(
+                  {
+                    mapId: map_Id,
+                    "users.userId": userId,
+                    "users.lifes": { $gt: 0 },
+                  }, // Prevent negative lives
+                  {
+                    $inc: { "users.$.lifes": -1 }, // Deduct 1 life
+                    $push: { "users.$.history": { startTime: new Date() } }, // Set startTime
+                  }
+                );
+              } else {
+                console.log("Unlimited Life Mode");
+                MapDynamicsData = await MapDynamics.updateOne(
+                  {
+                    mapId: map_Id,
+                    "users.userId": userId,
+                    "users.lifes": { $gt: 0 },
+                  },
+                  {
+                    $push: { "users.$.history": { startTime: new Date() } }, // Set startTime
+                  }
+                );
+              }
             }
 
             let updatedData = await MapDynamics.findOne(
@@ -132,7 +146,7 @@ router.get("/map/:mapId", async (req, res) => {
     missions: map.missions,
     imageExist: imgexist,
     timeFuture: dateInFuture(map.launchTime),
-    lifes: lifes,
+    lifes: map.unlimitedLifes ? 3 : lifes,
     gameStarted: gameStarted,
     playable: map?.playable,
     pacman: map.pacman,
