@@ -64,6 +64,10 @@ const mapSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    gameWinnigUrl: {
+      type: String,
+      default: "",
+    },
     missions: [
       {
         redeemLink: {
