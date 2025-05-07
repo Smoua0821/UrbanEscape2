@@ -64,7 +64,7 @@ const mapSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    gameWinnigUrl: {
+    gameWinningUrl: {
       type: String,
       default: "",
     },

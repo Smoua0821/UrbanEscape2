@@ -13,6 +13,15 @@ const Map = require("../../models/Map");
 const MapDynamics = require("../../models/MapDynamics");
 const Setting = require("../../models/Settings");
 
+function isValidURL(str) {
+  try {
+    new URL(str);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 const cleanUp = async (rawId, mapId) => {
   try {
     const deletionResult = await User.updateMany(
@@ -131,8 +140,20 @@ const fetchMaps = async (req, res) => {
   });
 };
 const newMap = async (req, res) => {
-  const { name, mapLaunchTime, mapLaunchDate, playable, unlimitedLifesCheck } =
-    req.body;
+  const {
+    name,
+    mapLaunchTime,
+    mapLaunchDate,
+    playable,
+    unlimitedLifesCheck,
+    gameWinningUrl,
+  } = req.body;
+
+  if (gameWinningUrl && !isValidURL(gameWinningUrl)) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "Invalid Website URL!" });
+  }
 
   if (!name || !mapLaunchTime || !mapLaunchDate) {
     return res
@@ -151,6 +172,7 @@ const newMap = async (req, res) => {
       launchTime: ISODate,
       playable: playable ? true : false,
       unlimitedLifes: unlimitedLifesCheck ? true : false,
+      gameWinningUrl,
     });
 
     const destinationFile = `public/images/map_countdown/${uniqueId}.jpg`;

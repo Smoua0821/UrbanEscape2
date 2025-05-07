@@ -537,7 +537,7 @@ function startMovingPacman() {
       pacmanMarker.position = pos;
       if (type == "win") {
         $(".WinScreen h2")
-          .text("Congratulations!")
+          .text("You Win!")
           .removeClass("text-danger")
           .addClass("text-success");
 

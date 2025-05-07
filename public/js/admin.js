@@ -731,6 +731,9 @@ $(document).ready(() => {
       const mapName = $("form.new_map_form input#name").val();
       const mapLaunchDate = $("form.new_map_form input#mapLaunchDate").val();
       const mapLaunchTime = $("form.new_map_form input#mapLaunchTime").val();
+      const gameWinningUrl = $(
+        "form.new_map_form input#winning-price-link"
+      ).val();
       const unlimitedLifesCheck = $(
         "form.new_map_form input#unlimited-lifes-check"
       ).is(":checked");
@@ -742,6 +745,7 @@ $(document).ready(() => {
       customData.mapLaunchTime = mapLaunchTime;
       customData.playable = mapPlayableFlag;
       customData.unlimitedLifesCheck = unlimitedLifesCheck;
+      customData.gameWinningUrl = gameWinningUrl;
       $.post("/admin/map", customData, (data) => {
         if (data.status == "success") {
           notyf.success(`Form '${mapName}' created successfully!`);
