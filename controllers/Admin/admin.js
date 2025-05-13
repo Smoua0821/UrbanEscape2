@@ -809,6 +809,29 @@ const updateMapDate = async (req, res) => {
   }
 };
 
+const presetHandler = async (req, res) => {
+  const { mapId } = req.params;
+  const { path } = req.body;
+
+  if (!mapId && !distance && !angle)
+    return res
+      .status(400)
+      .json({ status: "error", message: "Invalid Argument!" });
+
+  await Map.updateOne({ id: mapId }, { $set: { preset: path } });
+
+  return res.json({ status: "success", successm: "Preset Updated!" });
+};
+
+const renderPreset = async (req, res) => {
+  const { mapId } = req.params;
+  const map = await Map.findOne({ id: mapId });
+  return res.render("pages/admin_preset.ejs", {
+    mapName: map.name,
+    apiKey: "AIzaSyBaQ334LSpDNZXU8flkT1VjGpdj7f3_BZI",
+  });
+};
+
 module.exports = {
   adminPage,
   deleteUser,
@@ -831,4 +854,6 @@ module.exports = {
   importBadges,
   settingsImport,
   settingsUpdate,
+  presetHandler,
+  renderPreset,
 };

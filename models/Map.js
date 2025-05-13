@@ -31,6 +31,10 @@ const mapSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    preset: {
+      type: String,
+      default: "[]",
+    },
     pacman: {
       type: {
         speed: {

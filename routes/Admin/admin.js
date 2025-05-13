@@ -24,6 +24,8 @@ const {
   importBadges,
   settingsUpdate,
   updateMapDate,
+  presetHandler,
+  renderPreset,
 } = require("../../controllers/Admin/admin");
 const {
   fetchLoopRoutes,
@@ -34,6 +36,9 @@ const {
   deleteImageAll,
   updateLoopRoutes,
 } = require("../../controllers/loopRoute");
+
+router.get("/preset/:mapId", renderPreset);
+router.post("/preset/:mapId", presetHandler);
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
