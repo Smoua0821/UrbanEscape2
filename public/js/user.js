@@ -1,3 +1,28 @@
+function destinationPoint(lat, lon, distanceMeters, bearingDegrees) {
+  const R = 6371000; // Radius of the Earth in meters
+  const δ = distanceMeters / R; // angular distance in radians
+  const θ = (bearingDegrees * Math.PI) / 180; // bearing converted to radians
+
+  const φ1 = (lat * Math.PI) / 180; // current lat point converted to radians
+  const λ1 = (lon * Math.PI) / 180; // current lon point converted to radians
+
+  const φ2 = Math.asin(
+    Math.sin(φ1) * Math.cos(δ) + Math.cos(φ1) * Math.sin(δ) * Math.cos(θ)
+  );
+
+  const λ2 =
+    λ1 +
+    Math.atan2(
+      Math.sin(θ) * Math.sin(δ) * Math.cos(φ1),
+      Math.cos(δ) - Math.sin(φ1) * Math.sin(φ2)
+    );
+
+  return {
+    lat: (φ2 * 180) / Math.PI,
+    lng: (λ2 * 180) / Math.PI,
+  };
+}
+
 function formatTime(seconds) {
   const days = String(Math.floor(seconds / (3600 * 24))).padStart(2, "0");
   const hours = String(Math.floor((seconds % (3600 * 24)) / 3600)).padStart(
@@ -743,8 +768,27 @@ function markerClickTrack(event) {
 }
 function showAllPolygons() {
   $.get(`/api/looproute/${mapParsedId}`, (data, success) => {
+    const preset = {
+      polygonCoords: [],
+      image: `/images/mapicons/${data.preset[0].image}`,
+      size: data.preset[0].size,
+      radius: data.preset[0].radius,
+      speed: data.preset[0].speed,
+      opacity: data.preset[0].opacity,
+      title: "test",
+      description: "Hi",
+    };
     if (!success) return;
+    JSON.parse(data.preset[0].path).forEach((b) => {
+      preset.polygonCoords.push(
+        destinationPoint(pos.lat, pos.lng, b.distance, b.angle)
+      );
+    });
+    preset.polygonCoords.push(preset.polygonCoords[0]);
+    console.log(preset);
     polygonCoordinates = data?.route;
+    polygonCoordinates.push(preset);
+    console.log(polygonCoordinates);
     polygonCoordinates.forEach((pl) => {
       const img = document.createElement("img");
       img.src = pl.image;
@@ -758,6 +802,7 @@ function showAllPolygons() {
         content: img,
         map: map,
       });
+      console.log(pl.polygonCoords[0]);
     });
     updateCurrentLocation();
   });

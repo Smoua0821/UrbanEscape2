@@ -22,6 +22,17 @@
     <div class="mt-5 text-light">
       <div class="container">
         <div id="g-map"></div>
+        <div class="my-3 images-container" style="display: none">
+          <div class="row justify-content-center">
+            <% images.forEach(img => { %>
+            <div class="col-4 col-md-3 col-lg-2">
+              <div class="img-container" data-src="<%=img%>">
+                <img src="/images/mapicons/<%=img%>" width="100%" />
+              </div>
+            </div>
+            <% }); %>
+          </div>
+        </div>
         <div class="navigation mt-3">
           <button class="btn btn-primary cenpo" style="display: none">
             Set Center Point
@@ -37,106 +48,156 @@
         height: 80vh;
       }
     </style>
-    <script src="https://maps.googleapis.com/maps/api/js?libraries=marker&key=<%= apiKey %>"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=marker&loading=async&callback=initMap&key=<%= apiKey %>"></script>
     <script>
-      const url = window.location.pathname.split("/");
-      const mapId = url[url.length - 1];
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          function getDistanceAndAngle(lat2, lon2) {
-            const lat1 = centerMarker.position.lat;
-            const lon1 = centerMarker.position.lng;
-            const R = 6371000;
-            const toRad = (angle) => (angle * Math.PI) / 180;
-            const toDeg = (rad) => (rad * 180) / Math.PI;
+      function initMap() {
+        const url = window.location.pathname.split("/");
+        const mapId = url[url.length - 1];
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            function getDistanceAndAngle(lat2, lon2) {
+              const lat1 = centerMarker.position.lat;
+              const lon1 = centerMarker.position.lng;
+              const R = 6371000;
+              const toRad = (angle) => (angle * Math.PI) / 180;
+              const toDeg = (rad) => (rad * 180) / Math.PI;
 
-            const φ1 = toRad(lat1);
-            const φ2 = toRad(lat2);
-            const Δφ = toRad(lat2 - lat1);
-            const Δλ = toRad(lon2 - lon1);
+              const φ1 = toRad(lat1);
+              const φ2 = toRad(lat2);
+              const Δφ = toRad(lat2 - lat1);
+              const Δλ = toRad(lon2 - lon1);
 
-            const a =
-              Math.sin(Δφ / 2) ** 2 +
-              Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            const distance = R * c;
+              const a =
+                Math.sin(Δφ / 2) ** 2 +
+                Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
+              const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+              const distance = R * c;
 
-            const y = Math.sin(Δλ) * Math.cos(φ2);
-            const x =
-              Math.cos(φ1) * Math.sin(φ2) -
-              Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
-            const θ = Math.atan2(y, x);
-            const angle = (toDeg(θ) + 360) % 360;
+              const y = Math.sin(Δλ) * Math.cos(φ2);
+              const x =
+                Math.cos(φ1) * Math.sin(φ2) -
+                Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+              const θ = Math.atan2(y, x);
+              const angle = (toDeg(θ) + 360) % 360;
 
-            return { distance, angle };
-          }
-          let centerMarker, coordsMarker, pathUI;
-          const path = [];
-          const tmPath = [];
-          let centerMode = true;
-          const pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-
-          const map = new google.maps.Map(document.getElementById("g-map"), {
-            zoom: 15,
-            center: pos,
-            mapId: "Main_Map",
-          });
-          centerMarker = new google.maps.marker.AdvancedMarkerElement({
-            position: pos,
-          });
-          pathUI = new google.maps.Polyline();
-          google.maps.event.addListener(map, "click", function (event) {
-            if (centerMode) {
-              centerMarker.position = event.latLng;
-              console.log(centerMarker.position);
-              centerMarker.setMap(map);
-              $("button.cenpo").show();
-            } else {
-              const newPos = {
-                lat: event.latLng.lat(),
-                lng: event.latLng.lng(),
-              };
-              tmPath.push(newPos);
-              path.push(getDistanceAndAngle(newPos.lat, newPos.lng));
-              if (path.length == 3) {
-                $(".roupo").show();
-              }
-              pathUI.setPath([...tmPath, tmPath[0]]);
-              pathUI.setMap(map);
+              return { distance, angle };
             }
-          });
+            let centerMarker, coordsMarker, pathUI;
+            const path = [];
+            const uploadOption = {
+              size: 5,
+              radius: 30,
+              speed: 1,
+              opacity: 100,
+            };
+            const tmPath = [];
+            let centerMode = true;
+            const pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
 
-          $(document).ready(function () {
-            $(".navigation button").click(function () {
-              if ($(this).hasClass("cenpo")) {
-                $(this).hide();
-                centerMode = false;
+            const map = new google.maps.Map(document.getElementById("g-map"), {
+              zoom: 15,
+              center: pos,
+              mapId: "Main_Map",
+            });
+            centerMarker = new google.maps.marker.AdvancedMarkerElement({
+              position: pos,
+            });
+
+            const pathImg = document.createElement("img");
+            pathImg.width = 100;
+            let pathMarker = new google.maps.marker.AdvancedMarkerElement({
+              position: pos,
+              content: pathImg,
+            });
+
+            pathUI = new google.maps.Polyline();
+            google.maps.event.addListener(map, "click", function (event) {
+              if (centerMode) {
+                centerMarker.position = event.latLng;
+                console.log(centerMarker.position);
+                centerMarker.setMap(map);
+                $("button.cenpo").show();
+              } else {
+                const newPos = {
+                  lat: event.latLng.lat(),
+                  lng: event.latLng.lng(),
+                };
+                tmPath.push(newPos);
+                path.push(getDistanceAndAngle(newPos.lat, newPos.lng));
+                if (path.length >= 3) {
+                  $(".images-container").fadeIn();
+                  $(".images-container .img-container").on(
+                    "click",
+                    function () {
+                      $(".roupo").hide();
+                      const imgPath = $(this).data("src");
+                      if (!imgPath) return;
+                      uploadOption.image = imgPath;
+                      $(".images-container .img-container").removeClass(
+                        "active"
+                      );
+                      $(this).addClass("active");
+                      $(".roupo").show();
+                      pathMarker.setMap(map);
+                      pathMarker.position = tmPath[0];
+                      pathImg.src = `/images/mapicons/${imgPath}`;
+                      pathMarker.content = pathImg;
+                    }
+                  );
+                }
+                pathUI.setPath([...tmPath, tmPath[0]]);
+                pathUI.setMap(map);
               }
             });
-            $(".roupo").click(function () {
-              $(this).attr("disabled", true);
-              $(this).text("Loading........");
-              $.post(
-                `/admin/preset/${mapId}`,
-                { path: JSON.stringify(path) },
-                (d) => {
-                  if (d.status == "success") {
-                    alert("Preset saved successfully");
-                  }
+
+            $(document).ready(function () {
+              $(".navigation button").click(function () {
+                if ($(this).hasClass("cenpo")) {
+                  $(this).hide();
+                  centerMode = false;
                 }
-              );
-              $(this).text("Save Preset");
-              $(this).attr("disabled", false);
+              });
+              $(".roupo").click(function () {
+                $(this).attr("disabled", true);
+                $(this).text("Loading........");
+                $.post(
+                  `/admin/preset/${mapId}`,
+                  { path: JSON.stringify(path), ...uploadOption },
+                  (d) => {
+                    if (d.status == "success") {
+                      alert("Preset saved successfully");
+                    }
+                    $(this).text("Save Preset");
+                    $(this).attr("disabled", false);
+                  }
+                );
+              });
             });
-          });
-        },
-        () => {
-          alert("Failed to get your location.");
-        }
-      );
+          },
+          () => {
+            alert("Failed to get your location.");
+          }
+        );
+      }
     </script>
+    <style>
+      .images-container .img-container {
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .images-container .img-container:hover {
+        padding: 5px;
+        background: #0000001a;
+      }
+
+      .images-container .img-container.active {
+        background: #8de4ff;
+      }
+    </style>
   </body>
 </html>
