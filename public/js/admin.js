@@ -1054,6 +1054,12 @@ function renderRoutes() {
       console.log(pacmanSettings);
     });
   let isUpdating = false;
+  $(".presetEditor")
+    .off("click")
+    .on("click", function () {
+      if (!mapId) return notyf.error("No map Found!");
+      window.location.href = `/admin/preset/${mapId}`;
+    });
   $(".updatePacmanSettings")
     .off("click")
     .on("click", () => {
