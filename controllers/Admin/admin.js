@@ -148,6 +148,7 @@ const newMap = async (req, res) => {
     unlimitedLifesCheck,
     gameWinningUrl,
   } = req.body;
+  console.log(unlimitedLifesCheck);
 
   if (gameWinningUrl && !isValidURL(gameWinningUrl)) {
     return res
@@ -171,9 +172,11 @@ const newMap = async (req, res) => {
       zoom: 15,
       launchTime: ISODate,
       playable: playable ? true : false,
-      unlimitedLifes: unlimitedLifesCheck ? true : false,
+      unlimitedLifes: unlimitedLifesCheck === "true",
       gameWinningUrl,
     });
+
+    console.log(newMap);
 
     const destinationFile = `public/images/map_countdown/${uniqueId}.jpg`;
     fs.copyFile(
