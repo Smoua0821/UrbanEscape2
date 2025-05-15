@@ -504,6 +504,13 @@ function startMovingPacman() {
     const speedInMetersPerSecond = pacmanData.speed * 0.25;
 
     const movePacman = () => {
+      if (
+        pacmanData.radius >
+        haversineDistance(pos, pacmanMarker.position) * 1000
+      ) {
+        gameOverHandler("lose");
+      }
+
       if (!pos2 && userPathHistory.length) {
         pos2 = userPathHistory.shift();
         progress = 0;
@@ -579,7 +586,6 @@ function startMovingPacman() {
     gameOverHandler = async (type = "win") => {
       gameoverSafe = false;
       clearInterval(timeInterval);
-      clearInterval(movingPing);
       pacmanMarker.position = pos;
       if (type == "win") {
         $(".WinScreen h2")
