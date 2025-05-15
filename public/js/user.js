@@ -827,7 +827,7 @@ function showAllPolygons() {
     presetPath.mapId = mapParsedIdRaw;
     presetPath.image = `/images/mapicons/${presetPath.image}`;
     presetPath.title = "TheAjThakur";
-    presetPath.description = "Vijay SIngh";
+    presetPath.description = "Vijay Singh";
     polygonCoordinates.forEach((pl) => {
       renderRoutes(pl);
     });
