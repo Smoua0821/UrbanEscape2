@@ -52,15 +52,18 @@ const countdownTimec = parseInt(
 
 let lastPos;
 let movingPending = false;
-const locationMarkerUpdate = (newPos) => {
+const locationMarkerUpdate = () => {
   if (movingPending) {
-    return;
+    return setTimeout(locationMarkerUpdate, 2000);
   }
+  const newPos = userPathHistory.shift();
+  if (!newPos) return setTimeout(locationMarkerUpdate, 2000);
   movingPending = true;
   nearestPolygon();
   if (!lastPos) {
     lastPos = newPos;
   }
+  console.log("moved", newPos, lastPos);
 
   const steps = 50;
   let currentStep = 0;
@@ -79,13 +82,13 @@ const locationMarkerUpdate = (newPos) => {
       currentStep = 0;
       clearInterval(interInterval);
       lastPos = newPos;
+      locationMarkerUpdate();
       movingPending = false;
     }
   }, 10);
 
   if (isFirstTime) {
     isFirstTime = false;
-    map.panTo(newPos);
     startGaming();
   }
 };
@@ -833,6 +836,7 @@ function removeObjectByIndex(arr, index) {
 }
 let isFirstTime = 1;
 let pendingPromise = 0;
+const userPathHistory = [];
 
 function getCurrentLocation() {
   marker.position = pos;
@@ -851,7 +855,6 @@ function getCurrentLocation() {
           pos.lat = latitude;
           pos.lng = longitude;
           const newPos = { ...pos };
-          locationMarkerUpdate(newPos);
           $(".currentLocationBtn").removeClass("pending");
           map.setZoom(18);
           map.panTo(pos);
@@ -871,7 +874,6 @@ function getCurrentLocation() {
                 pos.lat = fallbackLat;
                 pos.lng = fallbackLng;
                 const newPos = { ...pos };
-                locationMarkerUpdate(newPos);
                 $("currentLocationBtn").removeClass("pending");
                 map.panTo(pos);
                 resolve({ lat: fallbackLat, lng: fallbackLng });
@@ -897,6 +899,8 @@ function getCurrentLocation() {
   });
 }
 
+let startedLocationTracker = 0;
+
 function updateCurrentLocation() {
   if (!navigator.geolocation) {
     notyf.error("Geolocation is not supported by this browser.");
@@ -904,15 +908,19 @@ function updateCurrentLocation() {
   }
 
   const successCallback = async (position) => {
+    if (!startedLocationTracker) {
+      startedLocationTracker = 1;
+      locationMarkerUpdate();
+    }
     pos.lat = position.coords.latitude;
     pos.lng = position.coords.longitude;
     const newPos = { ...pos };
+    map.panTo(pos);
     console.log(pos);
     const success = await showAllPolygons();
     if (success) {
       $(".simpleLoading").fadeOut();
-
-      locationMarkerUpdate(newPos);
+      userPathHistory.push(newPos);
       deployPacmanOnMap();
     } else {
       console.log("Failed");
@@ -946,7 +954,6 @@ function updateCurrentLocation() {
           pos.lat = data.latitude;
           pos.lng = data.longitude;
           const newPos = { ...pos };
-          locationMarkerUpdate(newPos);
         } else {
           notyf.error("Unable to fetch fallback location.");
         }
