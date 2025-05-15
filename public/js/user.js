@@ -824,15 +824,14 @@ function showAllPolygons() {
     if (!success) return;
     polygonCoordinates = data?.route;
     presetPath = data.preset?.[0];
-    if (!presetPath) return true;
     presetPath.mapId = mapParsedIdRaw;
     presetPath.image = `/images/mapicons/${presetPath.image}`;
     presetPath.title = "TheAjThakur";
     presetPath.description = "Vijay SIngh";
     polygonCoordinates.forEach((pl) => {
       renderRoutes(pl);
-      updateCurrentLocation();
     });
+    updateCurrentLocation();
   });
 }
 function removeObjectByIndex(arr, index) {
