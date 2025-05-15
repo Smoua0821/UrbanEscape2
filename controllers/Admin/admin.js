@@ -829,37 +829,51 @@ const presetHandler = async (req, res) => {
 };
 
 const renderPreset = async (req, res) => {
-  const { mapId } = req.params;
-  const map = await Map.findOne({ id: mapId });
-  const imageDir = path.join(__dirname, "../../public/images/mapicons");
+  try {
+    const { mapId } = req.params;
+    const map = await Map.findOne({ id: mapId });
+    if (!map)
+      return res
+        .status(400)
+        .json({ status: "error", message: "Map Not exist anymore" });
+    const imageDir = path.join(__dirname, "../../public/images/mapicons");
 
-  const imageExtensions = [
-    ".png",
-    ".jpg",
-    ".jpeg",
-    ".gif",
-    ".webp",
-    ".bmp",
-    ".svg",
-  ];
+    const imageExtensions = [
+      ".png",
+      ".jpg",
+      ".jpeg",
+      ".gif",
+      ".webp",
+      ".bmp",
+      ".svg",
+    ];
 
-  fs.readdir(imageDir, (err, files) => {
-    if (err) {
-      console.error("Error reading directory:", err);
-      return res.status(500).send("Error reading image directory.");
-    }
+    fs.readdir(imageDir, (err, files) => {
+      if (err) {
+        console.error("Error reading directory:", err);
+        return res.status(500).send("Error reading image directory.");
+      }
 
-    const images = files.filter((file) =>
-      imageExtensions.includes(path.extname(file).toLowerCase())
-    );
-    console.log(images);
+      const images = files.filter((file) =>
+        imageExtensions.includes(path.extname(file).toLowerCase())
+      );
+      console.log(images);
 
-    return res.render("pages/admin_preset.ejs", {
-      mapName: map.name,
-      apiKey: "AIzaSyBaQ334LSpDNZXU8flkT1VjGpdj7f3_BZI",
-      images,
+      return res.render("pages/admin_preset.ejs", {
+        mapName: map.name,
+        apiKey: "AIzaSyBaQ334LSpDNZXU8flkT1VjGpdj7f3_BZI",
+        images,
+      });
     });
-  });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({
+        status: "error",
+        message: error.message || "Internal Server Error",
+      });
+  }
 };
 
 module.exports = {
