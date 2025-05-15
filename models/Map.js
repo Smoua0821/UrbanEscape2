@@ -33,6 +33,14 @@ const mapSchema = new mongoose.Schema(
     },
     preset: [
       {
+        title: {
+          type: String,
+          deafult: "Preset",
+        },
+        description: {
+          type: String,
+          deafult: "Preset Description",
+        },
         path: {
           type: String,
           default: "[]",

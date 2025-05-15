@@ -814,7 +814,8 @@ const updateMapDate = async (req, res) => {
 
 const presetHandler = async (req, res) => {
   const { mapId } = req.params;
-  const { path, size, radius, speed, opacity, image } = req.body;
+  const { title, description, path, size, radius, speed, opacity, image } =
+    req.body;
   if (!mapId || !path || !size || !radius || !speed || !opacity || !image)
     return res
       .status(400)
@@ -822,7 +823,13 @@ const presetHandler = async (req, res) => {
 
   await Map.updateOne(
     { id: mapId },
-    { $set: { preset: [{ path, size, radius, speed, opacity, image }] } }
+    {
+      $set: {
+        preset: [
+          { title, description, path, size, radius, speed, opacity, image },
+        ],
+      },
+    }
   );
 
   return res.json({ status: "success", successm: "Preset Updated!" });
@@ -867,12 +874,10 @@ const renderPreset = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({
-        status: "error",
-        message: error.message || "Internal Server Error",
-      });
+    return res.status(500).json({
+      status: "error",
+      message: error.message || "Internal Server Error",
+    });
   }
 };
 
