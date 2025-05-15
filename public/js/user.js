@@ -50,20 +50,18 @@ const countdownTimec = parseInt(
   document.getElementById("countdownTimec").value / 1000
 );
 
+const userPathHistory = [];
 let lastPos;
 let movingPending = false;
-const locationMarkerUpdate = () => {
+const locationMarkerUpdate = (newPos) => {
   if (movingPending) {
-    return setTimeout(locationMarkerUpdate, 2000);
+    return;
   }
-  const newPos = userPathHistory.shift();
-  if (!newPos) return setTimeout(locationMarkerUpdate, 2000);
   movingPending = true;
   nearestPolygon();
   if (!lastPos) {
     lastPos = newPos;
   }
-  console.log("moved", newPos, lastPos);
 
   const steps = 50;
   let currentStep = 0;
@@ -82,13 +80,13 @@ const locationMarkerUpdate = () => {
       currentStep = 0;
       clearInterval(interInterval);
       lastPos = newPos;
-      locationMarkerUpdate();
       movingPending = false;
     }
   }, 10);
 
   if (isFirstTime) {
     isFirstTime = false;
+    map.panTo(newPos);
     startGaming();
   }
 };
@@ -158,7 +156,7 @@ function getLastCoords() {
   if (!checkpoints || checkpoints.length == 0) return 0;
 
   const maps = checkpoints.find((d) => d.mapId === mapParsedId);
-  if (!maps || !polygonCoordinates.length) return 0;
+  if (!maps) return 0;
   const polygon = maps.polygons.find(
     (p) => p.polyId === polygonCoordinates[polyIndex]._id
   );
@@ -498,28 +496,46 @@ function startMovingPacman() {
     });
 
     // Moving Pacman Towards User
-    let movingPing;
-    let gameoverSafe = true;
-    movingPing = setInterval(() => {
-      if (!pacmanData.speed) pacmanData.speed = 1;
-      if (!pacmanData.radius) pacmanData.radius = 1;
-      const distance = haversineDistance(pos, pacmanPositionCoord);
-      let segments = (distance * 1000) / pacmanData.speed;
-      if (segments <= 0) segments = 1; // Ensure no Zero can be there
-      segments *= 40; // Correcting Speed to 0.25 meter per second
-      let steps = 1 / segments;
-      if (steps >= 1 && gameoverSafe) {
-        gameOverHandler("lose");
-        gameoverSafe = false;
-        steps = 1;
+    let pos1 = pacmanPositionCoord;
+    let pos2 = null;
+    let progress = 0; // progress from 0 to 1
+    let animationId = null;
+
+    const speedInMetersPerSecond = pacmanData.speed * 0.25;
+
+    const movePacman = () => {
+      if (!pos2 && userPathHistory.length) {
+        pos2 = userPathHistory.shift();
+        progress = 0;
       }
-      pacmanPositionCoord = interpolate(pacmanPositionCoord, pos, steps);
-      pacmanMarker.position = pacmanPositionCoord;
-      if (hasPacmanAttackedUser(pacmanData.radius / 1000) && gameoverSafe) {
-        gameoverSafe = false;
-        gameOverHandler("lose");
-      }
-    }, 100);
+
+      if (!pos2) return;
+
+      const distance = haversineDistance(pos1, pos2); // in km
+      const duration = (distance * 1000) / speedInMetersPerSecond; // in seconds
+
+      const step = (timestamp) => {
+        if (!step.startTime) step.startTime = timestamp;
+        const elapsed = (timestamp - step.startTime) / 1000; // in seconds
+        progress = elapsed / duration;
+
+        if (progress >= 1) {
+          pacmanPositionCoord = pos2;
+          pacmanMarker.position = pos2;
+          pos1 = pos2;
+          pos2 = null;
+          step.startTime = null;
+          movePacman(); // move to next segment
+        } else {
+          pacmanPositionCoord = interpolate(pos1, pos2, progress);
+          pacmanMarker.position = pacmanPositionCoord;
+          animationId = requestAnimationFrame(step);
+        }
+      };
+
+      animationId = requestAnimationFrame(step);
+    };
+    movePacman();
 
     const startTime = Date.now(); // Record the initial start time
     let elapsedTime = 0;
@@ -572,6 +588,16 @@ function startMovingPacman() {
           .addClass("text-success");
 
         $(".WinScreen").attr("style", "background: lightblue;");
+      } else {
+        $(".WinScreen h2")
+          .text("Game Over!")
+          .addClass("text-danger")
+          .removeClass("text-success");
+
+        $(".WinScreen").attr(
+          "style",
+          "background: linear-gradient(45deg, #ffc1c1, #ffdbdb, #ffa8a8);"
+        );
       }
 
       let data = await leaderboardinfo(type);
@@ -755,6 +781,7 @@ function initMap() {
     radius: 1000,
     clickable: false,
   });
+  showAllPolygons();
 }
 function markerClickTrack(event) {
   $(".popup-button").show();
@@ -770,65 +797,37 @@ function markerClickTrack(event) {
       return false;
     });
 }
-async function showAllPolygons() {
-  try {
-    const data = await new Promise((resolve, reject) => {
-      $.get(`/api/looproute/${mapParsedId}`, (data, success) => {
-        if (!success) return reject(false);
-        resolve(data);
-      });
-    });
-    if (!data?.preset?.length) {
-      $(".simpleLoading").fadeOut();
-      return true;
-    }
-    const preset = {
-      _id: data.preset[0]._id,
-      polygonCoords: [],
-      image: `/images/mapicons/${data.preset[0].image}`,
-      size: data.preset[0].size,
-      radius: data.preset[0].radius,
-      speed: data.preset[0].speed,
-      opacity: data.preset[0].opacity,
-      title: "test",
-      description: "Hi",
-    };
-
-    JSON.parse(data.preset[0].path).forEach((b) => {
-      preset.polygonCoords.push(
-        destinationPoint(pos.lat, pos.lng, b.distance, b.angle)
-      );
-    });
-    preset.polygonCoords.push(preset.polygonCoords[0]);
-
-    polygonCoordinates = data?.route;
-    polygonCoordinates.push(preset);
-
-    if (polygonCoordinates.length == 0) return true;
-
-    console.log("Created Image");
-
-    polygonCoordinates.forEach((pl) => {
-      const img = document.createElement("img");
-      img.src = pl.image;
-      img.width = 10 * pl.size;
-      img.id = pl._id;
-      img.className = "mapPolyImage";
-      img.addEventListener("click", markerClickTrack);
-      img.addEventListener("touchstart", markerClickTrack);
-      new google.maps.marker.AdvancedMarkerElement({
-        position: pl.polygonCoords[0],
-        content: img,
-        map: map,
-      });
-    });
-
-    return true;
-  } catch (error) {
-    return false;
-  }
+let presetPath;
+function renderRoutes(pl) {
+  const img = document.createElement("img");
+  img.src = pl.image;
+  img.width = 10 * pl.size;
+  img.id = pl._id;
+  img.className = "mapPolyImage";
+  img.addEventListener("click", markerClickTrack);
+  img.addEventListener("touchstart", markerClickTrack);
+  new google.maps.marker.AdvancedMarkerElement({
+    position: pl.polygonCoords[0],
+    content: img,
+    map: map,
+  });
+  console.log("Rendered");
 }
-
+function showAllPolygons() {
+  $.get(`/api/looproute/${mapParsedId}`, (data, success) => {
+    if (!success) return;
+    polygonCoordinates = data?.route;
+    presetPath = data.preset?.[0];
+    presetPath.mapId = mapParsedIdRaw;
+    presetPath.image = `/images/mapicons/${presetPath.image}`;
+    presetPath.title = "TheAjThakur";
+    presetPath.description = "Vijay SIngh";
+    polygonCoordinates.forEach((pl) => {
+      renderRoutes(pl);
+      updateCurrentLocation();
+    });
+  });
+}
 function removeObjectByIndex(arr, index) {
   if (index > -1 && index < arr.length) {
     arr.splice(index, 1);
@@ -836,7 +835,6 @@ function removeObjectByIndex(arr, index) {
 }
 let isFirstTime = 1;
 let pendingPromise = 0;
-const userPathHistory = [];
 
 function getCurrentLocation() {
   marker.position = pos;
@@ -855,6 +853,7 @@ function getCurrentLocation() {
           pos.lat = latitude;
           pos.lng = longitude;
           const newPos = { ...pos };
+          locationMarkerUpdate(newPos);
           $(".currentLocationBtn").removeClass("pending");
           map.setZoom(18);
           map.panTo(pos);
@@ -874,6 +873,7 @@ function getCurrentLocation() {
                 pos.lat = fallbackLat;
                 pos.lng = fallbackLng;
                 const newPos = { ...pos };
+                locationMarkerUpdate(newPos);
                 $("currentLocationBtn").removeClass("pending");
                 map.panTo(pos);
                 resolve({ lat: fallbackLat, lng: fallbackLng });
@@ -898,33 +898,30 @@ function getCurrentLocation() {
     }
   });
 }
-
-let startedLocationTracker = 0;
-
+let isDeployedPreset = false;
 function updateCurrentLocation() {
   if (!navigator.geolocation) {
     notyf.error("Geolocation is not supported by this browser.");
     return;
   }
 
-  const successCallback = async (position) => {
-    if (!startedLocationTracker) {
-      startedLocationTracker = 1;
-      locationMarkerUpdate();
-    }
+  const successCallback = (position) => {
+    $(".simpleLoading").fadeOut();
     pos.lat = position.coords.latitude;
     pos.lng = position.coords.longitude;
     const newPos = { ...pos };
-    map.panTo(pos);
-    console.log(pos);
-    const success = await showAllPolygons();
-    if (success) {
-      $(".simpleLoading").fadeOut();
-      userPathHistory.push(newPos);
-      deployPacmanOnMap();
-    } else {
-      console.log("Failed");
+    userPathHistory.push(newPos);
+    if (presetPath && !isDeployedPreset) {
+      isDeployedPreset = true;
+      presetPath.polygonCoords = JSON.parse(presetPath.path).map((pp) =>
+        destinationPoint(pos.lat, pos.lng, pp.distance, pp.angle)
+      );
+      delete presetPath.path;
+      polygonCoordinates.push(presetPath);
+      renderRoutes(presetPath);
     }
+    locationMarkerUpdate(newPos);
+    deployPacmanOnMap();
   };
 
   const errorCallback = (error) => {
@@ -954,6 +951,7 @@ function updateCurrentLocation() {
           pos.lat = data.latitude;
           pos.lng = data.longitude;
           const newPos = { ...pos };
+          locationMarkerUpdate(newPos);
         } else {
           notyf.error("Unable to fetch fallback location.");
         }
@@ -972,12 +970,6 @@ function updateCurrentLocation() {
   // Using watchPosition instead of getCurrentPosition
   navigator.geolocation.watchPosition(successCallback, errorCallback, options);
 }
-
-navigator.geolocation.getCurrentPosition((e) => {
-  pos.lat = e.coords.latitude;
-  pos.lng = e.coords.longitude;
-  updateCurrentLocation();
-});
 
 function interpolate(start, end, factor) {
   if (!start || !start.lat || !start.lng || !end || !end.lat || !end.lng) {
