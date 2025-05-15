@@ -46,6 +46,7 @@ async function fetchLoopRoutes(req, res) {
     status: "success",
     mapGameSetting: map.pacman,
     route: filteredImages,
+    preset: map?.preset,
   });
 }
 

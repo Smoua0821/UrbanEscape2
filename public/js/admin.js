@@ -731,6 +731,9 @@ $(document).ready(() => {
       const mapName = $("form.new_map_form input#name").val();
       const mapLaunchDate = $("form.new_map_form input#mapLaunchDate").val();
       const mapLaunchTime = $("form.new_map_form input#mapLaunchTime").val();
+      const gameWinningUrl = $(
+        "form.new_map_form input#winning-price-link"
+      ).val();
       const unlimitedLifesCheck = $(
         "form.new_map_form input#unlimited-lifes-check"
       ).is(":checked");
@@ -742,6 +745,7 @@ $(document).ready(() => {
       customData.mapLaunchTime = mapLaunchTime;
       customData.playable = mapPlayableFlag;
       customData.unlimitedLifesCheck = unlimitedLifesCheck;
+      customData.gameWinningUrl = gameWinningUrl;
       $.post("/admin/map", customData, (data) => {
         if (data.status == "success") {
           notyf.success(`Form '${mapName}' created successfully!`);
@@ -1050,6 +1054,12 @@ function renderRoutes() {
       console.log(pacmanSettings);
     });
   let isUpdating = false;
+  $(".presetEditor")
+    .off("click")
+    .on("click", function () {
+      if (!mapId) return notyf.error("No map Found!");
+      window.location.href = `/admin/preset/${mapId}`;
+    });
   $(".updatePacmanSettings")
     .off("click")
     .on("click", () => {
@@ -1468,3 +1478,44 @@ const renderProvince = () => {
       });
   });
 };
+
+function uploadPacmanImage() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/png,image/jpeg,image/gif";
+
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    const validTypes = ["image/png", "image/jpeg", "image/gif"];
+    if (!validTypes.includes(file.type)) {
+      alert("Only PNG, JPG, and GIF images are allowed.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("pacman-image", file);
+
+    try {
+      const response = await fetch(`/admin/map/upload/pacman?mapId=${mapId}`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        notyf.success("Image uploaded successfully");
+        console.log(result);
+      } else {
+        notyf.error("Upload failed");
+        console.error(result);
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
+      notyf.error("An error occurred during upload");
+    }
+  };
+
+  input.click();
+}

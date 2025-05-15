@@ -13,6 +13,15 @@ const Map = require("../../models/Map");
 const MapDynamics = require("../../models/MapDynamics");
 const Setting = require("../../models/Settings");
 
+function isValidURL(str) {
+  try {
+    new URL(str);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 const cleanUp = async (rawId, mapId) => {
   try {
     const deletionResult = await User.updateMany(
@@ -131,8 +140,20 @@ const fetchMaps = async (req, res) => {
   });
 };
 const newMap = async (req, res) => {
-  const { name, mapLaunchTime, mapLaunchDate, playable, unlimitedLifesCheck } =
-    req.body;
+  const {
+    name,
+    mapLaunchTime,
+    mapLaunchDate,
+    playable,
+    unlimitedLifesCheck,
+    gameWinningUrl,
+  } = req.body;
+
+  if (gameWinningUrl && !isValidURL(gameWinningUrl)) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "Invalid Website URL!" });
+  }
 
   if (!name || !mapLaunchTime || !mapLaunchDate) {
     return res
@@ -151,6 +172,7 @@ const newMap = async (req, res) => {
       launchTime: ISODate,
       playable: playable ? true : false,
       unlimitedLifes: unlimitedLifesCheck ? true : false,
+      gameWinningUrl,
     });
 
     const destinationFile = `public/images/map_countdown/${uniqueId}.jpg`;
@@ -787,6 +809,56 @@ const updateMapDate = async (req, res) => {
   }
 };
 
+const presetHandler = async (req, res) => {
+  const { mapId } = req.params;
+  const { path, size, radius, speed, opacity, image } = req.body;
+  if (!mapId || !path || !size || !radius || !speed || !opacity || !image)
+    return res
+      .status(400)
+      .json({ status: "error", message: "Invalid Argument!" });
+
+  await Map.updateOne(
+    { id: mapId },
+    { $set: { preset: [{ path, size, radius, speed, opacity, image }] } }
+  );
+
+  return res.json({ status: "success", successm: "Preset Updated!" });
+};
+
+const renderPreset = async (req, res) => {
+  const { mapId } = req.params;
+  const map = await Map.findOne({ id: mapId });
+  const imageDir = path.join(__dirname, "../../public/images/mapicons");
+
+  const imageExtensions = [
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".webp",
+    ".bmp",
+    ".svg",
+  ];
+
+  fs.readdir(imageDir, (err, files) => {
+    if (err) {
+      console.error("Error reading directory:", err);
+      return res.status(500).send("Error reading image directory.");
+    }
+
+    const images = files.filter((file) =>
+      imageExtensions.includes(path.extname(file).toLowerCase())
+    );
+    console.log(images);
+
+    return res.render("pages/admin_preset.ejs", {
+      mapName: map.name,
+      apiKey: "AIzaSyBaQ334LSpDNZXU8flkT1VjGpdj7f3_BZI",
+      images,
+    });
+  });
+};
+
 module.exports = {
   adminPage,
   deleteUser,
@@ -809,4 +881,6 @@ module.exports = {
   importBadges,
   settingsImport,
   settingsUpdate,
+  presetHandler,
+  renderPreset,
 };

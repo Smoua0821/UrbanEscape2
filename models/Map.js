@@ -31,6 +31,38 @@ const mapSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    preset: [
+      {
+        path: {
+          type: String,
+          default: "[]",
+        },
+        size: {
+          type: Number,
+          default: 10,
+        },
+        radius: {
+          type: Number,
+          default: 50,
+        },
+        speed: {
+          type: Number,
+          required: true,
+          default: 1,
+        },
+        opacity: {
+          type: Number,
+          required: true,
+          default: 100,
+          min: 0,
+          max: 100,
+        },
+        image: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
     pacman: {
       type: {
         speed: {
@@ -63,6 +95,10 @@ const mapSchema = new mongoose.Schema(
     unlimitedLifes: {
       type: Boolean,
       default: false,
+    },
+    gameWinningUrl: {
+      type: String,
+      default: "",
     },
     missions: [
       {

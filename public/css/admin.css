@@ -499,3 +499,30 @@
     display: none;
   }
 }
+
+.file-folder {
+  position: relative;
+  height: 50px;
+  width: 50px;
+  background: #ffd400;
+  transition: 0.5s;
+  cursor: pointer;
+}
+
+.file-folder:active:before {
+  background: #f80;
+}
+
+.file-folder:before {
+  content: "";
+  position: absolute;
+  transform-origin: bottom;
+  height: 100%;
+  width: 100%;
+  background: #ffb100;
+  transform: skewX(-10deg) rotateX(30deg);
+}
+
+.file-folder:hover:before {
+  transform: skewX(-5deg) rotateX(20deg);
+}

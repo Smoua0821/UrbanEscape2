@@ -1,3 +1,30 @@
+function destinationPoint(lat, lon, distanceMeters, bearingDegrees) {
+  console.log("using", { lat, lon });
+  const R = 6371000; // Radius of the Earth in meters
+  const δ = distanceMeters / R; // angular distance in radians
+  const θ = (bearingDegrees * Math.PI) / 180; // bearing converted to radians
+
+  const φ1 = (lat * Math.PI) / 180; // current lat point converted to radians
+  const λ1 = (lon * Math.PI) / 180; // current lon point converted to radians
+
+  const φ2 = Math.asin(
+    Math.sin(φ1) * Math.cos(δ) + Math.cos(φ1) * Math.sin(δ) * Math.cos(θ)
+  );
+
+  const λ2 =
+    λ1 +
+    Math.atan2(
+      Math.sin(θ) * Math.sin(δ) * Math.cos(φ1),
+      Math.cos(δ) - Math.sin(φ1) * Math.sin(φ2)
+    );
+  const cdata = {
+    lat: (φ2 * 180) / Math.PI,
+    lng: (λ2 * 180) / Math.PI,
+  };
+  console.log(cdata);
+  return cdata;
+}
+
 function formatTime(seconds) {
   const days = String(Math.floor(seconds / (3600 * 24))).padStart(2, "0");
   const hours = String(Math.floor((seconds % (3600 * 24)) / 3600)).padStart(
@@ -25,15 +52,18 @@ const countdownTimec = parseInt(
 
 let lastPos;
 let movingPending = false;
-const locationMarkerUpdate = (newPos) => {
+const locationMarkerUpdate = () => {
   if (movingPending) {
-    return;
+    return setTimeout(locationMarkerUpdate, 2000);
   }
+  const newPos = userPathHistory.shift();
+  if (!newPos) return setTimeout(locationMarkerUpdate, 2000);
   movingPending = true;
   nearestPolygon();
   if (!lastPos) {
     lastPos = newPos;
   }
+  console.log("moved", newPos, lastPos);
 
   const steps = 50;
   let currentStep = 0;
@@ -52,13 +82,13 @@ const locationMarkerUpdate = (newPos) => {
       currentStep = 0;
       clearInterval(interInterval);
       lastPos = newPos;
+      locationMarkerUpdate();
       movingPending = false;
     }
   }, 10);
 
   if (isFirstTime) {
     isFirstTime = false;
-    map.panTo(newPos);
     startGaming();
   }
 };
@@ -128,7 +158,7 @@ function getLastCoords() {
   if (!checkpoints || checkpoints.length == 0) return 0;
 
   const maps = checkpoints.find((d) => d.mapId === mapParsedId);
-  if (!maps) return 0;
+  if (!maps || !polygonCoordinates.length) return 0;
   const polygon = maps.polygons.find(
     (p) => p.polyId === polygonCoordinates[polyIndex]._id
   );
@@ -537,7 +567,7 @@ function startMovingPacman() {
       pacmanMarker.position = pos;
       if (type == "win") {
         $(".WinScreen h2")
-          .text("Congratulations!")
+          .text("You Win!")
           .removeClass("text-danger")
           .addClass("text-success");
 
@@ -725,7 +755,6 @@ function initMap() {
     radius: 1000,
     clickable: false,
   });
-  showAllPolygons();
 }
 function markerClickTrack(event) {
   $(".popup-button").show();
@@ -741,10 +770,44 @@ function markerClickTrack(event) {
       return false;
     });
 }
-function showAllPolygons() {
-  $.get(`/api/looproute/${mapParsedId}`, (data, success) => {
-    if (!success) return;
+async function showAllPolygons() {
+  try {
+    const data = await new Promise((resolve, reject) => {
+      $.get(`/api/looproute/${mapParsedId}`, (data, success) => {
+        if (!success) return reject(false);
+        resolve(data);
+      });
+    });
+    if (!data?.preset?.length) {
+      $(".simpleLoading").fadeOut();
+      return true;
+    }
+    const preset = {
+      _id: data.preset[0]._id,
+      polygonCoords: [],
+      image: `/images/mapicons/${data.preset[0].image}`,
+      size: data.preset[0].size,
+      radius: data.preset[0].radius,
+      speed: data.preset[0].speed,
+      opacity: data.preset[0].opacity,
+      title: "test",
+      description: "Hi",
+    };
+
+    JSON.parse(data.preset[0].path).forEach((b) => {
+      preset.polygonCoords.push(
+        destinationPoint(pos.lat, pos.lng, b.distance, b.angle)
+      );
+    });
+    preset.polygonCoords.push(preset.polygonCoords[0]);
+
     polygonCoordinates = data?.route;
+    polygonCoordinates.push(preset);
+
+    if (polygonCoordinates.length == 0) return true;
+
+    console.log("Created Image");
+
     polygonCoordinates.forEach((pl) => {
       const img = document.createElement("img");
       img.src = pl.image;
@@ -759,9 +822,13 @@ function showAllPolygons() {
         map: map,
       });
     });
-    updateCurrentLocation();
-  });
+
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
+
 function removeObjectByIndex(arr, index) {
   if (index > -1 && index < arr.length) {
     arr.splice(index, 1);
@@ -769,6 +836,7 @@ function removeObjectByIndex(arr, index) {
 }
 let isFirstTime = 1;
 let pendingPromise = 0;
+const userPathHistory = [];
 
 function getCurrentLocation() {
   marker.position = pos;
@@ -787,7 +855,6 @@ function getCurrentLocation() {
           pos.lat = latitude;
           pos.lng = longitude;
           const newPos = { ...pos };
-          locationMarkerUpdate(newPos);
           $(".currentLocationBtn").removeClass("pending");
           map.setZoom(18);
           map.panTo(pos);
@@ -807,7 +874,6 @@ function getCurrentLocation() {
                 pos.lat = fallbackLat;
                 pos.lng = fallbackLng;
                 const newPos = { ...pos };
-                locationMarkerUpdate(newPos);
                 $("currentLocationBtn").removeClass("pending");
                 map.panTo(pos);
                 resolve({ lat: fallbackLat, lng: fallbackLng });
@@ -833,19 +899,32 @@ function getCurrentLocation() {
   });
 }
 
+let startedLocationTracker = 0;
+
 function updateCurrentLocation() {
   if (!navigator.geolocation) {
     notyf.error("Geolocation is not supported by this browser.");
     return;
   }
 
-  const successCallback = (position) => {
-    $(".simpleLoading").fadeOut();
+  const successCallback = async (position) => {
+    if (!startedLocationTracker) {
+      startedLocationTracker = 1;
+      locationMarkerUpdate();
+    }
     pos.lat = position.coords.latitude;
     pos.lng = position.coords.longitude;
     const newPos = { ...pos };
-    locationMarkerUpdate(newPos);
-    deployPacmanOnMap();
+    map.panTo(pos);
+    console.log(pos);
+    const success = await showAllPolygons();
+    if (success) {
+      $(".simpleLoading").fadeOut();
+      userPathHistory.push(newPos);
+      deployPacmanOnMap();
+    } else {
+      console.log("Failed");
+    }
   };
 
   const errorCallback = (error) => {
@@ -875,7 +954,6 @@ function updateCurrentLocation() {
           pos.lat = data.latitude;
           pos.lng = data.longitude;
           const newPos = { ...pos };
-          locationMarkerUpdate(newPos);
         } else {
           notyf.error("Unable to fetch fallback location.");
         }
@@ -894,6 +972,12 @@ function updateCurrentLocation() {
   // Using watchPosition instead of getCurrentPosition
   navigator.geolocation.watchPosition(successCallback, errorCallback, options);
 }
+
+navigator.geolocation.getCurrentPosition((e) => {
+  pos.lat = e.coords.latitude;
+  pos.lng = e.coords.longitude;
+  updateCurrentLocation();
+});
 
 function interpolate(start, end, factor) {
   if (!start || !start.lat || !start.lng || !end || !end.lat || !end.lng) {

@@ -150,6 +150,7 @@ router.get("/map/:mapId", async (req, res) => {
     gameStarted: gameStarted,
     playable: map?.playable,
     pacman: map.pacman,
+    gameWinningUrl: map.gameWinningUrl || null,
   };
   console.log(dataOutput);
   res.render("pages/home", dataOutput);
