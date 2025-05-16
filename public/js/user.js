@@ -821,9 +821,11 @@ function renderRoutes(pl) {
 }
 function showAllPolygons() {
   $.get(`/api/looproute/${mapParsedId}`, (data, success) => {
-    if (!success) return;
+    if (!success) return updateCurrentLocation();
+
     polygonCoordinates = data?.route;
     presetPath = data.preset?.[0];
+    if (!presetPath) return updateCurrentLocation();
     presetPath.mapId = mapParsedIdRaw;
     presetPath.image = `/images/mapicons/${presetPath.image}`;
     polygonCoordinates.forEach((pl) => {
@@ -977,7 +979,7 @@ function updateCurrentLocation() {
 
 function interpolate(start, end, factor) {
   if (!start || !start.lat || !start.lng || !end || !end.lat || !end.lng) {
-    return polygonCoordinates[polyIndex].polygonCoords[0];
+    return polygonCoordinates[polyIndex]?.polygonCoords[0];
   }
 
   return {

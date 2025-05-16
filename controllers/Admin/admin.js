@@ -171,7 +171,7 @@ const newMap = async (req, res) => {
       id: uniqueId,
       zoom: 15,
       launchTime: ISODate,
-      playable: playable ? true : false,
+      playable: playable === "true",
       unlimitedLifes: unlimitedLifesCheck === "true",
       gameWinningUrl,
     });
