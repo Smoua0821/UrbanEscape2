@@ -109,6 +109,9 @@
           <button class="btn btn-info roupo" style="display: none">
             Save Preset
           </button>
+          <button class="btn closePathBtn btn-primary" style="display: none">
+            Close Path
+          </button>
         </div>
       </div>
     </div>
@@ -122,6 +125,7 @@
       function initMap() {
         const url = window.location.pathname.split("/");
         const mapId = url[url.length - 1];
+        let unClick = false;
         navigator.geolocation.getCurrentPosition(
           (position) => {
             function getDistanceAndAngle(lat2, lon2) {
@@ -184,6 +188,7 @@
 
             pathUI = new google.maps.Polyline();
             google.maps.event.addListener(map, "click", function (event) {
+              if (unClick) return;
               if (centerMode) {
                 centerMarker.position = event.latLng;
                 console.log(centerMarker.position);
@@ -197,27 +202,9 @@
                 tmPath.push(newPos);
                 path.push(getDistanceAndAngle(newPos.lat, newPos.lng));
                 if (path.length >= 3) {
-                  $(".images-container").fadeIn();
-                  $(".images-container .img-container").on(
-                    "click",
-                    function () {
-                      $(".roupo").hide();
-                      const imgPath = $(this).data("src");
-                      if (!imgPath) return;
-                      uploadOption.image = imgPath;
-                      $(".images-container .img-container").removeClass(
-                        "active"
-                      );
-                      $(this).addClass("active");
-                      $(".roupo").show();
-                      pathMarker.setMap(map);
-                      pathMarker.position = tmPath[0];
-                      pathImg.src = `/images/mapicons/${imgPath}`;
-                      pathMarker.content = pathImg;
-                    }
-                  );
+                  $(".closePathBtn").fadeIn();
                 }
-                pathUI.setPath([...tmPath, tmPath[0]]);
+                pathUI.setPath([...tmPath]);
                 pathUI.setMap(map);
               }
             });
@@ -228,6 +215,26 @@
                   $(this).hide();
                   centerMode = false;
                 }
+              });
+              $(".closePathBtn").click(() => {
+                unClick = true;
+                pathUI.setPath([...tmPath, tmPath[0]]);
+                path.push(path[0]);
+                $(".closePathBtn").hide();
+                $(".images-container").fadeIn();
+                $(".images-container .img-container").on("click", function () {
+                  $(".roupo").hide();
+                  const imgPath = $(this).data("src");
+                  if (!imgPath) return;
+                  uploadOption.image = imgPath;
+                  $(".images-container .img-container").removeClass("active");
+                  $(this).addClass("active");
+                  $(".roupo").show();
+                  pathMarker.setMap(map);
+                  pathMarker.position = tmPath[0];
+                  pathImg.src = `/images/mapicons/${imgPath}`;
+                  pathMarker.content = pathImg;
+                });
               });
               $(".roupo").click(function () {
                 uploadOption.title = $("#routeTitle").val();
