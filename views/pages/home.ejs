@@ -52,7 +52,7 @@
       </div>
     </div>
     <% }else{ %>
-    <input id="playable" value="<%=playable%>" />
+    <input type="hidden" id="playable" value="<%=playable%>" />
     <input type="hidden" value="<%=timeFuture%>" id="countdownTimec" />
     <% if(pacman && pacman.coords){ %>
     <input
@@ -194,7 +194,8 @@
             <a
               href="<%= gameWinningUrl %>"
               target="_blank"
-              class="my-3 w-100 d-block btn btn-dark"
+              class="my-3 w-100 d-block btn btn-dark priceLinkBTN"
+              style="display: none"
               >Claim Your prize</a
             >
             <%}%>

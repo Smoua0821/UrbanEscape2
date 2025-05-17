@@ -588,6 +588,7 @@ function startMovingPacman() {
       clearInterval(timeInterval);
       pacmanMarker.position = pos;
       if (type == "win") {
+        $(".priceLinkBTN").fadeIn();
         $(".WinScreen h2")
           .text("You Win!")
           .removeClass("text-danger")
@@ -595,6 +596,7 @@ function startMovingPacman() {
 
         $(".WinScreen").attr("style", "background: lightblue;");
       } else {
+        $(".priceLinkBTN").hide();
         $(".WinScreen h2")
           .text("Game Over!")
           .addClass("text-danger")
@@ -825,9 +827,10 @@ function showAllPolygons() {
 
     polygonCoordinates = data?.route;
     presetPath = data.preset?.[0];
-    if (!presetPath) return updateCurrentLocation();
-    presetPath.mapId = mapParsedIdRaw;
-    presetPath.image = `/images/mapicons/${presetPath.image}`;
+    if (presetPath) {
+      presetPath.mapId = mapParsedIdRaw;
+      presetPath.image = `/images/mapicons/${presetPath.image}`;
+    }
     polygonCoordinates.forEach((pl) => {
       renderRoutes(pl);
     });

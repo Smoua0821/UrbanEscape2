@@ -146,7 +146,7 @@ router.get("/map/:mapId", async (req, res) => {
     missions: map.missions,
     imageExist: imgexist,
     timeFuture: dateInFuture(map.launchTime),
-    lifes: map.unlimitedLifes ? 4 : lifes,
+    lifes: map.unlimitedLifes ? 99 : lifes,
     gameStarted: gameStarted,
     playable: map?.playable,
     pacman: map.pacman,
