@@ -18,7 +18,19 @@ const loopRouteSchema = new mongoose.Schema(
           lng: { type: Number, required: true },
         },
       ],
-      required: true,
+    },
+    path: {
+      type: [
+        {
+          distance: { type: Number, required: true },
+          angle: { type: Number, required: true },
+        },
+      ],
+    },
+    loopType: {
+      type: String,
+      enum: ["custom", "preset"],
+      default: "custom",
     },
     image: {
       type: String,
