@@ -93,6 +93,7 @@ const locationMarkerUpdate = (newPos) => {
 
 let initialTime = countdownTimec;
 let startTime = new Date();
+let isGameOver = false;
 
 const ctwlIvl = setInterval(() => {
   let currentTime = new Date();
@@ -504,6 +505,7 @@ function startMovingPacman() {
     const speedInMetersPerSecond = pacmanData.speed * 0.25;
 
     const movePacman = () => {
+      if (isGameOver) return;
       if (
         pacmanData.radius >
         haversineDistance(pos, pacmanMarker.position) * 1000
@@ -525,6 +527,13 @@ function startMovingPacman() {
         if (!step.startTime) step.startTime = timestamp;
         const elapsed = (timestamp - step.startTime) / 1000; // in seconds
         progress = elapsed / duration;
+        const distBWPacLoc =
+          haversineDistance(pacmanMarker.position, pos) * 1000;
+        console.log(distBWPacLoc);
+        if (isNaN(progress) || distBWPacLoc < pacmanData.radius) {
+          gameOverHandler("lose");
+          return false;
+        }
 
         if (progress >= 1) {
           pacmanPositionCoord = pos2;
@@ -584,7 +593,8 @@ function startMovingPacman() {
     }
 
     gameOverHandler = async (type = "win") => {
-      gameoverSafe = false;
+      if (isGameOver) return;
+      isGameOver = true;
       clearInterval(timeInterval);
       pacmanMarker.position = pos;
       if (type == "win") {
@@ -1003,7 +1013,13 @@ let gameOverHandler;
 function gameWon() {
   markerElement.setMap(null);
   circle.setMap(null);
-  gameOverHandler("win");
+  $(".priceLinkBTN").fadeIn();
+  $(".WinScreen h2")
+    .text("You Win!")
+    .removeClass("text-danger")
+    .addClass("text-success");
+
+  $(".WinScreen").attr("style", "background: lightblue;");
   return notyf.success("You Won the Game!");
 }
 function animateMarker() {
