@@ -1,5 +1,4 @@
 function destinationPoint(lat, lon, distanceMeters, bearingDegrees) {
-  console.log("using", { lat, lon });
   const R = 6371000; // Radius of the Earth in meters
   const δ = distanceMeters / R; // angular distance in radians
   const θ = (bearingDegrees * Math.PI) / 180; // bearing converted to radians
@@ -21,7 +20,6 @@ function destinationPoint(lat, lon, distanceMeters, bearingDegrees) {
     lat: (φ2 * 180) / Math.PI,
     lng: (λ2 * 180) / Math.PI,
   };
-  console.log(cdata);
   return cdata;
 }
 
@@ -129,8 +127,6 @@ if (localStorage.checkpoints && localStorage.checkpoints !== "[]") {
   localStorage.checkpoints = "[]";
 }
 let checkpoints = JSON.parse(localStorage.getItem("checkpoints")) || [];
-
-console.log(checkpoints);
 
 function addCoords(mapId, polyId, segment) {
   let map = checkpoints.find((m) => m.mapId === mapId);
@@ -242,7 +238,6 @@ $(document).ready(() => {
   });
   if (positionRadius) {
     positionCircle.setMap(map);
-    console.log(positionCircle);
   }
   $(".ldrbrd_btn").click(() => {
     window.location.href = `/leaderboard/${mapParsedId}`;
@@ -483,6 +478,26 @@ function deployPacmanOnMap() {
   document.getElementById("pacmanCoordinates")?.remove();
   startMovingPacman();
 }
+let elapsedTime = 0;
+let timeInterval;
+async function leaderboardinfo(type = "lose") {
+  let url = "/game/lose";
+  if (type == "win") {
+    url = "/game/win";
+  }
+
+  try {
+    const response = await $.post(url, {
+      mapParsedIdRaw,
+      time: elapsedTime,
+      type,
+    });
+    return response; // Properly return response
+  } catch (error) {
+    console.error("Request failed:", error);
+    return { status: "error", message: "Something went wrong!" };
+  }
+}
 
 function startMovingPacman() {
   let pacmanMarker;
@@ -524,12 +539,13 @@ function startMovingPacman() {
       const duration = (distance * 1000) / speedInMetersPerSecond; // in seconds
 
       const step = (timestamp) => {
+        if (isGameOver) return false;
+
         if (!step.startTime) step.startTime = timestamp;
         const elapsed = (timestamp - step.startTime) / 1000; // in seconds
         progress = elapsed / duration;
         const distBWPacLoc =
           haversineDistance(pacmanMarker.position, pos) * 1000;
-        console.log(distBWPacLoc);
         if (isNaN(progress) || distBWPacLoc < pacmanData.radius) {
           gameOverHandler("lose");
           return false;
@@ -554,8 +570,7 @@ function startMovingPacman() {
     movePacman();
 
     const startTime = Date.now(); // Record the initial start time
-    let elapsedTime = 0;
-    const timeInterval = setInterval(() => {
+    timeInterval = setInterval(() => {
       const currentTime = Date.now();
       elapsedTime = Math.floor((currentTime - startTime) / 1000);
 
@@ -573,38 +588,28 @@ function startMovingPacman() {
       );
     }, 1000);
 
-    async function leaderboardinfo(type = "lose") {
-      let url = "/game/lose";
-      if (type == "win") {
-        url = "/game/win";
-      }
-
-      try {
-        const response = await $.post(url, {
-          mapParsedIdRaw,
-          time: elapsedTime,
-          type,
-        });
-        return response; // Properly return response
-      } catch (error) {
-        console.error("Request failed:", error);
-        return { status: "error", message: "Something went wrong!" };
-      }
-    }
-
     gameOverHandler = async (type = "win") => {
       if (isGameOver) return;
       isGameOver = true;
       clearInterval(timeInterval);
       pacmanMarker.position = pos;
       if (type == "win") {
+        markerElement.setMap(null);
+        circle.setMap(null);
+        isGameOver = true;
         $(".priceLinkBTN").fadeIn();
         $(".WinScreen h2")
           .text("You Win!")
           .removeClass("text-danger")
           .addClass("text-success");
 
+        $(".WinScreen").show();
         $(".WinScreen").attr("style", "background: lightblue;");
+
+        let data = await leaderboardinfo("win");
+        $("#userRankAfterGameOver").html(data.rank);
+
+        return notyf.success("You Won the Game!");
       } else {
         $(".priceLinkBTN").hide();
         $(".WinScreen h2")
@@ -651,7 +656,6 @@ function initMap() {
 
   $.get("/user/profile/capture", { mapId: mapParsedId }, (data) => {
     if (!data.imgexist || !data.imgexist.length > 0) {
-      console.log("No Picture is saved in Profile");
     } else {
       const targetPolygon = data.imgexist.find((dt) => dt.mapId == mapParsedId);
       if (!targetPolygon) return console.log("Not Played Yet!");
@@ -717,7 +721,6 @@ function initMap() {
           "/user/profile/capture",
           { mapId: mapParsedId, polyId: polyId },
           (data, status, xhr) => {
-            console.log(status);
             if (
               status === "success" &&
               data.message === "Image Captured successfully!"
@@ -742,7 +745,8 @@ function initMap() {
               $("#bsModal").modal("show");
               if (polygonCoordinates.length >= 0) {
                 removeObjectByIndex(polygonCoordinates, polyIndex);
-                if (polygonCoordinates.length == 0) return gameWon();
+                if (polygonCoordinates.length == 0)
+                  return gameOverHandler("win");
                 polyIndex = nearestPolygon().index;
                 map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
               }
@@ -806,7 +810,6 @@ function markerClickTrack(event) {
   $(".popup-button")
     .off("click")
     .on("click", function () {
-      console.log("Clicked");
       const tarId = event.target.id;
       if (!tarId) return notyf.error("No Information");
       InfoModal(tarId);
@@ -829,7 +832,6 @@ function renderRoutes(pl) {
     content: img,
     map: map,
   });
-  console.log("Rendered");
 }
 function showAllPolygons() {
   $.get(`/api/looproute/${mapParsedId}`, (data, success) => {
@@ -1010,23 +1012,11 @@ const hasPacmanAttackedUser = (radius) => {
 
 let gameOverHandler;
 
-function gameWon() {
-  markerElement.setMap(null);
-  circle.setMap(null);
-  $(".priceLinkBTN").fadeIn();
-  $(".WinScreen h2")
-    .text("You Win!")
-    .removeClass("text-danger")
-    .addClass("text-success");
-
-  $(".WinScreen").attr("style", "background: lightblue;");
-  return notyf.success("You Won the Game!");
-}
 function animateMarker() {
   if (!polygonCoordinates[polyIndex]) return;
   $(`img.mapPolyImage#${polygonCoordinates[polyIndex]._id}`).hide();
   const urlParsed = new URL(iconMarker.src);
-  if (polygonCoordinates.length == 0) return gameWon();
+  if (polygonCoordinates.length == 0) return gameOverHandler("win");
   if (urlParsed.pathname != polygonCoordinates[polyIndex].image) {
     iconMarker.src = polygonCoordinates[polyIndex].image;
   }
