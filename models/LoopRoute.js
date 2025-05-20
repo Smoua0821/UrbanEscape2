@@ -27,7 +27,7 @@ const loopRouteSchema = new mongoose.Schema(
         },
       ],
     },
-    loopType: {
+    mode: {
       type: String,
       enum: ["custom", "preset"],
       default: "custom",
