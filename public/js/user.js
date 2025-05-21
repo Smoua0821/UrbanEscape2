@@ -928,12 +928,13 @@ function convertPresetToCoords(preset) {
     let presetUnit = { ...p };
     const tmpPath = presetUnit.path;
     presetUnit.polygonCoords = [];
-    const tmp_path = tmpPath.map((m) => {
+    let tmp_path = tmpPath.map((m) => {
       return {
         ...destinationPoint(pos.lat, pos.lng, m.distance, m.angle),
         _id: m._id,
       };
     });
+    tmp_path = [...tmp_path, tmp_path[0]];
     presetUnit.polygonCoords.push(...tmp_path);
     polygonCoordinates.push(presetUnit);
     renderRoutes(presetUnit);
