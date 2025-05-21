@@ -149,7 +149,12 @@ function getLastCoords() {
   if (!localStorage.checkpoints) return 0;
   if (localStorage.checkpoints == "[object Object]")
     localStorage.checkpoints = "[]";
-  const checkpoints = JSON.parse(localStorage.checkpoints);
+  let checkpoints;
+  try {
+    checkpoints = JSON.parse(localStorage.checkpoints);
+  } catch (error) {
+    checkpoints = [];
+  }
   if (!checkpoints || checkpoints.length == 0) return 0;
 
   const maps = checkpoints.find((d) => d.mapId === mapParsedId);
@@ -818,8 +823,8 @@ function markerClickTrack(event) {
       return false;
     });
 }
-let presetPath;
 function renderRoutes(pl) {
+  if ($(`img#${pl._id}`).length == 1) return;
   const img = document.createElement("img");
   img.src = pl.image;
   img.width = 10 * pl.size;
@@ -833,16 +838,14 @@ function renderRoutes(pl) {
     map: map,
   });
 }
+let allCoords;
 function showAllPolygons() {
   $.get(`/api/looproute/${mapParsedId}`, (data, success) => {
     if (!success) return updateCurrentLocation();
+    console.log(data);
 
-    polygonCoordinates = data?.route;
-    presetPath = data.preset?.[0];
-    if (presetPath) {
-      presetPath.mapId = mapParsedIdRaw;
-      presetPath.image = `/images/mapicons/${presetPath.image}`;
-    }
+    allCoords = data?.route;
+    polygonCoordinates = allCoords.filter((d) => d.mode == "custom");
     polygonCoordinates.forEach((pl) => {
       renderRoutes(pl);
     });
@@ -920,6 +923,26 @@ function getCurrentLocation() {
   });
 }
 let isDeployedPreset = false;
+function convertPresetToCoords(preset) {
+  preset.forEach((p) => {
+    let presetUnit = { ...p };
+    const tmpPath = presetUnit.path;
+    presetUnit.polygonCoords = [];
+    let tmp_path = tmpPath.map((m) => {
+      return {
+        ...destinationPoint(pos.lat, pos.lng, m.distance, m.angle),
+        _id: m._id,
+      };
+    });
+    tmp_path = [...tmp_path, tmp_path[0]];
+    presetUnit.polygonCoords.push(...tmp_path);
+    polygonCoordinates.push(presetUnit);
+    renderRoutes(presetUnit);
+  });
+}
+
+let isRenderedPreset = false;
+
 function updateCurrentLocation() {
   if (!navigator.geolocation) {
     notyf.error("Geolocation is not supported by this browser.");
@@ -930,17 +953,14 @@ function updateCurrentLocation() {
     $(".simpleLoading").fadeOut();
     pos.lat = position.coords.latitude;
     pos.lng = position.coords.longitude;
+    if (!isRenderedPreset) {
+      isRenderedPreset = true;
+      const presetCoords = allCoords.filter((d) => d.mode == "preset");
+      convertPresetToCoords(presetCoords);
+    }
     const newPos = { ...pos };
     userPathHistory.push(newPos);
-    if (presetPath && !isDeployedPreset) {
-      isDeployedPreset = true;
-      presetPath.polygonCoords = JSON.parse(presetPath.path).map((pp) =>
-        destinationPoint(pos.lat, pos.lng, pp.distance, pp.angle)
-      );
-      delete presetPath.path;
-      polygonCoordinates.push(presetPath);
-      renderRoutes(presetPath);
-    }
+
     locationMarkerUpdate(newPos);
     deployPacmanOnMap();
   };

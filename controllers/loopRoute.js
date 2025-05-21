@@ -61,6 +61,8 @@ async function saveLoopRoutes(req, res) {
     size,
     mapId,
     opacity,
+    mode = "custom",
+    presetCoords,
   } = req.body;
   if (!mapId)
     return res
@@ -81,6 +83,8 @@ async function saveLoopRoutes(req, res) {
     size,
     opacity,
     mapId: map._id,
+    mode,
+    path: mode === "custom" ? [] : presetCoords,
   });
 
   try {

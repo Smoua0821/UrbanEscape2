@@ -3,6 +3,7 @@ let isClosedPath = 0;
 let maps = [];
 let map, marker, polygon, circle, iconMarker, radius;
 let polyCoords = [];
+let presetCoords = [];
 let speed = 1;
 let tmpImg;
 const beachFlagImg = document.createElement("img");
@@ -139,6 +140,7 @@ $(".save_final").click(() => {
     payloadData.description
   ) {
     payloadData.polygonCoords = polyCoords;
+    payloadData.presetCoords = presetCoords;
     payloadData.radius = radius;
     $.post(loopRouteOptions.url, payloadData, (success, data) => {
       if (success) {
@@ -1039,7 +1041,36 @@ function renderMapMissions() {
 }
 
 function renderRoutes() {
-  $(".game-mode-controller").hide();
+  let mode = "custom";
+  let presetMode = false;
+  let presetCenterMarker = new google.maps.marker.AdvancedMarkerElement({});
+  let centerFixed = false;
+  let centerRelativePos = {};
+  function getDistanceAndAngle(lat2, lon2) {
+    const { lat: lat1, lng: lon1 } = centerRelativePos;
+    const R = 6371000;
+    const toRad = (angle) => (angle * Math.PI) / 180;
+    const toDeg = (rad) => (rad * 180) / Math.PI;
+
+    const φ1 = toRad(lat1);
+    const φ2 = toRad(lat2);
+    const Δφ = toRad(lat2 - lat1);
+    const Δλ = toRad(lon2 - lon1);
+
+    const a =
+      Math.sin(Δφ / 2) ** 2 +
+      Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+
+    const y = Math.sin(Δλ) * Math.cos(φ2);
+    const x =
+      Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+    const θ = Math.atan2(y, x);
+    const angle = (toDeg(θ) + 360) % 360;
+
+    return { distance, angle };
+  }
   const pacmanSettings = {
     mapId: mapId,
     activate: false,
@@ -1047,6 +1078,27 @@ function renderRoutes() {
     speed: 0,
     radius: 0,
   };
+  $(".routes-side-fixed .presetBTN").removeClass("btn-danger");
+  $(".routes-side-fixed .presetBTN").addClass("btn-primary");
+  $(".routes-side-fixed .presetBTN")
+    .off("click")
+    .on("click", function () {
+      presetMode = !presetMode;
+      if (presetMode) {
+        $(this).removeClass("btn-primary");
+        $(this).addClass("btn-danger");
+        mode = "preset";
+        presetCenterMarker.setMap(map);
+      } else {
+        $(this).removeClass("btn-danger");
+        $(this).addClass("btn-primary");
+        mode = "custom";
+        presetCenterMarker.setMap(null);
+      }
+      payloadData.mode = mode;
+    });
+
+  $(".game-mode-controller").hide();
   $("#pacmanGameActivationStatus")
     .off("change")
     .on("change", () => {
@@ -1146,6 +1198,27 @@ function renderRoutes() {
       lat: lat,
       lng: lng,
     };
+    if (presetMode && !centerFixed) {
+      presetCenterMarker.position = tmp;
+      presetCenterMarker.setMap(map);
+      $(".routes-side-fixed .presetCenterSaveBTN")
+        .show()
+        .off("click")
+        .on("click", function () {
+          centerRelativePos = {
+            lat: presetCenterMarker.position.lat,
+            lng: presetCenterMarker.position.lng,
+          };
+          new google.maps.marker.AdvancedMarkerElement({
+            map,
+            position: centerRelativePos,
+          });
+          polyCoords = [];
+          presetCenterMarker.remove();
+          centerFixed = true;
+        });
+      return;
+    }
     loopRouteOptions.mode = "new";
     loopRouteOptions.url = "/admin/looproute";
     loopRouteOptions.smessage = "New Route added successfully!";
@@ -1159,6 +1232,10 @@ function renderRoutes() {
       $(".btn.undo").fadeIn();
     }
     polyCoords.push(tmp);
+    if (centerFixed) {
+      presetCoords.push(getDistanceAndAngle(tmp.lat, tmp.lng));
+    }
+
     marker.position = tmp;
     marker.setMap(map);
     $(".map-controller").hide();
