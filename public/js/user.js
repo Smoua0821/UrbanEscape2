@@ -604,7 +604,7 @@ function startMovingPacman() {
         isGameOver = true;
         $(".priceLinkBTN").fadeIn();
         $(".WinScreen h2")
-          .text("You Win!")
+          .text("Challenge Complete")
           .removeClass("text-danger")
           .addClass("text-success");
 
@@ -680,7 +680,7 @@ function initMap() {
         isGameOver = true;
         $(".priceLinkBTN").fadeIn();
         $(".WinScreen h2")
-          .text("You Win!")
+          .text("Challenge Complete")
           .removeClass("text-danger")
           .addClass("text-success");
 
