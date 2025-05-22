@@ -39,9 +39,13 @@ async function fetchLoopRoutes(req, res) {
       console.log(error);
     }
   }
-  const filteredImages = data.filter(
-    (d) => !imgexist.images?.includes(d._id) && !blockedImages.includes(d._id)
-  );
+
+  // const filteredImages = data.filter(
+  //   (d) => !imgexist.images?.includes(d._id) && !blockedImages.includes(d._id)
+  // );
+
+  const filteredImages = data.filter((d) => !blockedImages.includes(d._id));
+
   res.json({
     status: "success",
     mapGameSetting: map.pacman,

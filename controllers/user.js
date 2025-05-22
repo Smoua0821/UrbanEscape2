@@ -80,7 +80,7 @@ const captureImage = async (req, res) => {
         (cii) => cii.mapId.toString() === mapId && cii.images.includes(polyId)
       )
     )
-      return res.json({ message: "Exists Already" });
+      return res.json({ status: "success", message: "Exists Already" });
     const capturedImagesFilter = capturedImages.find(
       (ci) => ci.mapId.toString() === mapId
     );
