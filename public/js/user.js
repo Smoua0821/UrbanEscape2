@@ -604,7 +604,7 @@ function startMovingPacman() {
         isGameOver = true;
         $(".priceLinkBTN").fadeIn();
         $(".WinScreen h2")
-          .text("You Win!")
+          .text("Challenge Complete")
           .removeClass("text-danger")
           .addClass("text-success");
 
@@ -634,7 +634,7 @@ function startMovingPacman() {
     };
   }
 }
-
+let polygon;
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     zoom: 15,
@@ -649,6 +649,7 @@ function initMap() {
       mapTypeIds: ["roadmap", "satellite", "terrain"],
     },
   });
+  polygon = new google.maps.Polyline({ map });
   const defaultMarkerIcon = document.createElement("img");
   defaultMarkerIcon.id = "defaultMarkerIcon";
   defaultMarkerIcon.src = "/api/marker";
@@ -680,7 +681,7 @@ function initMap() {
         isGameOver = true;
         $(".priceLinkBTN").fadeIn();
         $(".WinScreen h2")
-          .text("You Win!")
+          .text("Challenge Complete")
           .removeClass("text-danger")
           .addClass("text-success");
 
