@@ -1298,6 +1298,7 @@ function renderRoutes() {
       bulkPolyLine = new google.maps.Polyline({
         map: map,
         path: path.polygonCoords,
+        clickable: false,
       });
       const cco = path.polygonCoords[0];
       bulkCircle = new google.maps.Circle({
@@ -1306,6 +1307,7 @@ function renderRoutes() {
         center: cco,
         fillOpacity: path.opacity / 200,
         strokeOpacity: path.opacity / 100,
+        clickable: false,
       });
       tmpImg = document.createElement("img");
       tmpImg.src = path.image;
@@ -1315,7 +1317,7 @@ function renderRoutes() {
         map: map,
         content: tmpImg,
       });
-      bulkMarker.addListener("click", function () {
+      bulkMarker.addListener("gmp-click", function () {
         loopRouteOptions.mode = "update";
         loopRouteOptions.url = "/admin/looproute/update";
         loopRouteOptions.smessage = "Route Updated Successfully!";
