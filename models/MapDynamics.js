@@ -50,6 +50,11 @@ const MapDynamicSchema = new mongoose.Schema({
           endTime: { type: Date },
         },
       ],
+      lastGameStatus: {
+        type: String,
+        enum: ["win", "lose"],
+        default: "lose",
+      },
     },
   ],
 });
