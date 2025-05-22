@@ -157,6 +157,7 @@ $(".save_final").click(() => {
     });
     $(".icon-selector").removeClass("active");
     polyCoords = [];
+    presetCoords = [];
     $(".map-controller").fadeOut();
   } else {
     notyf.error("Invalid Configuration!");
