@@ -635,6 +635,7 @@ function startMovingPacman() {
   }
 }
 
+let polygon;
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     zoom: 15,
@@ -648,6 +649,9 @@ function initMap() {
       style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
       mapTypeIds: ["roadmap", "satellite", "terrain"],
     },
+  });
+  polygon = new google.maps.Polyline({
+    map,
   });
   const defaultMarkerIcon = document.createElement("img");
   defaultMarkerIcon.id = "defaultMarkerIcon";
