@@ -504,8 +504,8 @@ async function leaderboardinfo(type = "lose") {
   }
 }
 
+let pacmanMarker;
 function startMovingPacman() {
-  let pacmanMarker;
   if (mapParsedIdRaw) {
     const pacmanImage = document.createElement("img");
     pacmanImage.src = `/api/pacman/character/${mapParsedId}`;
@@ -669,6 +669,45 @@ function initMap() {
   });
   $(".loadingScreen").hide();
   map.addListener("click", (event) => {
+    gameOverHandler = async (type = "win") => {
+      if (isGameOver) return;
+      isGameOver = true;
+      clearInterval(timeInterval);
+      if (pacmanMarker) pacmanMarker.position = pos;
+      if (type == "win") {
+        markerElement.setMap(null);
+        circle.setMap(null);
+        isGameOver = true;
+        $(".priceLinkBTN").fadeIn();
+        $(".WinScreen h2")
+          .text("You Win!")
+          .removeClass("text-danger")
+          .addClass("text-success");
+
+        $(".WinScreen").show();
+        $(".WinScreen").attr("style", "background: lightblue;");
+
+        let data = await leaderboardinfo("win");
+        $("#userRankAfterGameOver").html(data.rank);
+
+        return notyf.success("You Won the Game!");
+      } else {
+        $(".priceLinkBTN").hide();
+        $(".WinScreen h2")
+          .text("Game Over!")
+          .addClass("text-danger")
+          .removeClass("text-success");
+
+        $(".WinScreen").attr(
+          "style",
+          "background: linear-gradient(45deg, #ffc1c1, #ffdbdb, #ffa8a8);"
+        );
+      }
+
+      let data = await leaderboardinfo(type);
+      $("#userRankAfterGameOver").html(data.rank);
+      $(".WinScreen").show();
+    };
     if (polygonCoordinates.length == 0)
       return notyf.error("No Route Available");
     const clickedLocation = event.latLng;
@@ -728,7 +767,8 @@ function initMap() {
           (data, status, xhr) => {
             if (
               status === "success" &&
-              data.message === "Image Captured successfully!"
+              (data.message === "Image Captured successfully!" ||
+                data.message === "Exists Already")
             ) {
               $(".confirmCaptureContainer").hide();
               const checkpointIndex = checkpoints.findIndex(
