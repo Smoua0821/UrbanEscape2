@@ -3,6 +3,8 @@ const path = require("path");
 const fs = require("fs");
 const LoopRoute = require("../models/LoopRoute.js");
 const Map = require("../models/Map");
+const MapDynamics = require("../models/MapDynamics");
+
 const jwt = require("jsonwebtoken");
 const User = require("../models/User.js");
 require("dotenv").config();
