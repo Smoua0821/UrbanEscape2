@@ -404,3 +404,15 @@ img {
 .game-buttons-container .mbtn:hover {
   color: #000;
 }
+
+@media screen and (max-width: 350px) {
+  .game-buttons-container .mbtn {
+    font-size: 0.8rem;
+  }
+}
+
+@media screen and (max-width: 250px) {
+  .game-buttons-container .mbtn {
+    font-size: 0.6rem;
+  }
+}
