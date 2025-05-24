@@ -50,7 +50,7 @@ const getRank = async (mapId, gameId = null) => {
 
 const updateUserHistory = async (req, res, incrementLifes) => {
   try {
-    const { mapParsedIdRaw, mapParsedId } = req.body;
+    const { time, mapParsedIdRaw, mapParsedId } = req.body;
     if ((!mapParsedIdRaw && !mapParsedId) || !req.user?._id)
       return await res.json({ status: "error", message: "Invalid Argument" });
 
@@ -201,9 +201,11 @@ const findAllRanks = async (req, res) => {
 
   const rank = await getRank(map._id);
   if (!rank || rank.length <= 0)
-    return res
-      .status(400)
-      .json({ status: "error", message: "Something went Wrong!" });
+    return res.status(200).render("pages/Leaderboard", {
+      nodata: true,
+      isLoggedIn: req.user?.name ? true : false,
+      title: map.name,
+    });
 
   //ENABLING IFRAME ACCESSIBILITY
   res.removeHeader("X-Frame-Options");
@@ -211,6 +213,7 @@ const findAllRanks = async (req, res) => {
   res.removeHeader("Cross-Origin-Embedder-Policy");
   return res.status(200).render("pages/Leaderboard", {
     rank,
+    nodata: false,
     isLoggedIn: req.user?.name ? true : false,
     title: map.name,
   });
