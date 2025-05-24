@@ -405,6 +405,18 @@ const updateClientInterface = (targetName) => {
   );
 };
 
+function copyCode(mmid) {
+  const textarea = document.createElement("textarea");
+  const content = `<iframe src="https://www.urbanescape-online.com/leaderboard/${mmid}" width="100%"
+                height="400" frameborder="0"
+                allowfullscreen></iframe>`;
+  textarea.value = content;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+  alert("Embed code copied to clipboard!");
+}
 $(document).ready(() => {
   $(".MapControllerSetting .visibility-toggle span").click(function () {
     if ($(this).hasClass("fa-arrow-up")) {
@@ -1406,9 +1418,14 @@ function fetchMaps() {
     const myData = data.maps.reverse();
     myData.forEach((d) => {
       $("tbody.map_list").append(
-        `<tr><td>${d.name}</td><td><a target='_blank' href='/map/${d.id}'>View Map</a></td><td><button class='btn btn-info me-1 edit_map' data-id='${d.id}'>Edit</button><button class='me-1 btn btn-danger delete_map' data-id='${d.id}'>delete</button><button class='btn btn-warning setupMissions' data-id='${d.id}'>Missions</button><button class='btn btn-info ms-2 setUpDuplicate' data-id='${d.id}'>Duplicate</button><button data-id='${d.id}' class='mapBgUpload btn btn-warning'>Background</button></td></tr>`
+        `<tr><td>${d.name}</td><td><a target='_blank' href='/map/${d.id}'>View Map</a></td><td><button class='btn btn-info me-1 edit_map' data-id='${d.id}'>Edit</button><button class='me-1 btn btn-danger delete_map' data-id='${d.id}'><span class="fa fa-trash"></span></button><button class='btn btn-warning setupMissions' data-id='${d.id}'>Missions</button><button class='btn btn-info ms-2 setUpDuplicate' data-id='${d.id}'>Duplicate</button><button data-id='${d.id}' class='mapBgUpload me-1 btn btn-warning'>Background</button><button class="btn btn-secondary showEmbedCode" data-id="${d.id}"><span class="fa fa-code"></span></button></td></tr>`
       );
     });
+    $(".showEmbedCode")
+      .off("click")
+      .on("click", function () {
+        copyCode($(this).data("id"));
+      });
     $(".delete_map")
       .off("click")
       .on("click", function () {

@@ -383,3 +383,36 @@ img {
   background: #cc00ff3b;
   backdrop-filter: blur(5px);
 }
+
+.game-buttons-container {
+  display: flex;
+  background: #00000010;
+  border: 2px solid #00000015;
+  border-radius: 10px;
+  padding: 0 10px;
+}
+
+.game-buttons-container .mbtn {
+  background: transparent;
+  border: 0;
+  white-space: nowrap;
+  text-decoration: none;
+  color: #006567;
+  transition: all 0.2s;
+}
+
+.game-buttons-container .mbtn:hover {
+  color: #000;
+}
+
+@media screen and (max-width: 350px) {
+  .game-buttons-container .mbtn {
+    font-size: 0.8rem;
+  }
+}
+
+@media screen and (max-width: 250px) {
+  .game-buttons-container .mbtn {
+    font-size: 0.6rem;
+  }
+}

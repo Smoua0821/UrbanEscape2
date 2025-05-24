@@ -183,14 +183,13 @@
           <div class="text-center shadow-lg bg-white p-4">
             <h2 class="pb-3 mb-3 border-bottom text-danger">Game Over</h2>
             <p class="lead text-center">
-              Your current ranking is displayed below.<br />Select
-              <b>Start Game</b> to attempt a higher score.
+              Your rank amongst other players.<br />
             </p>
             <div class="my-3 text-center">
               <h1 class="text-warning" id="userRankAfterGameOver">1</h1>
-              <p class="lead">Your Ranking</p>
             </div>
             <% if(gameWinningUrl) {%>
+            <p class="lead">Tap 'open Link' to continue</p>
             <a
               href="<%= gameWinningUrl %>"
               target="_blank"
@@ -199,11 +198,14 @@
               >Tap to Access</a
             >
             <%}%>
-            <a href="" class="btn btn-info m-2">Start Game</a>
-            <a href="/user/profile" class="btn btn-secondary m-2"
-              >Go Back to Profile</a
-            >
-            <button class="btn btn-warning ldrbrd_btn">Leaderboard</button>
+            <p>Select Start game to attempt a higher score!</p>
+            <div class="game-buttons-container">
+              <a href="" class="mbtn m-2">Start Game</a>
+              <a href="/user/profile" class="mbtn btn-secondary m-2"
+                >Go Back to Profile</a
+              >
+              <button class="mbtn ldrbrd_btn">Leaderboard</button>
+            </div>
           </div>
         </div>
       </div>
