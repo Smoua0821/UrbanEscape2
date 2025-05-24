@@ -25,6 +25,7 @@ async function fetchLoopRoutes(req, res) {
 
   const token = req.cookies.sessionId;
   const data = await LoopRoute.find({ mapId: map._id });
+  let lastGameWinner = true;
   if (token) {
     try {
       const userO = await jwt.verify(token, process.env.JWT_SECRET);
@@ -32,6 +33,13 @@ async function fetchLoopRoutes(req, res) {
         const user = await User.findOne({ email: userO.email });
         if (user) {
           blockedImages = user.blockedImages;
+
+          if (
+            user?.capturedImages?.find((d) => mapid === d.mapId)?.gameStatus ==
+            "lose"
+          )
+            lastGameWinner = false;
+
           // if (user.email == process.env.ADMIN_EMAIL) return res.json(data);
           imgexist = user.capturedImages.find((ci) => ci.mapId === map.id);
           if (!imgexist) imgexist = [];
@@ -41,12 +49,11 @@ async function fetchLoopRoutes(req, res) {
       console.log(error);
     }
   }
-
-  // const filteredImages = data.filter(
-  //   (d) => !imgexist.images?.includes(d._id) && !blockedImages.includes(d._id)
-  // );
-
-  const filteredImages = data.filter((d) => !blockedImages.includes(d._id));
+  const filteredImages = data.filter(
+    (d) =>
+      !blockedImages.includes(d._id) &&
+      (!lastGameWinner ? !imgexist.images?.includes(d._id) : true)
+  );
 
   res.json({
     status: "success",

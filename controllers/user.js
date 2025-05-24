@@ -60,7 +60,7 @@ const userProfile = async (req, res) => {
 };
 
 const captureImage = async (req, res) => {
-  let { polyId, mapId } = req.body;
+  let { polyId, mapId, showingOnMap } = req.body;
   if (!polyId || !mapId) return res.status(400).end("Invalid Request");
   const map = await Map.findOne({ id: mapId });
   if (!map) return res.json({ status: "error", message: "No Map Found!" });
@@ -68,6 +68,28 @@ const captureImage = async (req, res) => {
     email: req.user.email,
   });
   if (!user) return res.status(369).redirect("/auth");
+  const looproute = await LoopRoute.find({ mapId: map._id });
+  if (
+    showingOnMap == looproute.length &&
+    looproute.length > 1 &&
+    user.capturedImages
+  ) {
+    console.log("Updating.....");
+    User.updateOne(
+      { _id: req.user._id },
+      {
+        $set: {
+          "capturedImages.$[elem].images": [polyId],
+          "capturedImages.$[elem].gameStatus": "lose",
+        },
+      },
+      {
+        arrayFilters: [{ "elem.mapId": mapId }],
+      }
+    ).catch((err) => {
+      console.error(err);
+    });
+  }
   let capturedImages = user.capturedImages;
   let blockedImages = user.blockedImages;
   if (blockedImages.includes(polyId))

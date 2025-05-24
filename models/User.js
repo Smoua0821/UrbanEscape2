@@ -54,6 +54,11 @@ const UserSchema = new mongoose.Schema(
             type: String,
           },
         ],
+        gameStatus: {
+          type: String,
+          enum: ["win", "lose"],
+          default: "lose",
+        },
       },
     ],
     blockedImages: [{ type: String, default: [] }],
