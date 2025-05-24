@@ -153,6 +153,8 @@ $(".save_final").click(() => {
         iconMarker.setMap(null);
         polygon.setMap(null);
         circle.setMap(null);
+        presetMode = false;
+        $(".presetBTN").removeClass("btn-danger").addClass("btn-primary");
       }
     });
     $(".icon-selector").removeClass("active");
@@ -1217,6 +1219,8 @@ function renderRoutes() {
           polyCoords = [];
           presetCenterMarker.remove();
           centerFixed = true;
+
+          $(this).hide();
         });
       return;
     }
@@ -1235,6 +1239,7 @@ function renderRoutes() {
     polyCoords.push(tmp);
     if (centerFixed) {
       presetCoords.push(getDistanceAndAngle(tmp.lat, tmp.lng));
+      console.log(presetCoords);
     }
 
     marker.position = tmp;

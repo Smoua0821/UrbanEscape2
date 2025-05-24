@@ -494,6 +494,7 @@ async function leaderboardinfo(type = "lose") {
   try {
     const response = await $.post(url, {
       mapParsedIdRaw,
+      mapParsedId,
       time: elapsedTime,
       type,
     });
@@ -764,7 +765,11 @@ function initMap() {
         const polyId = polygonCoordinates[polyIndex]._id;
         $.post(
           "/user/profile/capture",
-          { mapId: mapParsedId, polyId: polyId },
+          {
+            mapId: mapParsedId,
+            polyId: polyId,
+            showingOnMap: polygonCoordinates.length,
+          },
           (data, status, xhr) => {
             if (
               status === "success" &&

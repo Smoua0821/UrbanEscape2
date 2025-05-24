@@ -1,4 +1,5 @@
 const Map = require("../models/Map");
+const User = require("../models/User");
 const MapDynamics = require("../models/MapDynamics");
 const { ObjectId } = require("mongodb");
 
@@ -49,8 +50,8 @@ const getRank = async (mapId, gameId = null) => {
 
 const updateUserHistory = async (req, res, incrementLifes) => {
   try {
-    const { mapParsedIdRaw, time } = req.body;
-    if (!mapParsedIdRaw || !req.user?._id)
+    const { mapParsedIdRaw, mapParsedId } = req.body;
+    if ((!mapParsedIdRaw && !mapParsedId) || !req.user?._id)
       return await res.json({ status: "error", message: "Invalid Argument" });
 
     const endTime = new Date();
@@ -61,6 +62,22 @@ const updateUserHistory = async (req, res, incrementLifes) => {
       },
       incrementLifes ? { $inc: { "users.$.lifes": +1 } } : {}
     );
+    console.log(incrementLifes);
+    if (incrementLifes) {
+      User.updateOne(
+        { _id: req.user._id },
+        {
+          $set: {
+            "capturedImages.$[elem].gameStatus": "win",
+          },
+        },
+        {
+          arrayFilters: [{ "elem.mapId": mapParsedId }],
+        }
+      ).catch((err) => {
+        console.error(err);
+      });
+    }
     if (!getDoc)
       return await res.json({ status: "error", message: "Document not found" });
 
