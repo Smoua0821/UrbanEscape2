@@ -49,11 +49,18 @@ async function fetchLoopRoutes(req, res) {
       console.log(error);
     }
   }
-  const filteredImages = data.filter(
-    (d) =>
-      !blockedImages.includes(d._id) &&
-      (!lastGameWinner ? !imgexist.images?.includes(d._id) : true)
-  );
+  let filteredImages = data
+    .filter(
+      (d) =>
+        !blockedImages.includes(d._id) &&
+        (!lastGameWinner ? !imgexist.images?.includes(d._id) : true)
+    )
+    .map((d) => {
+      if (d?.path?.length == 0) {
+        d.mode = "custom";
+      }
+      return d;
+    });
 
   res.json({
     status: "success",
@@ -64,7 +71,7 @@ async function fetchLoopRoutes(req, res) {
 }
 
 async function saveLoopRoutes(req, res) {
-  const {
+  let {
     title,
     description,
     polygonCoords,
@@ -86,6 +93,7 @@ async function saveLoopRoutes(req, res) {
     return res
       .status(404)
       .json({ status: "error", message: "No map Found with corresponding ID" });
+  if (presetCoords.length <= 0) mode = "custom";
   const newLoopRoute = new LoopRoute({
     title,
     description,

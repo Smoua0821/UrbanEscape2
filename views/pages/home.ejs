@@ -189,14 +189,15 @@
               <h1 class="text-warning" id="userRankAfterGameOver">1</h1>
             </div>
             <% if(gameWinningUrl) {%>
-            <p class="lead">Tap 'open Link' to continue</p>
-            <a
-              href="<%= gameWinningUrl %>"
-              target="_blank"
-              class="my-3 w-100 btn btn-dark priceLinkBTN"
-              style="display: none"
-              >Tap to Access</a
-            >
+            <div class="priceLinkBTN" style="display: none">
+              <p class="lead">Tap 'open Link' to continue</p>
+              <a
+                href="<%= gameWinningUrl %>"
+                target="_blank"
+                class="my-3 w-100 btn btn-dark"
+                >Tap to Access</a
+              >
+            </div>
             <%}%>
             <p>Select Start game to attempt a higher score!</p>
             <div class="game-buttons-container">
