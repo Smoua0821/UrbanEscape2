@@ -386,23 +386,25 @@ img {
 
 .game-buttons-container {
   display: flex;
-  background: #00000010;
+  background: #f80;
   border: 2px solid #00000015;
   border-radius: 10px;
-  padding: 0 10px;
 }
 
 .game-buttons-container .mbtn {
-  background: transparent;
+  background: linear-gradient(90deg, #f80, orange, #f80);
   border: 0;
   white-space: nowrap;
   text-decoration: none;
-  color: #006567;
+  color: #fff;
   transition: all 0.2s;
+  padding: 10px;
+  transition: 0.2s;
 }
 
 .game-buttons-container .mbtn:hover {
   color: #000;
+  background: linear-gradient(90deg, orange, #f80, orange);
 }
 
 @media screen and (max-width: 350px) {

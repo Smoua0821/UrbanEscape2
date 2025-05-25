@@ -236,6 +236,21 @@ const settings = {
 };
 
 $(document).ready(() => {
+  $(".navbar-toggler").click(() => {
+    if ($(".navbar-toggler span").hasClass("fa-arrow-down")) {
+      $(".navbar-toggler span")
+        .removeClass("fa-arrow-down")
+        .addClass("fa-arrow-up");
+
+      $(".navbar-container").addClass("collapsed");
+    } else {
+      $(".navbar-toggler span")
+        .addClass("fa-arrow-down")
+        .removeClass("fa-arrow-up");
+
+      $(".navbar-container").removeClass("collapsed");
+    }
+  });
   positionRadius = parseInt($("#userLocationRadius").val());
   if (!positionRadius) positionRadius = 0;
   positionCircle = new google.maps.Circle({

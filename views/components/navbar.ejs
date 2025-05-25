@@ -16,47 +16,50 @@
       </div>
     </div>
   </div>
-  <div class="navbar-container">
-    <input type="hidden" id="userLifeCount" value="lifes" />
-    <% if(user && lifes>0 && gameStarted && playable){ %>
-    <input type="hidden" id="mapParsedIdRaw" value="<%= mapParsedIdRaw %>" />
-    <div class="game-options pt-3 pb-2">
-      <div class="row">
-        <div class="col-4 col-md-4">
-          <div class="text-center game-timer">
-            <div class="time-countdown">00:00:00</div>
-            <div class="title">Time Played</div>
+  <div class="navbar-holder">
+    <div class="navbar-container">
+      <div class="unit profile-link"></div>
+      <input type="hidden" id="userLifeCount" value="lifes" />
+      <% if(user && lifes>0 && gameStarted && playable){ %>
+      <input type="hidden" id="mapParsedIdRaw" value="<%= mapParsedIdRaw %>" />
+      <div class="unit game-timer">
+        <div class="text-center game-timer">
+          <div class="time-countdown">00:00:00</div>
+          <div class="title">Time Played</div>
+        </div>
+      </div>
+      <% if(lifes!=99){ %>
+      <div class="unit game-life">
+        <div class="text-center game-lifes">
+          <div class="life-center">
+            <% for(let i = 0; i < (3 - lifes); i++) { %>
+            <span class="fa fa-heart"></span>
+            <% } %> <% for(let i = 0; i < lifes; i++) { %>
+            <span class="fa fa-heart active"></span>
+            <% } %>
           </div>
         </div>
-        <% if(lifes!=99){ %>
-        <div class="col-6 col-md-4">
-          <div class="text-center game-lifes">
-            <div class="life-center">
-              <% for(let i = 0; i < (3 - lifes); i++) { %>
-              <span class="fa fa-heart"></span>
-              <% } %> <% for(let i = 0; i < lifes; i++) { %>
-              <span class="fa fa-heart active"></span>
-              <% } %>
-            </div>
-          </div>
-        </div>
-        <%}%>
+      </div>
+      <%}%> <%}%>
+      <div class="unit navigate">
+        <ul>
+          <% if (user) { %>
+          <li data-id="/user/profile">
+            <span class="fa fa-bars"></span>
+          </li>
+          <% if (user.role.current=="admin") { %>
+          <li data-id="/admin">Admin</li>
+          <%}%> <% if (locals.missions) { %>
+          <li data-id="/missions">Missions</li>
+          <% } %> <% }else{ %>
+          <li data-id="/auth">Login</li>
+          <% } %>
+        </ul>
       </div>
     </div>
-    <%}%>
-    <ul>
-      <% if (user) { %>
-      <li data-id="/user/profile" style="float: left">
-        <span class="fa fa-bars"></span>
-      </li>
-      <% if (user.role.current=="admin") { %>
-      <li data-id="/admin">Admin</li>
-      <%}%> <% if (locals.missions) { %>
-      <li data-id="/missions">Missions</li>
-      <% } %> <% }else{ %>
-      <li data-id="/auth">Login</li>
-      <% } %>
-    </ul>
+    <div class="navbar-toggler">
+      <span class="fa fa-arrow-down"></span>
+    </div>
   </div>
 </div>
 <style>
@@ -75,6 +78,19 @@
     font-family: sans-serif;
     text-align: center;
     box-shadow: 0 -5px 10px #00000059;
+    display: flex;
+    overflow-x: scroll;
+    height: 65px;
+    transition: 0.5s;
+  }
+
+  .user-navbar .navbar-container.collapsed {
+    height: 0px;
+  }
+
+  .user-navbar .navbar-container .unit {
+    white-space: nowrap;
+    margin: auto;
   }
 
   .user-navbar .navbar-container ul {
@@ -98,7 +114,7 @@
     color: white;
   }
 
-  .game-options .game-lifes .life-center span.fa {
+  .game-lifes .life-center span.fa {
     font-size: 30px;
     margin: 0 5px;
     color: #0000002e;
@@ -106,17 +122,43 @@
     opacity: 0.4;
   }
 
-  .game-options .game-lifes .life-center span.fa.active {
+  .game-lifes .life-center span.fa.active {
     color: red;
     text-shadow: 2px 2px 20px red;
     opacity: 1;
   }
 
-  .game-options .game-timer .time-countdown {
+  .game-timer .time-countdown {
     font-size: 1.5rem;
   }
 
-  .game-options .game-timer .title {
+  .game-timer .title {
     font-size: 0.78rem;
+  }
+
+  @media screen and (max-width: 430px) {
+    .user-navbar .navbar-container .unit {
+      transform: scale(0.9);
+    }
+  }
+  .navbar-holder {
+    position: relative;
+  }
+
+  .navbar-holder .navbar-toggler {
+    position: absolute;
+    top: -35px;
+    left: 5px;
+    background: white;
+    padding: 10px 20px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    box-shadow: 0 -5px 5px 0 #00000050;
+    transition: 0.2s;
+    cursor: pointer;
+  }
+
+  .navbar-toggler:hover {
+    box-shadow: 0 0px 5px 0 #00000000;
   }
 </style>
