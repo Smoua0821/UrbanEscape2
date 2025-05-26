@@ -93,7 +93,7 @@ async function saveLoopRoutes(req, res) {
     return res
       .status(404)
       .json({ status: "error", message: "No map Found with corresponding ID" });
-  if (presetCoords.length <= 0) mode = "custom";
+  if (presetCoords?.length <= 0) mode = "custom";
   const newLoopRoute = new LoopRoute({
     title,
     description,
