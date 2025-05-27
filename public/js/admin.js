@@ -1339,7 +1339,7 @@ function renderRoutes() {
         loopRouteOptions.mode = "update";
         loopRouteOptions.url = "/admin/looproute/update";
         loopRouteOptions.smessage = "Route Updated Successfully!";
-        console.log("Changed to YUpdate");
+        console.log("Changed to Update");
         $(".delRouteBtn").show();
         $("#savePolyModal").modal("show");
         const tarObj = data.find((d) => d._id == path._id);
@@ -1348,13 +1348,10 @@ function renderRoutes() {
         $("#routeTitle").val(tarObj.title);
         $("#routeDescription").val(tarObj.description);
         $("#sizeRange").val(tarObj.title);
-        // const modifiedRadius = parseInt(
-        //   10 * Math.pow(tarObj.radius / 100, 2 / 3)
-        // );
-        const modifiedRadius = tarObj.radius;
-        $("#radiusRange").val(modifiedRadius);
+        radius = tarObj.radius;
+        $("#radiusRange").val(radius);
         $("#sizeRange").val(tarObj.size);
-        $("#radiusNum").val(modifiedRadius);
+        $("#radiusNum").val(radius);
         $("#sizeNum").val(tarObj.size);
         $("#imageSpeed").val(tarObj.speed);
         $("#loopOpacity").val(tarObj.opacity);
@@ -1367,6 +1364,8 @@ function renderRoutes() {
         payloadData.speed = tarObj.speed;
         payloadData.opacity = tarObj.opacity;
         payloadData.size = tarObj.size;
+
+        console.log(payloadData);
 
         $(".delRouteBtn")
           .off("click")
