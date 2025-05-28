@@ -1137,8 +1137,7 @@ function animateMarker() {
   }
   // Repeat animation
   if (speed > 100) speed = 100;
-  if (speed < 0) speed = 0;
-  if (speed > 0 && speed < 10) speed = 10;
+  if (speed <= 0) speed = 1;
   const moveTimer = setTimeout(animateMarker, 1000 / speed);
   if (!speed) {
     clearTimeout(moveTimer);

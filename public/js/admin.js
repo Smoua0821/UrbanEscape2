@@ -964,6 +964,10 @@ $(document).ready(() => {
     uploadFileByClick("/admin/import/images");
   });
 
+  $(".importPacmanImageBTN").click(function () {
+    uploadFileByClick("/admin/import/images/pacman");
+  });
+
   $(".importBadgeBTN").click(function () {
     uploadFileByClick("/admin/import/badges");
   });

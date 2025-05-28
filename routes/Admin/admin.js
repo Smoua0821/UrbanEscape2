@@ -19,8 +19,10 @@ const {
   getMarkerImage,
   deleteMarkerImage,
   exportImages,
+  exportPacmanImages,
   exportBadges,
   importImages,
+  importPacmanImages,
   importBadges,
   settingsUpdate,
   updateMapDate,
@@ -131,6 +133,7 @@ router.post("/map/missions/remove", removeMapMission);
 
 router.get("/export/users", exportExcel);
 router.get("/export/images", exportImages);
+router.get("/export/images/pacman", exportPacmanImages);
 router.get("/export/badges", exportBadges);
 
 const storageImportImage = multer.diskStorage({
@@ -152,6 +155,12 @@ router.post(
   "/import/images",
   uploadImportImage.single("zipFile"),
   importImages
+);
+
+router.post(
+  "/import/images/pacman",
+  uploadImportImage.single("zipFile"),
+  importPacmanImages
 );
 
 router.post(
