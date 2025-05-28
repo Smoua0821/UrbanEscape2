@@ -604,6 +604,12 @@ const exportImages = (req, res) => {
   exportDir(folderPath, zipFileName, res);
 };
 
+const exportPacmanImages = (req, res) => {
+  const folderPath = path.join(__dirname, "../../public/images/pacman/");
+  const zipFileName = "pacmanImagesBackup_" + Date.now() + ".zip";
+  exportDir(folderPath, zipFileName, res);
+};
+
 const exportBadges = (req, res) => {
   const folderPath = path.join(__dirname, "../../public/badges/");
   const zipFileName = "badgeBackup_" + Date.now() + ".zip";
@@ -723,6 +729,13 @@ const importImages = (req, res) => {
   const filename = req.file.filename;
   const zipFilePath = path.join(__dirname, "../../", filename);
   const destinationDir = path.join(__dirname, "../../public/images");
+  importDir(zipFilePath, destinationDir, "files", res);
+};
+
+const importPacmanImages = (req, res) => {
+  const filename = req.file.filename;
+  const zipFilePath = path.join(__dirname, "../../", filename);
+  const destinationDir = path.join(__dirname, "../../public/images/");
   importDir(zipFilePath, destinationDir, "files", res);
 };
 
@@ -898,8 +911,10 @@ module.exports = {
   getPacmanImage,
   deleteMarkerImage,
   exportImages,
+  exportPacmanImages,
   exportBadges,
   importImages,
+  importPacmanImages,
   importBadges,
   settingsImport,
   settingsUpdate,
