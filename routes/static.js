@@ -205,10 +205,31 @@ router.get("/privacy-policy", (req, res) => {
 });
 
 router.get("/quick-tutorial", (req, res) => {
-  return res.render("pages/quick_tutorial", {
-    title: "Quick Tutorial",
-    user: req.user,
-  });
+  try {
+    const tutorialDir = path.join(__dirname, "../public/images/tutorial");
+
+    if (!fs.existsSync(tutorialDir)) {
+      fs.mkdirSync(tutorialDir, { recursive: true });
+    }
+
+    const images = fs.readdirSync(tutorialDir).filter((file) => {
+      return /\.(jpe?g|png|gif|webp|svg)$/i.test(file); // Filter image files
+    });
+
+    const tutorialImages = images.map((image) => ({
+      name: image,
+      url: `/images/tutorial/${image}`,
+    }));
+
+    return res.render("pages/quick_tutorial", {
+      title: "Quick Tutorial",
+      user: req.user,
+      tutorialImages,
+    });
+  } catch (error) {
+    console.error("Error loading tutorial images:", error);
+    return res.status(500).send("Server error loading tutorial.");
+  }
 });
 
 router.get("/map/background/:tarId", (req, res) => {
