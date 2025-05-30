@@ -1,5 +1,11 @@
 const jwt = require("jsonwebtoken");
-const publicRoutes = ["/", "/home", "/privacy-policy", "/marker"];
+const publicRoutes = [
+  "/",
+  "/home",
+  "/privacy-policy",
+  "/marker",
+  "/quick-tutorial",
+];
 const globalRoutes = ["/map", "/leaderboard/"];
 
 const authMiddleware = (req, res, next) => {

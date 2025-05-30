@@ -204,6 +204,13 @@ router.get("/privacy-policy", (req, res) => {
   return res.render("pages/privacy_policy");
 });
 
+router.get("/quick-tutorial", (req, res) => {
+  return res.render("pages/quick_tutorial", {
+    title: "Quick Tutorial",
+    user: req.user,
+  });
+});
+
 router.get("/map/background/:tarId", (req, res) => {
   const pathN = `public/images/map_countdown/`;
   const imgPath = path.join(__dirname, "../", pathN, `${req.params.tarId}.jpg`);
