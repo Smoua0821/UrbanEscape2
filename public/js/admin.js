@@ -991,21 +991,25 @@ $(document).ready(() => {
     uploadFileByClick("/admin/import/badges");
   });
 
+  $(".importTutorialBTN").click(function () {
+    uploadFileByClick("/admin/import/tutorial", renderTutorialList);
+  });
+
   $(".uploadTutorialPicture").click(function () {
     uploadFileByClick(
       "/admin/upload/tutorial/picture",
+      renderTutorialList,
       "image/*",
-      "tutorialPic",
-      renderTutorialList
+      "tutorialPic"
     );
   });
 });
 
 function uploadFileByClick(
   url,
+  callback = () => {},
   accept = ".zip",
-  name = "zipFile",
-  callback = () => {}
+  name = "zipFile"
 ) {
   var fileInput = $("<input>", {
     type: "file",
