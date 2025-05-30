@@ -236,6 +236,12 @@ const settings = {
 };
 
 $(document).ready(() => {
+  setTimeout(() => {
+    $(".login-prompt-modal").fadeIn();
+  }, 1000);
+  $(".spl-modal-btn.exit").click(() => {
+    $(".login-prompt-modal").fadeOut();
+  });
   $(".navbar-toggler").click(() => {
     if ($(".navbar-toggler span").hasClass("fa-arrow-down")) {
       $(".navbar-toggler span")
