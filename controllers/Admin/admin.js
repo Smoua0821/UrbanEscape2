@@ -616,6 +616,12 @@ const exportBadges = (req, res) => {
   exportDir(folderPath, zipFileName, res);
 };
 
+const exportTutorial = (req, res) => {
+  const folderPath = path.join(__dirname, "../../public/images/tutorial/");
+  const zipFileName = "tutorialBackup_" + Date.now() + ".zip";
+  exportDir(folderPath, zipFileName, res);
+};
+
 const importDir = (zipFilePath, destinationDir, type, res) => {
   const allowedType = ["directory", "files"];
   if (!allowedType.includes(type))
@@ -922,9 +928,11 @@ module.exports = {
   exportImages,
   exportPacmanImages,
   exportBadges,
+  exportTutorial,
   importImages,
   importPacmanImages,
   importBadges,
+
   importTutorialPicture,
   settingsImport,
   settingsUpdate,

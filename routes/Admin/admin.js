@@ -21,9 +21,11 @@ const {
   exportImages,
   exportPacmanImages,
   exportBadges,
+  exportTutorial,
   importImages,
   importPacmanImages,
   importBadges,
+
   settingsUpdate,
   updateMapDate,
   presetHandler,
@@ -136,6 +138,7 @@ router.get("/export/users", exportExcel);
 router.get("/export/images", exportImages);
 router.get("/export/images/pacman", exportPacmanImages);
 router.get("/export/badges", exportBadges);
+router.get("/export/tutorial", exportTutorial);
 
 const storageImportImage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -168,6 +171,12 @@ router.post(
   "/import/badges",
   uploadImportImage.single("zipFile"),
   importBadges
+);
+
+router.post(
+  "/import/tutorial",
+  uploadImportImage.single("zipFile"),
+  importImages
 );
 
 const tutorialImageUploader = require("../../config/tutorialUploader");
