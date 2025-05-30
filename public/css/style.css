@@ -420,6 +420,7 @@ img {
 }
 
 .login-prompt-modal {
+  text-align: center;
   position: fixed;
   top: 0;
   background: #ffffff59;
@@ -430,6 +431,7 @@ img {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 4;
 }
 
 .login-prompt-modal .inner {
