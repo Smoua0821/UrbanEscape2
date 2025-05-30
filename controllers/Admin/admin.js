@@ -746,6 +746,15 @@ const importBadges = (req, res) => {
   importDir(zipFilePath, destinationDir, "directory", res);
 };
 
+const importTutorialPicture = (req, res) => {
+  const filename = req.file.filename;
+  return res.json({
+    status: "success",
+    message: "Tutorial Picture Uploaded Successfully!",
+    filename: filename,
+  });
+};
+
 const settingsImport = async (req, res) => {
   try {
     const settings = await Settings.find({});
@@ -916,6 +925,7 @@ module.exports = {
   importImages,
   importPacmanImages,
   importBadges,
+  importTutorialPicture,
   settingsImport,
   settingsUpdate,
   presetHandler,

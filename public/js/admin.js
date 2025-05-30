@@ -418,6 +418,25 @@ function copyCode(mmid) {
   alert("Embed code copied to clipboard!");
 }
 $(document).ready(() => {
+  const renderTutorialList = () => {
+    try {
+      fetch("/admin/upload/tutorial/picture")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.status != "success")
+            return notyf.error(data.message || "Something went wrong!");
+          $(".quick-tutorial-list").empty();
+          data.data.forEach((d) => {
+            $(".quick-tutorial-list").append(
+              `<tr><td><img src='${d.url}' width='200px'></td><td><button class='btn btn-danger' data-id='${d.name}'><span class='fa fa-trash'></span></button></td></tr>`
+            );
+          });
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  renderTutorialList();
   $(".MapControllerSetting .visibility-toggle span").click(function () {
     if ($(this).hasClass("fa-arrow-up")) {
       $(this).removeClass("fa-arrow-up");
@@ -971,12 +990,26 @@ $(document).ready(() => {
   $(".importBadgeBTN").click(function () {
     uploadFileByClick("/admin/import/badges");
   });
+
+  $(".uploadTutorialPicture").click(function () {
+    uploadFileByClick(
+      "/admin/upload/tutorial/picture",
+      "image/*",
+      "tutorialPic",
+      renderTutorialList
+    );
+  });
 });
 
-function uploadFileByClick(url) {
+function uploadFileByClick(
+  url,
+  accept = ".zip",
+  name = "zipFile",
+  callback = () => {}
+) {
   var fileInput = $("<input>", {
     type: "file",
-    accept: ".zip",
+    accept,
     style: "display: none;",
   });
   $("body").append(fileInput);
@@ -985,7 +1018,7 @@ function uploadFileByClick(url) {
     var file = event.target.files[0];
     if (file) {
       var formData = new FormData();
-      formData.append("zipFile", file);
+      formData.append(name, file);
       $.ajax({
         url: url,
         type: "POST",
@@ -994,6 +1027,7 @@ function uploadFileByClick(url) {
         processData: false,
         success: function () {
           notyf.success("File uploaded successfully!");
+          callback();
         },
         error: function (xhr, status, error) {
           notyf.error("Error: " + error);

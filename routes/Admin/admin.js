@@ -28,6 +28,7 @@ const {
   updateMapDate,
   presetHandler,
   renderPreset,
+  importTutorialPicture,
 } = require("../../controllers/Admin/admin");
 const {
   fetchLoopRoutes,
@@ -168,6 +169,47 @@ router.post(
   uploadImportImage.single("zipFile"),
   importBadges
 );
+
+const tutorialImageUploader = require("../../config/tutorialUploader");
+
+router.post(
+  "/upload/tutorial/picture",
+  tutorialImageUploader.single("tutorialPic"),
+  importTutorialPicture
+);
+
+router.get("/upload/tutorial/picture", (req, res) => {
+  try {
+    const tutorialDir = path.join(__dirname, "../../public/images/tutorial");
+
+    // Ensure the directory exists
+    if (!fs.existsSync(tutorialDir)) {
+      fs.mkdirSync(tutorialDir, { recursive: true });
+    }
+
+    const files = fs.readdirSync(tutorialDir);
+    const fileList = files.map((file) => {
+      return {
+        name: file,
+        url: `/images/tutorial/${file}`,
+      };
+    });
+
+    return res.json({
+      status: "success",
+      message: "Tutorial pictures fetched successfully.",
+      data: fileList,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.json({
+      status: "error",
+      message:
+        error.message ||
+        "Something went wrong while fetching the tutorial pictures.",
+    });
+  }
+});
 
 router.post("/settings/update", settingsUpdate);
 

@@ -1,6 +1,8 @@
 <html>
   <head>
     <title><%=title%> - Urban Escape</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="google-site-verification"
       content="AWs8hJem8IT6O4cQ7612JJiVbaFPXWy-x-FUNH9PxVE"
@@ -27,62 +29,6 @@
       </div>
     </section>
 
-    <!-- Tutorial Steps -->
-    <section class="py-5 bg-light">
-      <div class="container">
-        <h2 class="text-center mb-4">How to Play</h2>
-        <div class="row g-4">
-          <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-              <div class="card-body text-center">
-                <h5 class="card-title">1. Sign Up & Log In</h5>
-                <p class="card-text">
-                  Create your account to access missions, maps, and track your
-                  progress.
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-              <div class="card-body text-center">
-                <h5 class="card-title">2. Explore the Map</h5>
-                <p class="card-text">
-                  Use our interactive map to find missions, danger zones, and
-                  safe areas.
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-              <div class="card-body text-center">
-                <h5 class="card-title">3. Complete Missions</h5>
-                <p class="card-text">
-                  Capture location images, solve clues, and earn rewards and
-                  badges!
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Embedded Video -->
-    <section class="py-5">
-      <div class="container">
-        <h2 class="text-center mb-4">Watch the Demo</h2>
-        <div class="ratio ratio-16x9 shadow-lg rounded">
-          <iframe
-            src="https://www.youtube.com/embed/5V9f3MT86M8"
-            title="UrbanEscape Tutorial"
-            allowfullscreen
-          ></iframe>
-        </div>
-      </div>
-    </section>
-
     <!-- Carousel Section -->
     <section class="py-5 bg-dark">
       <div class="container">
@@ -93,27 +39,11 @@
           data-bs-ride="carousel"
         >
           <div class="carousel-inner">
+            <%tutorialImages.forEach(d=>{%>
             <div class="carousel-item active">
-              <img
-                src="https://picsum.photos/800/400?random=1"
-                class="d-block w-100"
-                alt="Random Image 1"
-              />
+              <img src="<%=d.url%>" class="d-block w-100" alt="<%=d.name%>" />
             </div>
-            <div class="carousel-item">
-              <img
-                src="https://picsum.photos/800/400?random=2"
-                class="d-block w-100"
-                alt="Random Image 2"
-              />
-            </div>
-            <div class="carousel-item">
-              <img
-                src="https://picsum.photos/800/400?random=3"
-                class="d-block w-100"
-                alt="Random Image 3"
-              />
-            </div>
+            <%})%>
           </div>
           <button
             class="carousel-control-prev"
@@ -142,7 +72,7 @@
       <div class="container">
         <h2 class="mb-3">Ready to Escape?</h2>
         <a href="/register" class="btn btn-warning btn-lg me-3"
-          >Join UrbanEscape Now</a
+          >Create Account Now</a
         >
         <button onclick="goToMap()" class="btn btn-warning btn-lg">
           Go back to Map
