@@ -18,7 +18,6 @@
   </div>
   <div class="navbar-holder">
     <div class="navbar-container">
-      <div class="unit profile-link"></div>
       <input type="hidden" id="userLifeCount" value="lifes" />
       <% if(user && lifes>0 && gameStarted && playable){ %>
       <input type="hidden" id="mapParsedIdRaw" value="<%= mapParsedIdRaw %>" />
@@ -53,6 +52,23 @@
           <li data-id="/missions">Missions</li>
           <% } %> <% }else{ %>
           <li data-id="/auth">Login</li>
+          <div class="login-prompt-modal" style="display: none;">
+            <div class="inner">
+              <div class="body">
+                <h1>WELCOME!</h1>
+                <div class="section login-section">
+                  <h3>Create an account to play</h3>
+                  <a href="/auth" class="spl-modal-btn">Create</a>
+                </div>
+                <div class="section how-to-play-section">
+                  <h3>Learn How to Play?</h3>
+                  <a href="/quick-tutorial" class="spl-modal-btn">Quick Tutorial</a>
+                </div>
+                <div class="section">
+                  <button class="spl-modal-btn exit">Exit</button>
+                </div>
+            </div>
+          </div>
           <% } %>
         </ul>
       </div>

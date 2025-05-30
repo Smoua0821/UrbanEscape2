@@ -269,7 +269,7 @@ img {
 
 .howtoplaycontainer {
   position: fixed;
-  z-index: 3;
+  z-index: 4;
   width: 100%;
   bottom: 50px;
   text-align: center;
@@ -417,4 +417,43 @@ img {
   .game-buttons-container .mbtn {
     font-size: 0.6rem;
   }
+}
+
+.login-prompt-modal {
+  position: fixed;
+  top: 0;
+  background: #ffffff59;
+  width: 100%;
+  left: 0;
+  height: 100%;
+  backdrop-filter: blur(3px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-prompt-modal .inner {
+  background: #80ff00;
+  border: 2px solid black;
+  padding: 30px;
+}
+
+.spl-modal-btn {
+  display: block;
+  color: white;
+  background: black;
+  text-decoration: none;
+  text-transform: uppercase;
+  padding: 5px 0;
+  font-weight: 700;
+  width: 100%;
+  border: 2px solid black;
+}
+
+.login-prompt-modal .inner .section {
+  margin-top: 3rem;
+}
+
+.spl-modal-btn:hover {
+  border: 2px solid white;
 }
