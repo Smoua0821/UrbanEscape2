@@ -428,9 +428,28 @@ $(document).ready(() => {
           $(".quick-tutorial-list").empty();
           data.data.forEach((d) => {
             $(".quick-tutorial-list").append(
-              `<tr><td><img src='${d.url}' width='200px'></td><td><button class='btn btn-danger' data-id='${d.name}'><span class='fa fa-trash'></span></button></td></tr>`
+              `<tr><td><img src='${d.url}' width='200px'></td><td><button class='btn btn-danger deleteTutorialBtn' data-id='${d.name}'><span class='fa fa-trash'></span></button></td></tr>`
             );
           });
+          $(".deleteTutorialBtn")
+            .off("click")
+            .on("click", function () {
+              const tarId = $(this).data("id");
+              if (!tarId) return notyf.error("Invalid Option!");
+              if (!confirm("Are you sure to delete this tutorial?")) return;
+              $.post(
+                "/admin/upload/tutorial/delete",
+                { name: tarId },
+                (data) => {
+                  if (data.status == "success") {
+                    notyf.success(data.message);
+                    renderTutorialList();
+                  } else {
+                    notyf.error(data.message || "Something went wrong!");
+                  }
+                }
+              );
+            });
         });
     } catch (error) {
       console.log(error);

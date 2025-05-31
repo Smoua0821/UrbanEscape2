@@ -220,6 +220,30 @@ router.get("/upload/tutorial/picture", (req, res) => {
   }
 });
 
+router.post("/upload/tutorial/delete", (req, res) => {
+  const { name } = req.body;
+  if (!name) {
+    return res.status(400).json({
+      status: "error",
+      message: "Name of the file to delete is required.",
+    });
+  }
+  const filePath = path.join(__dirname, "../../public/images/tutorial", name);
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({
+        status: "error",
+        message: "Failed to delete the file.",
+      });
+    }
+    return res.json({
+      status: "success",
+      message: "File deleted successfully.",
+    });
+  });
+});
+
 router.post("/settings/update", settingsUpdate);
 
 router.post("/settings/update/pacman", updateGameSettings);
