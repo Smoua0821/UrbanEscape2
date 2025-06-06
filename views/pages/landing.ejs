@@ -52,9 +52,21 @@
         <div class="my-5"></div>
         <%}%> <%if(locals.user){%>
         <div class="my-3">
-          <a href="/user/profile" class="btn btn-primary w-100 rounded-0 my-1"
-            >My Profile</a
-          >
+          <div class="row">
+            <div class="col-sm-6 my-2">
+              <button
+                onclick="modalToggle()"
+                class="btn btn-success w-100 my-1"
+              >
+                Go Back to Home
+              </button>
+            </div>
+            <div class="col-sm-6 my-2">
+              <a href="/user/profile" class="btn btn-primary w-100 my-1"
+                >My Profile</a
+              >
+            </div>
+          </div>
         </div>
         <%}%>
         <div class="extra mt-2 text-center">
@@ -71,33 +83,71 @@
         </div>
       </div>
     </div>
+    <div
+      class="modal fade"
+      id="backToMapModal"
+      tabindex="-1"
+      aria-labelledby="backToMapModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3
+              class="m-0 text-center w-100 text-success"
+              id="exampleModalLabel"
+            >
+              Game On
+            </h3>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="py-5">
+              <p class="lead m-0 text-center">
+                Click <span class="text-success"><b>Start Game</b></span> to
+                play.
+              </p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <div class="text-center">
+              <button class="me-2 btn btn-info backBTN" data-id="restartgame">
+                Restart Game
+              </button>
+              <button class="me-2 btn btn-secondary" data-bs-dismiss="modal">
+                Go Back to Home
+              </button>
+              <button class="btn btn-warning backBTN" data-id="leaderboard">
+                Leaderboard
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      function submitt(event) {
-        const mapId = document.getElementById("mapId").value;
-        if (!mapId) return alert("Please Enter a Map ID");
-        fetch("/user/map", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ mapId: mapId }),
-        })
-          .then((response) => {
-            if (response.ok) {
-              window.location.href = `/map/${mapId}`;
-            } else {
-              return response.json();
-            }
-          })
-          .then((data) => {
-            if (data) {
-              console.error("Error:", data.message);
-            }
-          })
-          .catch((error) => {
-            console.error("Request failed", error);
-          });
+      function modalToggle() {
+        $("#backToMapModal").modal("toggle");
       }
+      $(document).ready(() => {
+        $(".backBTN").click(function () {
+          const curID = $(this).data("id");
+          let actTo = "leaderboard";
+          if (curID == "restartgame") {
+            actTo = "map";
+          }
+          let tgt = localStorage.lastMap;
+          if (!tgt) tgt = $(this).data("target");
+          window.location.href = `/${actTo}/${tgt}`;
+        });
+      });
     </script>
   </body>
 </html>
