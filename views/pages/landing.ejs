@@ -52,9 +52,18 @@
         <div class="my-5"></div>
         <%}%> <%if(locals.user){%>
         <div class="my-3">
-          <a href="/user/profile" class="btn btn-primary w-100 rounded-0 my-1"
-            >My Profile</a
-          >
+          <div class="row">
+            <div class="col-sm-6 my-2">
+              <button onclick="backToMap()" class="btn btn-warning w-100 my-1">
+                Go Back to Profile
+              </button>
+            </div>
+            <div class="col-sm-6 my-2">
+              <a href="/user/profile" class="btn btn-warning w-100 my-1"
+                >My Profile</a
+              >
+            </div>
+          </div>
         </div>
         <%}%>
         <div class="extra mt-2 text-center">
@@ -72,31 +81,10 @@
       </div>
     </div>
     <script>
-      function submitt(event) {
-        const mapId = document.getElementById("mapId").value;
-        if (!mapId) return alert("Please Enter a Map ID");
-        fetch("/user/map", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ mapId: mapId }),
-        })
-          .then((response) => {
-            if (response.ok) {
-              window.location.href = `/map/${mapId}`;
-            } else {
-              return response.json();
-            }
-          })
-          .then((data) => {
-            if (data) {
-              console.error("Error:", data.message);
-            }
-          })
-          .catch((error) => {
-            console.error("Request failed", error);
-          });
+      function backToMap() {
+        let tgt = localStorage.lastMap;
+        if (!tgt) window.location.href = `/user/profile`;
+        window.location.href = `/map/${tgt}`;
       }
     </script>
   </body>
