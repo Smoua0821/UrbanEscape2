@@ -130,6 +130,26 @@ $(".save_final").click(() => {
     lat: map.getCenter().lat(),
     lng: map.getCenter().lng(),
   };
+  const quizQuestion = $("#quizQuestion").val();
+
+  const options = $(".quiz-option-unit")
+    .map(function () {
+      return $(this).val();
+    })
+    .get();
+
+  const quizAnswer = $("#quizAnswer").val();
+  if (
+    quizQuestion &&
+    options.length === 4 &&
+    options.every((opt) => opt.trim() !== "") &&
+    quizAnswer
+  ) {
+    payloadData.quiz = { quizQuestion, quizAnswer, options };
+  } else {
+    notyf.error("Please fill all fields");
+  }
+
   if (
     (payloadData.polygonCoords.length > 2 ||
       loopRouteOptions.mode == "update") &&
@@ -1405,6 +1425,18 @@ function renderRoutes() {
         $("#savePolyModal").modal("show");
         const tarObj = data.find((d) => d._id == path._id);
         if (!tarObj) return notyf.error("Something went Wrong!");
+        const quiz = tarObj.quiz;
+        if (quiz) {
+          $("#quizQuestion").val(quiz.question);
+
+          // Set options
+          $(".quiz-option-unit").each(function (index) {
+            $(this).val(quiz.options[index] || "");
+          });
+
+          // Set answer index (convert to 1-based for input field)
+          $("#quizAnswer").val(quiz.answerIndex);
+        }
 
         $("#routeTitle").val(tarObj.title);
         $("#routeDescription").val(tarObj.description);
@@ -1425,8 +1457,6 @@ function renderRoutes() {
         payloadData.speed = tarObj.speed;
         payloadData.opacity = tarObj.opacity;
         payloadData.size = tarObj.size;
-
-        console.log(payloadData);
 
         $(".delRouteBtn")
           .off("click")
