@@ -83,17 +83,43 @@ async function saveLoopRoutes(req, res) {
     opacity,
     mode = "custom",
     presetCoords,
+    quiz,
   } = req.body;
+
   if (!mapId)
     return res
       .status(400)
       .json({ status: "error", message: "No MAP is Selected" });
+
   const map = await Map.findOne({ id: mapId });
   if (!map)
     return res
       .status(404)
       .json({ status: "error", message: "No map Found with corresponding ID" });
+
   if (presetCoords?.length <= 0) mode = "custom";
+
+  let quizData = null;
+
+  if (
+    quiz &&
+    typeof quiz.quizQuestion === "string" &&
+    quiz.quizQuestion.trim() !== "" &&
+    quiz.quizAnswer &&
+    parseInt(quiz.quizAnswer) > 0 &&
+    parseInt(quiz.quizAnswer) <= 4 &&
+    Array.isArray(quiz.options) &&
+    quiz.options.length === 4 &&
+    quiz.options.every((opt) => typeof opt === "string" && opt.trim() !== "")
+  ) {
+    quizData = {
+      mode: "on",
+      question: quiz.quizQuestion.trim(),
+      options: quiz.options.map((opt) => opt.trim()),
+      answerIndex: parseInt(quiz.quizAnswer),
+    };
+  }
+
   const newLoopRoute = new LoopRoute({
     title,
     description,
@@ -106,19 +132,42 @@ async function saveLoopRoutes(req, res) {
     mapId: map._id,
     mode,
     path: mode === "custom" ? [] : presetCoords,
+    ...(quizData && { quiz: quizData }), // Add quiz only if valid
   });
 
   try {
     const savedLoopRoute = await newLoopRoute.save();
-    res.status(201).json(savedLoopRoute);
+
+    // Add quiz warning if quiz was invalid or missing
+    const response = {
+      status: "success",
+      message: "Loop route saved successfully",
+      data: savedLoopRoute,
+    };
+
+    if (quiz && !quizData) {
+      response.warning = "Quiz data was invalid and not saved.";
+    }
+
+    res.status(201).json(response);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ status: "error", error: error.message });
   }
 }
 
 async function updateLoopRoutes(req, res) {
-  const { title, description, image, radius, speed, size, opacity, loopId } =
-    req.body;
+  const {
+    title,
+    description,
+    image,
+    radius,
+    speed,
+    size,
+    opacity,
+    loopId,
+    quiz,
+  } = req.body;
+
   if (!loopId) {
     return res
       .status(400)
@@ -133,12 +182,38 @@ async function updateLoopRoutes(req, res) {
         .json({ status: "error", message: "No Route Found" });
     }
 
-    await LoopRoute.updateOne(
-      { _id: loopId },
-      {
-        $set: { title, description, image, radius, speed, size, opacity },
-      }
-    );
+    let dataToSave = {
+      title,
+      description,
+      image,
+      radius,
+      speed,
+      size,
+      opacity,
+    };
+
+    if (
+      quiz &&
+      typeof quiz.quizQuestion === "string" &&
+      quiz.quizQuestion.trim() !== "" &&
+      quiz.quizAnswer &&
+      parseInt(quiz.quizAnswer) > 0 &&
+      parseInt(quiz.quizAnswer) <= 4 &&
+      Array.isArray(quiz.options) &&
+      quiz.options.length === 4 &&
+      quiz.options.every((opt) => typeof opt === "string" && opt.trim() !== "")
+    ) {
+      dataToSave.quiz = {
+        mode: "on",
+        question: quiz.quizQuestion.trim(),
+        options: quiz.options.map((opt) => opt.trim()),
+        answerIndex: parseInt(quiz.quizAnswer),
+      };
+    } else {
+      return res.json({ status: "error", message: "Invalid Quiz parameters!" });
+    }
+
+    await LoopRoute.updateOne({ _id: loopId }, { $set: dataToSave });
 
     return res.json({
       status: "success",

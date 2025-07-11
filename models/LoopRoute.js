@@ -64,6 +64,24 @@ const loopRouteSchema = new mongoose.Schema(
       ref: "Map",
       required: true,
     },
+    quiz: {
+      mode: {
+        type: String,
+        enum: ["on", "off"],
+        default: "off",
+      },
+      question: {
+        type: String,
+      },
+      options: [
+        {
+          type: String,
+        },
+      ],
+      answerIndex: {
+        type: Number,
+      },
+    },
   },
   {
     timestamps: true,

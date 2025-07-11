@@ -62,7 +62,6 @@ const updateUserHistory = async (req, res, incrementLifes) => {
       },
       incrementLifes ? { $inc: { "users.$.lifes": +1 } } : {}
     );
-    console.log(incrementLifes);
     if (incrementLifes) {
       User.updateOne(
         { _id: req.user._id },

@@ -535,3 +535,8 @@
   top: 30%;
   overflow: hidden;
 }
+
+.icon-container {
+  max-height: 400px;
+  overflow: scroll;
+}
