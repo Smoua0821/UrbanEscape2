@@ -136,6 +136,37 @@
     </style>
     <%}%>
     <input type="hidden" id="gameStarted" value="<%= gameStarted %>" />
+    <div class="quiz-container" style="display: none">
+      <div
+        class="d-flex justify-content-center align-items-center h-100 quizParent"
+      >
+        <div class="quiz-box shadow-lg p-3">
+          <div class="quiz-question mb-2 pb-2 border-bottom">
+            <h4 id="quizQuestion">Which question is this?</h4>
+          </div>
+          <div class="quiz-options p-2">
+            <div class="quiz-option-unit"><p>The last one</p></div>
+            <div class="quiz-option-unit"><p>only the white space</p></div>
+            <div class="quiz-option-unit"><p>error handling</p></div>
+            <div class="quiz-option-unit"><p>It is not a question</p></div>
+          </div>
+          <div class="quiz-action-buttons">
+            <div class="row">
+              <div class="col-sm-4 my-2">
+                <button class="btn btn-danger w-100" id="quizCloseBtn">
+                  Close
+                </button>
+              </div>
+              <div class="col-sm-8 my-2">
+                <button class="btn btn-success w-100" id="quizSubmitBtn">
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="fullscreen-toggle">
       <div class="fullscreen p-2 bg-primary text-white">
         <span>Full Screen</span>
