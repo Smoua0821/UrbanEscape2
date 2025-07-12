@@ -198,7 +198,7 @@ async function updateLoopRoutes(req, res) {
       quiz.quizQuestion.trim() !== "" &&
       quiz.quizAnswer &&
       parseInt(quiz.quizAnswer) > 0 &&
-      parseInt(quiz.quizAnswer) <= 4 &&
+      parseInt(quiz.quizAnswer) < quiz.options.length &&
       Array.isArray(quiz.options) &&
       quiz.options.length === 4 &&
       quiz.options.every((opt) => typeof opt === "string" && opt.trim() !== "")
@@ -207,7 +207,7 @@ async function updateLoopRoutes(req, res) {
         mode: "on",
         question: quiz.quizQuestion.trim(),
         options: quiz.options.map((opt) => opt.trim()),
-        answerIndex: parseInt(quiz.quizAnswer),
+        answerIndex: parseInt(quiz.quizAnswer) - 1,
       };
     } else {
       return res.json({ status: "error", message: "Invalid Quiz parameters!" });
