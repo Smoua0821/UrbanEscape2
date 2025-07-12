@@ -436,7 +436,8 @@ iconMarker.width = 50;
 let isFullScreen = 0;
 let polyIndex = 0;
 iconMarker.addEventListener("click", () => {
-  InfoModal(polygonCoordinates[polyIndex]._id);
+  const target = polygonCoordinates[polyIndex]._id;
+  return InfoModal(target);
 });
 
 function getPointAtDistance(lat, lng, distanceKm, angleDeg) {
@@ -761,13 +762,16 @@ function initMap() {
     if (clickDist2 > circle.getRadius() / 1000)
       return console.log("Clicked Outside Circle");
 
-    if (clickDist2 < circle.getRadius())
+    if (clickDist2 < circle.getRadius()) {
       InfoModal(polygonCoordinates[polyIndex]._id);
+    }
 
     if (clickDist > (circle.getRadius() + positionRadius) / 1000)
       return console.log("Your live Location is Outside Circle");
 
-    InfoModal(polygonCoordinates[polyIndex]._id);
+    if (!clickDist2 < circle.getRadius()) {
+      InfoModal(polygonCoordinates[polyIndex]._id);
+    }
 
     $(".confirmCaptureContainer").show();
     $(".confirmCaptureContainer button.confirmCapture")
@@ -784,78 +788,29 @@ function initMap() {
           `/images/mapicons/${ImgPath[ImgPath.length - 1]}`
         );
         const polyId = polygonCoordinates[polyIndex]._id;
-        $.post(
-          "/user/profile/capture",
-          {
-            mapId: mapParsedId,
-            polyId: polyId,
-            showingOnMap: polygonCoordinates.length,
-          },
-          (data, status, xhr) => {
-            if (
-              status === "success" &&
-              (data.message === "Image Captured successfully!" ||
-                data.message === "Exists Already")
-            ) {
-              $(".confirmCaptureContainer").hide();
-              const checkpointIndex = checkpoints.findIndex(
-                (d) => d.mapId === mapParsedId
-              );
-              if (checkpointIndex !== -1) {
-                const polygonIndex = checkpoints[
-                  checkpointIndex
-                ].polygons?.findIndex((d) => d.polyId === polyId);
-                if (polygonIndex !== -1) {
-                  checkpoints[checkpointIndex].polygons.splice(polygonIndex, 1);
-                  localStorage.setItem("checkpoints", checkpoints);
-                }
-              }
-
-              profileImages.push(polyId);
-              $("#CapturedImagePopUp").fadeIn();
-              $("#bsModalTitle").text(data.title);
-              $("#bsModal").modal("show");
-              if (polygonCoordinates.length >= 0) {
-                removeObjectByIndex(polygonCoordinates, polyIndex);
-                if (polygonCoordinates.length == 0)
-                  return gameOverHandler("win");
-                polyIndex = nearestPolygon().index;
-                map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
-              }
-            } else {
-              const errorMessage =
-                data.message || "It seems You are not logged in, Please login";
-              notyf.error(errorMessage);
-              window.location.href = "/auth";
-            }
-          }
-        ).fail((xhr, status, error) => {
-          if (xhr.status == 369) {
-            window.location.href = "/auth";
-          }
-
-          const errorMessage =
-            xhr.responseJSON?.message || "An unexpected error occurred.";
-          const errorCode = xhr.responseJSON?.code;
-
-          if (errorCode === 302) {
-            // Redirect only if specific error code is returned
-            setTimeout(() => {
-              window.location.href = "/auth";
-            }, 2000);
-          } else {
-            // Show server error message
-            notyf.error(errorMessage);
-          }
-
-          let dCode = xhr.responseJSON?.code || 0;
-          if (dCode == 1) {
-            if (polygonCoordinates.length > 0) {
-              removeObjectByIndex(polygonCoordinates, polyIndex);
-              polyIndex = nearestPolygon().index;
-            }
-          }
-        });
+        const quizData = polygonCoordinates.find((d) => d._id == polyId)?.quiz;
+        let imgCaptureData;
+        imgCaptureData = {
+          mapId: mapParsedId,
+          polyId: polyId,
+          showingOnMap: polygonCoordinates.length,
+        };
+        if (quizData?.mode == "on") {
+          showQuizConfirmation(quizData)
+            .then((msg) => {
+              console.log(quizData, msg);
+              if (quizData.answerIndex != msg.index)
+                return notyf.error("The selected answer is wrong!");
+              imgCaptureData.quizAnswer = msg;
+              captureImage(imgCaptureData, polyId);
+            })
+            .catch((msg) => {
+              console.warn(msg);
+              handleClose();
+            });
+        } else {
+          captureImage(imgCaptureData, polyId);
+        }
 
         nearestPolygon();
         if (!gameStarted) {
@@ -864,6 +819,72 @@ function initMap() {
         }
       });
   });
+  const captureImage = (imgCaptureData, polyId) => {
+    if (!imgCaptureData) return notyf.error("Invalid Request!");
+    $.post("/user/profile/capture", imgCaptureData, (data, status, xhr) => {
+      if (
+        status === "success" &&
+        (data.message === "Image Captured successfully!" ||
+          data.message === "Exists Already")
+      ) {
+        $(".confirmCaptureContainer").hide();
+        const checkpointIndex = checkpoints.findIndex(
+          (d) => d.mapId === mapParsedId
+        );
+        if (checkpointIndex !== -1) {
+          const polygonIndex = checkpoints[checkpointIndex].polygons?.findIndex(
+            (d) => d.polyId === polyId
+          );
+          if (polygonIndex !== -1) {
+            checkpoints[checkpointIndex].polygons.splice(polygonIndex, 1);
+            localStorage.setItem("checkpoints", checkpoints);
+          }
+        }
+
+        profileImages.push(polyId);
+        $("#CapturedImagePopUp").fadeIn();
+        $("#bsModalTitle").text(data.title);
+        $("#bsModal").modal("show");
+        if (polygonCoordinates.length >= 0) {
+          removeObjectByIndex(polygonCoordinates, polyIndex);
+          if (polygonCoordinates.length == 0) return gameOverHandler("win");
+          polyIndex = nearestPolygon().index;
+          map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
+        }
+      } else {
+        const errorMessage =
+          data.message || "It seems You are not logged in, Please login";
+        notyf.error(errorMessage);
+        window.location.href = "/auth";
+      }
+    }).fail((xhr, status, error) => {
+      if (xhr.status == 369) {
+        window.location.href = "/auth";
+      }
+
+      const errorMessage =
+        xhr.responseJSON?.message || "An unexpected error occurred.";
+      const errorCode = xhr.responseJSON?.code;
+
+      if (errorCode === 302) {
+        // Redirect only if specific error code is returned
+        setTimeout(() => {
+          window.location.href = "/auth";
+        }, 2000);
+      } else {
+        // Show server error message
+        notyf.error(errorMessage);
+      }
+
+      let dCode = xhr.responseJSON?.code || 0;
+      if (dCode == 1) {
+        if (polygonCoordinates.length > 0) {
+          removeObjectByIndex(polygonCoordinates, polyIndex);
+          polyIndex = nearestPolygon().index;
+        }
+      }
+    });
+  };
   markerElement = new google.maps.marker.AdvancedMarkerElement({
     position: pos,
     map: map,
@@ -1243,11 +1264,59 @@ function startGaming() {
   animateMarker();
   gameStarted = 1;
 }
+
 function InfoModal(polyid) {
   const tarPolygon = polygonCoordinates.find((d) => d._id == polyid);
   if (!tarPolygon) return notyf.error("No Information found!");
+  showModalCapture(tarPolygon);
+}
+
+function showModalCapture(tarPolygon) {
   $(".infoBoxMarkimage").attr("src", tarPolygon.image);
   $(".informationWindow .infoTitle").text(tarPolygon.title);
   $(".informationWindow p.mText").text(tarPolygon.description);
   $(".informationWindow").fadeIn();
+}
+
+function showQuizConfirmation(quizData = {}) {
+  $(".quiz-question #quizQuestion").text(quizData?.question);
+  $(".quiz-options").html(
+    quizData.options
+      ?.map(
+        (opt) =>
+          `<div class="quiz-option-unit">
+         <p>${opt}</p>
+       </div>`
+      )
+      .join("")
+  );
+  $(".quiz-option-unit")
+    .off("click")
+    .on("click", function () {
+      $(".quiz-option-unit").removeClass("selected");
+      $(this).addClass("selected");
+    });
+
+  return new Promise((resolve, reject) => {
+    const quizBox = document.querySelector(".quiz-container");
+    const closeBtn = document.getElementById("quizCloseBtn");
+    const submitBtn = document.getElementById("quizSubmitBtn");
+
+    quizBox.style.display = "flex";
+
+    // OK (Submit)
+    submitBtn.onclick = () => {
+      quizBox.style.display = "none";
+      resolve({
+        index: $(".quiz-option-unit.selected").index(".quiz-option-unit"),
+        text: $(".quiz-option-unit.selected").text().trim(),
+      });
+    };
+
+    // Cancel (Close)
+    closeBtn.onclick = () => {
+      quizBox.style.display = "none";
+      reject("User closed the quiz");
+    };
+  });
 }
