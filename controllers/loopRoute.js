@@ -107,16 +107,16 @@ async function saveLoopRoutes(req, res) {
     quiz.quizQuestion.trim() !== "" &&
     quiz.quizAnswer &&
     parseInt(quiz.quizAnswer) > 0 &&
-    parseInt(quiz.quizAnswer) <= 4 &&
+    parseInt(quiz.quizAnswer) < quiz.options.length &&
     Array.isArray(quiz.options) &&
-    quiz.options.length === 4 &&
+    quiz.options.length > 0 &&
     quiz.options.every((opt) => typeof opt === "string" && opt.trim() !== "")
   ) {
     quizData = {
       mode: "on",
       question: quiz.quizQuestion.trim(),
       options: quiz.options.map((opt) => opt.trim()),
-      answerIndex: parseInt(quiz.quizAnswer),
+      answerIndex: parseInt(quiz.quizAnswer) - 1,
     };
   }
 
@@ -200,7 +200,7 @@ async function updateLoopRoutes(req, res) {
       parseInt(quiz.quizAnswer) > 0 &&
       parseInt(quiz.quizAnswer) < quiz.options.length &&
       Array.isArray(quiz.options) &&
-      quiz.options.length === 4 &&
+      quiz.options.length > 0 &&
       quiz.options.every((opt) => typeof opt === "string" && opt.trim() !== "")
     ) {
       dataToSave.quiz = {
