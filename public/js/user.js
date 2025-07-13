@@ -236,6 +236,11 @@ const settings = {
 };
 
 $(document).ready(() => {
+  $(".quiz-box-alert button")
+    .off("click")
+    .on("click", () => {
+      $(".quiz-box-alert").fadeOut();
+    });
   setTimeout(() => {
     $(".login-prompt-modal").fadeIn();
   }, 1000);
@@ -799,8 +804,11 @@ function initMap() {
           showQuizConfirmation(quizData)
             .then((msg) => {
               console.log(quizData, msg);
-              if (quizData.answerIndex != msg.index)
+              if (quizData.answerIndex != msg.index) {
+                $(".quiz-box-alert").fadeIn();
+
                 return notyf.error("The selected answer is wrong!");
+              }
               imgCaptureData.quizAnswer = msg;
               captureImage(imgCaptureData, polyId);
             })
