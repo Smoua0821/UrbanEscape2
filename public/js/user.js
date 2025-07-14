@@ -803,12 +803,6 @@ function initMap() {
         if (quizData?.mode == "on") {
           showQuizConfirmation(quizData)
             .then((msg) => {
-              console.log(quizData, msg);
-              if (quizData.answerIndex != msg.index) {
-                $(".quiz-box-alert").fadeIn();
-
-                return notyf.error("The selected answer is wrong!");
-              }
               imgCaptureData.quizAnswer = msg;
               captureImage(imgCaptureData, polyId);
             })
@@ -860,10 +854,10 @@ function initMap() {
           map.panTo(polygonCoordinates[polyIndex].polygonCoords[0]);
         }
       } else {
-        const errorMessage =
-          data.message || "It seems You are not logged in, Please login";
-        notyf.error(errorMessage);
-        window.location.href = "/auth";
+        if (data.status == "error") {
+          notyf.error(data.message || "Something went wrong!");
+          $(".quiz-box-alert").fadeIn();
+        }
       }
     }).fail((xhr, status, error) => {
       if (xhr.status == 369) {
@@ -1315,10 +1309,11 @@ function showQuizConfirmation(quizData = {}) {
     // OK (Submit)
     submitBtn.onclick = () => {
       quizBox.style.display = "none";
-      resolve({
+      const answerObject = {
         index: $(".quiz-option-unit.selected").index(".quiz-option-unit"),
         text: $(".quiz-option-unit.selected").text().trim(),
-      });
+      };
+      resolve(answerObject);
     };
 
     // Cancel (Close)

@@ -134,7 +134,6 @@ router.get("/map/:mapId", async (req, res) => {
     const now = new Date();
     now.setHours(now.getHours() + -7 - now.getTimezoneOffset() / 60);
     const givenDate = new Date(isoDateString);
-    console.log(`${now} --- ${givenDate}`);
     return givenDate - now;
   }
   const dataOutput = {
@@ -152,7 +151,6 @@ router.get("/map/:mapId", async (req, res) => {
     pacman: map.pacman,
     gameWinningUrl: map.gameWinningUrl || null,
   };
-  console.log(dataOutput);
   res.render("pages/home", dataOutput);
 });
 

@@ -61,7 +61,15 @@ async function fetchLoopRoutes(req, res) {
       }
       return d;
     });
-
+  filteredImages.forEach((item) => {
+    if (item.quiz) {
+      item.quiz = {
+        mode: item.quiz.mode,
+        question: item.quiz.question,
+        options: item.quiz.options,
+      };
+    }
+  });
   res.json({
     status: "success",
     mapGameSetting: map.pacman,

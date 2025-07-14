@@ -60,7 +60,7 @@ const userProfile = async (req, res) => {
 };
 
 const captureImage = async (req, res) => {
-  let { polyId, mapId, showingOnMap } = req.body;
+  let { polyId, mapId, showingOnMap, quizAnswer } = req.body;
   if (!polyId || !mapId) return res.status(400).end("Invalid Request");
   const map = await Map.findOne({ id: mapId });
   if (!map) return res.json({ status: "error", message: "No Map Found!" });
@@ -117,6 +117,45 @@ const captureImage = async (req, res) => {
     return res.json({ message: "Something went Wrong!" });
 
   try {
+    let isQuizRequired = 0;
+    let isQuizPassed = 0;
+
+    const quizSelector = looproute?.find((e) => e._id == polyId);
+
+    if (quizSelector?.quiz?.mode === "on") {
+      isQuizRequired = 1;
+
+      if (quizAnswer?.index !== undefined && quizAnswer?.text) {
+        const correctText = quizSelector.quiz.options[quizAnswer.index];
+        const correctIndex = quizSelector.quiz.answerIndex;
+        console.log(quizSelector.quiz, quizAnswer);
+
+        if (
+          correctText === quizAnswer.text &&
+          correctIndex === parseInt(quizAnswer.index)
+        ) {
+          isQuizPassed = 1;
+        } else {
+          return res.json({
+            status: "error",
+            message: "Wrong Answer!",
+          });
+        }
+      } else {
+        return res.json({
+          status: "error",
+          message: "Attempt quiz to capture this image!",
+        });
+      }
+    }
+
+    if (isQuizRequired && !isQuizPassed) {
+      return res.json({
+        status: "error",
+        message: "Attempt quiz to capture this image!",
+      });
+    }
+
     await User.updateOne(
       { email: req.user.email },
       { $set: { capturedImages: capturedImages } }

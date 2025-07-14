@@ -12,6 +12,7 @@ const {
 
 router.get("/profile", userProfile);
 router.post("/redeem/route", routeRedeem);
+
 router.get("/redeem/route/:id", redeemLinkHandler);
 router.post("/profile/capture", captureImage);
 router.get("/profile/capture", getCaptureImage);
