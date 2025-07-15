@@ -130,6 +130,8 @@ $(".save_final").click(() => {
     lat: map.getCenter().lat(),
     lng: map.getCenter().lng(),
   };
+  const quizMode = $("#QuizActivationStatus").prop("checked");
+  console.log("status: ", quizMode);
   const quizQuestion = $("#quizQuestion").val();
 
   const options = $(".quiz-option-unit")
@@ -141,7 +143,7 @@ $(".save_final").click(() => {
   const quizAnswer = $("#quizAnswer").val();
 
   const cooldowntimeValue = $("#cooldowntimeValue").val();
-  if (quizQuestion) {
+  if (quizMode) {
     if (
       (options.length === 4 &&
         options.every((opt) => opt.trim() !== "") &&
@@ -149,6 +151,7 @@ $(".save_final").click(() => {
       cooldowntimeValue)
     ) {
       payloadData.quiz = {
+        quizMode,
         quizQuestion,
         quizAnswer,
         options,
@@ -157,6 +160,8 @@ $(".save_final").click(() => {
     } else {
       return notyf.error("Please fill all QUIZ fields");
     }
+  } else {
+    payloadData.quiz = { quizMode };
   }
 
   if (
@@ -1436,6 +1441,12 @@ function renderRoutes() {
         if (!tarObj) return notyf.error("Something went Wrong!");
         const quiz = tarObj.quiz;
         if (quiz) {
+          if (quiz.mode == "on") {
+            $("#QuizActivationStatus").prop("checked", true);
+          } else {
+            $("#QuizActivationStatus").prop("checked", false);
+          }
+
           $("#quizQuestion").val(quiz.question);
 
           // Set options
@@ -1444,7 +1455,8 @@ function renderRoutes() {
           });
 
           // Set answer index (convert to 1-based for input field)
-          $("#quizAnswer").val(quiz.answerIndex);
+          $("#quizAnswer").val(quiz.answerIndex + 1);
+          $("#cooldowntimeValue").val(quiz.blockTime);
         }
 
         $("#routeTitle").val(tarObj.title);

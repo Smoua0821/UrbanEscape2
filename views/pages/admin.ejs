@@ -1061,6 +1061,21 @@
 
                 <div class="quiz-manager">
                   <p class="m-0">Quiz manager</p>
+                  <label class="custom-switch">
+                    <input type="checkbox" id="QuizActivationStatus" />
+                    <div
+                      class="custom-slider"
+                      style="background-color: #ffd4d4"
+                    >
+                      <div class="custom-slider-btn">
+                        <div class="custom-light"></div>
+                        <div class="custom-texture"></div>
+                        <div class="custom-texture"></div>
+                        <div class="custom-texture"></div>
+                        <div class="custom-light"></div>
+                      </div>
+                    </div>
+                  </label>
                   <div class="question-controller px-2 py-3">
                     <textarea
                       type="text"
@@ -1080,7 +1095,8 @@
                       min="1"
                     />
                   </div>
-                  <div class="question-options-controller bg-light py-3">
+                  <div class="question-options-controller bg-light p-3 rounded">
+                    <p class="mb-2 small">Quiz Options</p>
                     <div class="d-flex align-items-center gap-2">
                       <span>1).</span>
                       <input
@@ -1115,6 +1131,7 @@
                     </div>
                   </div>
                   <div class="quiz-answer-index bg-light px-2 py-3">
+                    <p class="mb-2 small">Quiz Answer Number (eg: 3)</p>
                     <input
                       type="number"
                       min="1"

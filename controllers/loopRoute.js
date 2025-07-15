@@ -61,15 +61,31 @@ async function fetchLoopRoutes(req, res) {
       }
       return d;
     });
-  filteredImages.forEach((item) => {
-    if (item.quiz) {
-      item.quiz = {
-        mode: item.quiz.mode,
-        question: item.quiz.question,
-        options: item.quiz.options,
-      };
+
+  try {
+    if (req.cookies?.sessionId) {
+      req.user = jwt.verify(req.cookies.sessionId, process.env.JWT_SECRET);
     }
-  });
+  } catch (err) {
+    req.user = null;
+  }
+
+  if (req?.user?.role?.current !== "admin") {
+    filteredImages = filteredImages.map((item) => {
+      if (item.quiz) {
+        return {
+          ...item,
+          quiz: {
+            mode: item.quiz.mode,
+            question: item.quiz.question,
+            options: item.quiz.options,
+          },
+        };
+      }
+      return item;
+    });
+  }
+
   res.json({
     status: "success",
     mapGameSetting: map.pacman,
@@ -140,7 +156,9 @@ async function saveLoopRoutes(req, res) {
     mapId: map._id,
     mode,
     path: mode === "custom" ? [] : presetCoords,
-    ...(quizData && { quiz: quizData }), // Add quiz only if valid
+    ...(quizData && {
+      quiz: { ...quizData, blockTime: parseInt(quiz.cooldowntimeValue) },
+    }), // Add quiz only if valid
   });
 
   try {
@@ -200,30 +218,47 @@ async function updateLoopRoutes(req, res) {
       opacity,
     };
     console.log("entered");
-
-    if (
-      quiz &&
-      typeof quiz.quizQuestion === "string" &&
-      quiz.quizQuestion.trim() !== "" &&
-      quiz.quizAnswer &&
-      parseInt(quiz.quizAnswer) > 0 &&
-      parseInt(quiz.quizAnswer) < quiz.options.length &&
-      Array.isArray(quiz.options) &&
-      quiz.options.length > 0 &&
-      quiz.options.every((opt) => typeof opt === "string" && opt.trim() !== "")
-    ) {
-      dataToSave.quiz = {
-        mode: "on",
-        question: quiz.quizQuestion.trim(),
-        options: quiz.options.map((opt) => opt.trim()),
-        answerIndex: parseInt(quiz.quizAnswer) - 1,
-        blockTime: parseInt(quiz.cooldowntimeValue) || 2,
-      };
-    } else {
-      return res.json({ status: "error", message: "Invalid Quiz parameters!" });
+    if (quiz) {
+      console.log(quiz);
+      if (quiz.quizMode == "true") {
+        if (
+          quiz &&
+          typeof quiz.quizQuestion === "string" &&
+          quiz.quizQuestion.trim() !== "" &&
+          quiz.quizAnswer &&
+          parseInt(quiz.quizAnswer) > 0 &&
+          parseInt(quiz.quizAnswer) < quiz.options.length &&
+          Array.isArray(quiz.options) &&
+          quiz.options.length > 0 &&
+          quiz.options.every(
+            (opt) => typeof opt === "string" && opt.trim() !== ""
+          )
+        ) {
+          dataToSave.quiz = {
+            question: quiz.quizQuestion.trim(),
+            options: quiz.options.map((opt) => opt.trim()),
+            answerIndex: parseInt(quiz.quizAnswer) - 1,
+            blockTime: parseInt(quiz.cooldowntimeValue) || 2,
+            mode: "on",
+          };
+        } else {
+          return res.json({
+            status: "error",
+            message: "Invalid Quiz parameters!",
+          });
+        }
+      }
     }
 
-    await LoopRoute.updateOne({ _id: loopId }, { $set: dataToSave });
+    if (quiz.quizMode == "false") {
+      await LoopRoute.updateOne(
+        { _id: loopId },
+        { $set: { "quiz.mode": "off" } }
+      );
+      console.log("Trying This");
+    } else {
+      await LoopRoute.updateOne({ _id: loopId }, { $set: dataToSave });
+    }
 
     return res.json({
       status: "success",
