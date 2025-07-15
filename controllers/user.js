@@ -134,9 +134,11 @@ const captureImage = async (req, res) => {
           loopRouteId: quizSelector._id,
           userId: req.user._id,
         });
-        console.log(blockhistory);
-        const timeDiff =
-          (new Date(blockhistory?.timeExpire) - new Date()) / (60 * 60);
+
+        const futureTime = new Date(blockhistory?.timeExpire);
+        const currentTime = new Date();
+        const timeDiff = (futureTime - currentTime) / 1000;
+        console.log(futureTime, currentTime);
         if (timeDiff > 0)
           return res.json({
             status: "error",
@@ -146,7 +148,6 @@ const captureImage = async (req, res) => {
               timeDiff > 60 ? (timeDiff / 60).toFixed(0) : timeDiff.toFixed(0)
             } ${timeDiff > 60 ? "minutes" : "seconds"}`,
           });
-        console.log(timeDiff);
 
         if (
           correctText === quizAnswer.text &&
@@ -155,6 +156,7 @@ const captureImage = async (req, res) => {
           isQuizPassed = 1;
         } else {
           const currentTime = new Date();
+          console.log(quizSelector.quiz.blockTime, " Time Gain");
           const timeExpire = new Date(
             currentTime.getTime() + quizSelector.quiz.blockTime * 60 * 1000
           );

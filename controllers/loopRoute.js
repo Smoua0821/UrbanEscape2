@@ -199,6 +199,7 @@ async function updateLoopRoutes(req, res) {
       size,
       opacity,
     };
+    console.log("entered");
 
     if (
       quiz &&
@@ -216,6 +217,7 @@ async function updateLoopRoutes(req, res) {
         question: quiz.quizQuestion.trim(),
         options: quiz.options.map((opt) => opt.trim()),
         answerIndex: parseInt(quiz.quizAnswer) - 1,
+        blockTime: parseInt(quiz.cooldowntimeValue) || 2,
       };
     } else {
       return res.json({ status: "error", message: "Invalid Quiz parameters!" });
