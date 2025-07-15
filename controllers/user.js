@@ -147,6 +147,7 @@ const captureImage = async (req, res) => {
             message: `Please wait ${
               timeDiff > 60 ? (timeDiff / 60).toFixed(0) : timeDiff.toFixed(0)
             } ${timeDiff > 60 ? "minutes" : "seconds"}`,
+            icon: "clock-o",
           });
 
         if (
@@ -172,6 +173,7 @@ const captureImage = async (req, res) => {
             type: "wrong",
             heading: "Incorrect Answer",
             message: "The Answer is incorrect!",
+            icon: "close",
           });
         }
       } else {

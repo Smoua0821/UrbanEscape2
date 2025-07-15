@@ -249,7 +249,7 @@ async function updateLoopRoutes(req, res) {
     if (quiz.quizMode == "false") {
       await LoopRoute.updateOne(
         { _id: loopId },
-        { $set: { "quiz.mode": "off" } }
+        { $set: { ...dataToSave, "quiz.mode": "off" } }
       );
       console.log("Trying This");
     } else {

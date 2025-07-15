@@ -858,8 +858,14 @@ function initMap() {
           notyf.error(data.message || "Something went wrong!");
           if (data.type) {
             $(".quiz-box-alert").fadeIn();
-            $(".quiz-box-alert h4").text(data.heading);
-            $(".quiz-box-alert p").text(data.message);
+            $(".quiz-box-alert h4").text(data.heading || "ERROR");
+            $(".quiz-box-alert p").text(
+              data.message || "Something went wrong!"
+            );
+            $(".quiz-box-alert .alert-icon i").removeAttr("class");
+            $(".quiz-box-alert .alert-icon i").addClass(
+              `fa fa-${data.icon || "warning"}`
+            );
           }
         }
       }
