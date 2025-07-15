@@ -139,15 +139,24 @@ $(".save_final").click(() => {
     .get();
 
   const quizAnswer = $("#quizAnswer").val();
-  if (
-    quizQuestion &&
-    options.length === 4 &&
-    options.every((opt) => opt.trim() !== "") &&
-    quizAnswer
-  ) {
-    payloadData.quiz = { quizQuestion, quizAnswer, options };
-  } else {
-    notyf.error("Please fill all fields");
+
+  const cooldowntimeValue = $("#cooldowntimeValue").val();
+  if (quizQuestion) {
+    if (
+      (options.length === 4 &&
+        options.every((opt) => opt.trim() !== "") &&
+        quizAnswer,
+      cooldowntimeValue)
+    ) {
+      payloadData.quiz = {
+        quizQuestion,
+        quizAnswer,
+        options,
+        cooldowntimeValue,
+      };
+    } else {
+      return notyf.error("Please fill all QUIZ fields");
+    }
   }
 
   if (

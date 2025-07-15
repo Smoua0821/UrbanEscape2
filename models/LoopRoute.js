@@ -81,6 +81,10 @@ const loopRouteSchema = new mongoose.Schema(
       answerIndex: {
         type: Number,
       },
+      blockTime: {
+        type: Number,
+        default: 2, // Time in Minutes
+      },
     },
   },
   {

@@ -856,7 +856,11 @@ function initMap() {
       } else {
         if (data.status == "error") {
           notyf.error(data.message || "Something went wrong!");
-          $(".quiz-box-alert").fadeIn();
+          if (data.type) {
+            $(".quiz-box-alert").fadeIn();
+            $(".quiz-box-alert h4").text(data.heading);
+            $(".quiz-box-alert p").text(data.message);
+          }
         }
       }
     }).fail((xhr, status, error) => {

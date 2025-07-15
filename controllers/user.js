@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const PrimaryMap = require("../models/PrimaryMap");
 const RedeemLink = require("../models/RedeemLink");
 const Badge = require("../models/Badges");
+const BlockHistory = require("../models/BlockHistory");
 
 function findDifference(arr1, arr2) {
   return arr1.filter((item) => !arr2.includes(item));
@@ -128,7 +129,25 @@ const captureImage = async (req, res) => {
       if (quizAnswer?.index !== undefined && quizAnswer?.text) {
         const correctText = quizSelector.quiz.options[quizAnswer.index];
         const correctIndex = quizSelector.quiz.answerIndex;
-        console.log(quizSelector.quiz, quizAnswer);
+
+        const blockhistory = await BlockHistory.findOne({
+          loopRouteId: quizSelector._id,
+          userId: req.user._id,
+        });
+
+        const futureTime = new Date(blockhistory?.timeExpire);
+        const currentTime = new Date();
+        const timeDiff = (futureTime - currentTime) / 1000;
+        console.log(futureTime, currentTime);
+        if (timeDiff > 0)
+          return res.json({
+            status: "error",
+            type: "timeleft",
+            heading: "Cooldown",
+            message: `Please wait ${
+              timeDiff > 60 ? (timeDiff / 60).toFixed(0) : timeDiff.toFixed(0)
+            } ${timeDiff > 60 ? "minutes" : "seconds"}`,
+          });
 
         if (
           correctText === quizAnswer.text &&
@@ -136,9 +155,23 @@ const captureImage = async (req, res) => {
         ) {
           isQuizPassed = 1;
         } else {
+          const currentTime = new Date();
+          console.log(quizSelector.quiz.blockTime, " Time Gain");
+          const timeExpire = new Date(
+            currentTime.getTime() + quizSelector.quiz.blockTime * 60 * 1000
+          );
+
+          await BlockHistory.findOneAndUpdate(
+            { loopRouteId: quizSelector._id, userId: req.user._id },
+            { timeExpire },
+            { upsert: true, new: true }
+          );
+
           return res.json({
             status: "error",
-            message: "Wrong Answer!",
+            type: "wrong",
+            heading: "Incorrect Answer",
+            message: "The Answer is incorrect!",
           });
         }
       } else {
