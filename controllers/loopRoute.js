@@ -71,18 +71,14 @@ async function fetchLoopRoutes(req, res) {
   }
 
   if (req?.user?.role?.current !== "admin") {
-    filteredImages = filteredImages.map((item) => {
+    filteredImages.forEach((item) => {
       if (item.quiz) {
-        return {
-          ...item,
-          quiz: {
-            mode: item.quiz.mode,
-            question: item.quiz.question,
-            options: item.quiz.options,
-          },
+        item.quiz = {
+          mode: item.quiz.mode,
+          question: item.quiz.question,
+          options: item.quiz.options,
         };
       }
-      return item;
     });
   }
 
