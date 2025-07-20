@@ -180,7 +180,7 @@
               <div class="image-container row justify-content-center">
                 <% user.capturedImages.forEach(image => { %> <%
                 image.images.forEach(img=>{%>
-                <div class="image-unit col-3">
+                <div class="image-unit col-3" data-id="<%=img%>">
                   <img src="/static/image/<%= img %>" width="100%" />
                 </div>
                 <%}) %> <% }) %>
@@ -256,6 +256,37 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
       $(document).ready(() => {
+        $(".image-unit").click(function () {
+          const imageId = $(this).data("id");
+          if (!imageId) return alert("Please click on an image to delete it!");
+          if (
+            confirm(
+              "Are you sure you want to delete this image from your collection?"
+            )
+          ) {
+            fetch("/user/profile/capture/remove", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ imageId }), // Convert to JSON
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.status === "success") {
+                  alert("Image deleted!");
+                  $(this).remove();
+                } else {
+                  alert(data.message || "Failed to delete image.");
+                }
+              })
+              .catch((err) => {
+                console.error("Error:", err);
+                alert("Something went wrong.");
+              });
+          }
+        });
+
         $(".backBTN").click(function () {
           const curID = $(this).data("id");
           let actTo = "leaderboard";

@@ -205,6 +205,29 @@ const captureImage = async (req, res) => {
   }
 };
 
+const removeCapturedImage = async (req, res) => {
+  const { imageId } = req.body;
+  if (!imageId || !req.user?.email)
+    return res.json({ status: "error", message: "Invalid request!" });
+
+  try {
+    await User.updateOne(
+      { email: req.user?.email },
+      { $pull: { "capturedImages.$[].images": imageId } }
+    );
+    return res.json({
+      status: "success",
+      message: "Image deleted successfully!",
+    });
+  } catch (error) {
+    console.log(error.message || error);
+    return res.json({
+      status: "error",
+      message: error.message || "Something went Wrong!",
+    });
+  }
+};
+
 const getCaptureImage = async (req, res) => {
   let imgexist = [];
   const { mapId } = req.query;
@@ -441,6 +464,7 @@ const badgeDelete = async (req, res) => {
 module.exports = {
   userProfile,
   captureImage,
+  removeCapturedImage,
   getCaptureImage,
   routeRedeem,
   handleRecentMaps,
