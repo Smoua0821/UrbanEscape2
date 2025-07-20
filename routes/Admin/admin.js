@@ -180,6 +180,7 @@ router.post(
 );
 
 const tutorialImageUploader = require("../../config/tutorialUploader");
+const { cleanupUserCapturedImages } = require("../../config/userCaptureClean");
 
 router.post(
   "/upload/tutorial/picture",
@@ -265,8 +266,25 @@ router.post(
   uploadMarkerPacman.single("pacman-image"),
   (req, res) => {
     console.log(req.query);
-    res.json({ status: "ok", body: req.body });
+    res.json({ status: "success", body: req.body });
   }
 );
+
+router.post("/fatal/cleanup", async (req, res) => {
+  try {
+    const curTime = new Date();
+    const updatedCount = await cleanupUserCapturedImages();
+    const timeTaken = ((new date() - curTime) / 1000).toFixed(0);
+    res.json({
+      status: "success",
+      message: "Cleanup Successfull",
+      updatedUsers: updatedCount,
+      timeTaken,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 module.exports = router;
