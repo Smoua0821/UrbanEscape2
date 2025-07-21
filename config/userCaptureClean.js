@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
-const User = require("./User");
-const LoopRoute = require("./LoopRoute");
+const User = require("../models/User");
+const LoopRoute = require("../models/LoopRoute");
 
 async function cleanupUserCapturedImages({ dryRun = false } = {}) {
-  await mongoose.connect(process.env.MONGO_URI);
   const validIds = await LoopRoute.distinct("_id");
   const valid = new Set(validIds.map(String));
   const cursor = User.find({}, { capturedImages: 1 }).cursor();
@@ -35,7 +34,6 @@ async function cleanupUserCapturedImages({ dryRun = false } = {}) {
   }
 
   if (bulk.length) await User.bulkWrite(bulk);
-  await mongoose.disconnect();
   return changed;
 }
 

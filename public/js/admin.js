@@ -452,6 +452,29 @@ function copyCode(mmid) {
   alert("Embed code copied to clipboard!");
 }
 $(document).ready(() => {
+  $(".deadCaptureCleanUp").click(function () {
+    $(this).attr("disabled", true);
+    $(this).text("Cleaning.....");
+    if (confirm("This can't be undone, are you sure?")) {
+      fetch("/admin/fatal/cleanup", {
+        method: "POST",
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          notyf[data.status || "error"](
+            data.message || "Something went wrong!"
+          );
+        })
+        .catch((e) => {
+          console.log(e);
+          notyf.alert("Something went wrong!");
+        })
+        .finally(() => {
+          $(this).attr("disabled", false);
+          $(this).text("Clean Up");
+        });
+    }
+  });
   const renderTutorialList = () => {
     try {
       fetch("/admin/upload/tutorial/picture")

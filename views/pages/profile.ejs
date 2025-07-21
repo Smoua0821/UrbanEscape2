@@ -78,6 +78,35 @@
       tr.unit-badge:hover {
         border-color: red;
       }
+
+      .image-unit {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .image-unit:before {
+        position: absolute;
+        bottom: -30px;
+        left: 0;
+        width: 100%;
+        height: 0%;
+        background: linear-gradient(0, red, #ff00008f);
+        content: "x";
+        cursor: pointer;
+        transition: 0.3s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 8rem;
+        -webkit-text-stroke: 1px white;
+        color: transparent;
+        border-radius: 5px;
+      }
+
+      .image-unit:hover:before {
+        height: calc(100% + 90px);
+        transition: 0.9s;
+      }
     </style>
   </head>
   <body>

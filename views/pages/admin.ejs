@@ -32,15 +32,23 @@
       <div class="col-md-4 col-lg-3 vh-100 sidebar-container">
         <div class="sidebar">
           <div class="logo text-center p-2">
-            <h1 onclick="window.open('/', '_self')">Urban Escape</h1>
+            <img src="/images/logo.png" onclick="window.open('/', '_self')" />
           </div>
           <div class="menu">
             <ul style="list-style: none">
-              <li data-link="home" class="active">Home</li>
-              <li data-link="users">Users</li>
-              <li data-link="routes">Routes</li>
-              <li data-link="maplist">Map List</li>
-              <li data-link="setting">Settings</li>
+              <li data-link="home" class="active">
+                <span class="fa fa-home"></span> Home
+              </li>
+              <li data-link="users"><span class="fa fa-users"></span> Users</li>
+              <li data-link="routes">
+                <span class="fa fa-road"></span> Routes
+              </li>
+              <li data-link="maplist">
+                <span class="fa fa-map"></span> Map List
+              </li>
+              <li data-link="setting">
+                <span class="fa fa-cog"></span> Settings
+              </li>
             </ul>
           </div>
         </div>
@@ -623,7 +631,9 @@
                   <div class="col-xl-6 my-2">
                     <div class="card">
                       <div class="card-header">
-                        <h3 class="text-center m-0">Provinces</h3>
+                        <h3 class="text-center m-0">
+                          <span class="fa fa-map"></span> Provinces
+                        </h3>
                       </div>
                       <div class="card-body">
                         <div class="province-container">
@@ -652,11 +662,50 @@
                         </div>
                       </div>
                     </div>
+                    <div class="card mt-3">
+                      <div class="card-header">
+                        <h3 class="text-center m-0">
+                          <span class="fa fa-trash"></span> Cleanup Manager
+                        </h3>
+                      </div>
+                      <div class="card-body">
+                        <div class="cleanup-manager">
+                          <table class="table table-striped">
+                            <thead>
+                              <tr>
+                                <th>
+                                  <p class="m-0">Article</p>
+                                </th>
+                                <th>
+                                  <p class="m-0">Action</p>
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>
+                                  <p class="m-0">User's dead captured images</p>
+                                </td>
+                                <td>
+                                  <button
+                                    class="btn btn-outline-danger deadCaptureCleanUp"
+                                  >
+                                    Clean Up
+                                  </button>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   <div class="col-xl-6 my-2">
                     <div class="card h-100">
                       <div class="card-header">
-                        <h3 class="m-0 text-center">User Map Settings</h3>
+                        <h3 class="m-0 text-center">
+                          <span class="fa fa-cogs"></span> User Map Settings
+                        </h3>
                       </div>
                       <div class="card-body">
                         <div class="row">
@@ -770,7 +819,9 @@
                   <div class="col-xl-6 my-2">
                     <div class="card">
                       <div class="card-header">
-                        <h3 class="m-0 text-center">Image Management</h3>
+                        <h3 class="m-0 text-center">
+                          <span class="fa fa-file"></span> Image Management
+                        </h3>
                       </div>
                       <div class="card-body">
                         <div class="managed-image row"></div>
@@ -787,7 +838,9 @@
                   <div class="col-xl-6 my-2">
                     <div class="card">
                       <div class="card-header">
-                        <h3 class="m-0 text-center">Image Center</h3>
+                        <h3 class="m-0 text-center">
+                          <span class="fa fa-photo"></span> Image Center
+                        </h3>
                       </div>
                       <div class="card-body">
                         <div class="export-map-images">
@@ -816,7 +869,9 @@
                   <div class="col-xl-6 my-2">
                     <div class="card">
                       <div class="card-header">
-                        <h3 class="m-0 text-center">Button Center</h3>
+                        <h3 class="m-0 text-center">
+                          <span class="fa fa-circle"></span> Button Center
+                        </h3>
                       </div>
                       <div class="card-body">
                         <form class="m-0 p-0 customButtonCreator">
@@ -869,7 +924,9 @@
                   <div class="col-xl-6 my-2">
                     <div class="card">
                       <div class="card-header">
-                        <h3 class="m-0 text-center">Quick Tutorial</h3>
+                        <h3 class="m-0 text-center">
+                          <span class="fa fa-book"></span> Quick Tutorial
+                        </h3>
                       </div>
                       <div class="card-body">
                         <div class="quick-tutorial-images">

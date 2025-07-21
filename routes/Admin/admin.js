@@ -274,7 +274,7 @@ router.post("/fatal/cleanup", async (req, res) => {
   try {
     const curTime = new Date();
     const updatedCount = await cleanupUserCapturedImages();
-    const timeTaken = ((new date() - curTime) / 1000).toFixed(0);
+    const timeTaken = ((new Date() - curTime) / 1000).toFixed(0);
     res.json({
       status: "success",
       message: "Cleanup Successfull",
