@@ -49,11 +49,7 @@ const UserSchema = new mongoose.Schema(
         mapId: {
           type: String,
         },
-        images: [
-          {
-            type: String,
-          },
-        ],
+        images: [{ type: mongoose.Schema.Types.ObjectId, ref: "LoopRoute" }],
         gameStatus: {
           type: String,
           enum: ["win", "lose"],

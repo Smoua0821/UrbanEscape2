@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   userProfile,
   captureImage,
+  removeCapturedImage,
   getCaptureImage,
   routeRedeem,
   handleRecentMaps,
@@ -15,6 +16,7 @@ router.post("/redeem/route", routeRedeem);
 
 router.get("/redeem/route/:id", redeemLinkHandler);
 router.post("/profile/capture", captureImage);
+router.post("/profile/capture/remove", removeCapturedImage);
 router.get("/profile/capture", getCaptureImage);
 
 router.post("/map/", handleRecentMaps);
