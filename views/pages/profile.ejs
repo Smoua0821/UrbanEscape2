@@ -8,6 +8,10 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/notiflix@3.2.8/src/notiflix.min.css"
+    />
     <style>
       ::-webkit-scrollbar {
         display: none;
@@ -283,16 +287,49 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
+      function customConfirm(message, imageUrl = null) {
+        const options = {
+          title: "Confirm",
+          text: message,
+          showCancelButton: true,
+          confirmButtonText: "Yes",
+          cancelButtonText: "No",
+          reverseButtons: true,
+        };
+
+        // If an image is provided, use it instead of the default icon
+        if (imageUrl) {
+          options.imageUrl = imageUrl;
+          options.imageWidth = 100;
+          options.imageAlt = "capture delete";
+        } else {
+          options.icon = "question";
+        }
+
+        return Swal.fire(options).then((result) => result.isConfirmed);
+      }
+
+      const customAlert = (message, icon = "info") => {
+        return Swal.fire({
+          title: "Alert",
+          text: message,
+          icon: icon, // success, error, warning, info, question
+        });
+      };
+
       $(document).ready(() => {
-        $(".image-unit").click(function () {
+        $(".image-unit").click(async function () {
           const imageId = $(this).data("id");
-          if (!imageId) return alert("Please click on an image to delete it!");
-          if (
-            confirm(
-              "Are you sure you want to delete this image from your collection?"
-            )
-          ) {
+          if (!imageId)
+            return customAlert("Please click on an image to delete it!");
+          const confirmed = await customConfirm(
+            "Are you sure you want to delete this image from your collection?",
+            `/static/image/${imageId}`
+          );
+          if (confirmed) {
             fetch("/user/profile/capture/remove", {
               method: "POST",
               headers: {
@@ -303,15 +340,15 @@
               .then((response) => response.json())
               .then((data) => {
                 if (data.status === "success") {
-                  alert("Image deleted!");
+                  customAlert("Image deleted!");
                   $(this).remove();
                 } else {
-                  alert(data.message || "Failed to delete image.");
+                  customAlert(data.message || "Failed to delete image.");
                 }
               })
               .catch((err) => {
                 console.error("Error:", err);
-                alert("Something went wrong.");
+                customAlert("Something went wrong.");
               });
           }
         });
