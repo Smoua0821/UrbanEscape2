@@ -991,27 +991,31 @@ function getCurrentLocation() {
           fetch("https://freeipapi.com/api/json")
             .then((response) => response.json())
             .then((data) => {
-              if (data && data.latitude && data.longitude) {
-                const fallbackLat = data.latitude;
-                const fallbackLng = data.longitude;
-                pos.lat = fallbackLat;
-                pos.lng = fallbackLng;
-                const newPos = { ...pos };
-                locationMarkerUpdate(newPos);
-                $("currentLocationBtn").removeClass("pending");
-                map.panTo(pos);
-                resolve({ lat: fallbackLat, lng: fallbackLng });
-              } else {
-                // If API doesn't return valid coordinates, reject the promise
-                pendingPromise = 0;
-                reject(new Error("Unable to retrieve fallback location"));
+              let fallbackLat = data.latitude || 28.6139; // New Delhi latitude
+              let fallbackLng = data.longitude || 77.209; // New Delhi longitude
+
+              if (!data.latitude || !data.longitude) {
+                notyf.warning("Using New Delhi as fallback location");
               }
+
+              pos.lat = fallbackLat;
+              pos.lng = fallbackLng;
+              const newPos = { ...pos };
+              locationMarkerUpdate(newPos);
+              $("#currentLocationBtn").removeClass("pending");
+              map.panTo(pos);
+              resolve({ lat: fallbackLat, lng: fallbackLng });
             })
             .catch((err) => {
-              // Handle API request failure
-              pendingPromise = 0;
-              notyf.error("Error fetching fallback location: " + err.message);
-              reject(new Error("Error fetching fallback location"));
+              // Fallback to New Delhi on API error
+              pos.lat = 28.6139;
+              pos.lng = 77.209;
+              const newPos = { ...pos };
+              locationMarkerUpdate(newPos);
+              $("#currentLocationBtn").removeClass("pending");
+              map.panTo(pos);
+              notyf.error("IP location failed, using New Delhi");
+              resolve({ lat: 28.6139, lng: 77.209 });
             });
         }
       );
@@ -1139,6 +1143,13 @@ function animateMarker() {
   if (polygonCoordinates.length == 0) return gameOverHandler("win");
   if (urlParsed.pathname != polygonCoordinates[polyIndex].image) {
     iconMarker.src = polygonCoordinates[polyIndex].image;
+  }
+  if (polygonCoordinates[polyIndex].border?.borderValue != "none") {
+    iconMarker.style.border = `2px solid ${polygonCoordinates[polyIndex].border?.borderColor}`;
+    iconMarker.style.borderRadius = `${polygonCoordinates[polyIndex].border?.borderValue}`;
+    iconMarker.style.background = "#ffffff40";
+    iconMarker.style.padding = "10px";
+    iconMarker.style.overflow = "hidden";
   }
   const start = polygonCoordinates[polyIndex].polygonCoords[currentSegment];
   const end = polygonCoordinates[polyIndex].polygonCoords[currentSegment + 1];
