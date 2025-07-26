@@ -1092,6 +1092,65 @@
                     class="form-control"
                   />
                 </div>
+                <div class="form-group mb-2">
+                  <p class="m-0">Border Option (0 - 50)</p>
+                  <div class="row">
+                    <div class="col-sm-6">
+                      <div class="my-2">
+                        <select
+                          id="border_option"
+                          class="form-select"
+                          onchange="generateBorderRadius()"
+                        >
+                          <option value="">No Border</option>
+                          <option value="pixel">Curvy/Rounded</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <div class="my-2">
+                        <input
+                          id="border-value"
+                          oninput="generateBorderRadius()"
+                          class="form-control"
+                          placeholder="Enter Border Amount"
+                          type="number"
+                          min="0"
+                          max="50"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="col-sm-12">
+                      <div class="my-2">
+                        <div
+                          class="d-flex justify-space-between align-items-center"
+                        >
+                          <div class="w-100"><p class="m-0">Colour</p></div>
+                          <div class="w-100">
+                            <p class="m-0">
+                              <input
+                                class="form-control"
+                                id="border-color"
+                                oninput="generateBorderRadius()"
+                                value="#ffffff"
+                                type="color"
+                              />
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-sm-12">
+                      <div class="my-2">
+                        <div class="d-flex justify-content-center">
+                          <div class="border-previewer"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <% if (icons) { %>
                 <p class="m-0">Select Image</p>
                 <div class="icon-container row justify-content-center">

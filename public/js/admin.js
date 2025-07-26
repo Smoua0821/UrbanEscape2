@@ -451,6 +451,28 @@ function copyCode(mmid) {
   document.body.removeChild(textarea);
   alert("Embed code copied to clipboard!");
 }
+
+function generateBorderRadius() {
+  let borderValue = $("#border-value").val();
+  let borderOption = $("#border_option").val();
+  let borderColor = $("#border-color").val() || "#ffffff";
+
+  if (borderOption && borderValue) {
+    borderValue += borderOption === "pixel" ? "px" : "";
+  } else {
+    borderValue = "none";
+  }
+
+  payloadData.border = { borderValue, borderColor };
+
+  $(".border-previewer").attr(
+    "style",
+    `border-radius: ${borderValue}; border: 2px solid ${borderColor}`
+  );
+
+  return borderValue;
+}
+
 $(document).ready(() => {
   $(".deadCaptureCleanUp").click(function () {
     $(this).attr("disabled", true);
@@ -473,6 +495,9 @@ $(document).ready(() => {
           $(this).attr("disabled", false);
           $(this).text("Clean Up");
         });
+    } else {
+      $(this).attr("disabled", false);
+      $(this).text("Clean Up");
     }
   });
   const renderTutorialList = () => {
@@ -1492,6 +1517,14 @@ function renderRoutes() {
         $("#sizeNum").val(tarObj.size);
         $("#imageSpeed").val(tarObj.speed);
         $("#loopOpacity").val(tarObj.opacity);
+        $("#border-color").val(tarObj?.border?.borderColor || "#fff");
+
+        const border = tarObj.border?.borderValue;
+        if (border.match("px")) {
+          $("#border_option").val("pixel");
+          $("#border-value").val(border.replace("px", ""));
+          generateBorderRadius();
+        }
 
         payloadData.title = tarObj.title;
         payloadData.loopId = path._id;

@@ -59,6 +59,16 @@ const loopRouteSchema = new mongoose.Schema(
       min: 0,
       max: 100,
     },
+    border: {
+      borderColor: {
+        type: String,
+        default: "#ffffff",
+      },
+      borderValue: {
+        type: String,
+        default: "none",
+      },
+    },
     mapId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Map",

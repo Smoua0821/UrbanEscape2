@@ -552,3 +552,10 @@
 td {
   vertical-align: middle;
 }
+
+.border-previewer {
+  height: 100px;
+  width: 100px;
+  background: url(https://placehold.co/100?text=Hello+World&font=roboto) center;
+  background-size: cover;
+}
