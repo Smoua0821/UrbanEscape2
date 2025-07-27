@@ -104,6 +104,7 @@ async function saveLoopRoutes(req, res) {
     mode = "custom",
     presetCoords,
     quiz,
+    border,
   } = req.body;
 
   if (!mapId)
@@ -151,6 +152,7 @@ async function saveLoopRoutes(req, res) {
     opacity,
     mapId: map._id,
     mode,
+    border,
     path: mode === "custom" ? [] : presetCoords,
     ...(quizData && {
       quiz: { ...quizData, blockTime: parseInt(quiz.cooldowntimeValue) },
@@ -188,6 +190,7 @@ async function updateLoopRoutes(req, res) {
     opacity,
     loopId,
     quiz,
+    border,
   } = req.body;
 
   if (!loopId) {
@@ -212,6 +215,7 @@ async function updateLoopRoutes(req, res) {
       speed,
       size,
       opacity,
+      border,
     };
     console.log("entered");
     if (quiz) {
