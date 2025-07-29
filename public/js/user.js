@@ -1145,11 +1145,10 @@ function animateMarker() {
     iconMarker.src = polygonCoordinates[polyIndex].image;
   }
   if (polygonCoordinates[polyIndex].border?.borderValue != "none") {
-    iconMarker.style.border = `2px solid ${polygonCoordinates[polyIndex].border?.borderColor}`;
+    iconMarker.style.border = `5px solid ${polygonCoordinates[polyIndex].border?.borderColor}`;
     iconMarker.style.borderRadius = `${polygonCoordinates[polyIndex].border?.borderValue}`;
-    iconMarker.style.background = "#ffffff40";
-    iconMarker.style.padding = "10px";
     iconMarker.style.overflow = "hidden";
+    iconMarker.style.objectFit = "cover";
   }
   const start = polygonCoordinates[polyIndex].polygonCoords[currentSegment];
   const end = polygonCoordinates[polyIndex].polygonCoords[currentSegment + 1];

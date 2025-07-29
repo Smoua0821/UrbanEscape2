@@ -556,6 +556,7 @@ td {
 .border-previewer {
   height: 100px;
   width: 100px;
-  background: url(https://placehold.co/100?text=Hello+World&font=roboto) center;
-  background-size: cover;
+  background-position: center !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
 }
