@@ -465,10 +465,10 @@ function generateBorderRadius() {
 
   payloadData.border = { borderValue, borderColor };
 
-  $(".border-previewer").attr(
-    "style",
-    `border-radius: ${borderValue}; border: 2px solid ${borderColor}`
-  );
+  $(".border-previewer").css({
+    "border-radius": borderValue,
+    border: `5px solid ${borderColor}`,
+  });
 
   return borderValue;
 }
@@ -1526,6 +1526,7 @@ function renderRoutes() {
           generateBorderRadius();
         }
 
+        $(".border-previewer")[0].style.background = `url(${tarObj.image})`;
         payloadData.title = tarObj.title;
         payloadData.loopId = path._id;
         payloadData.description = tarObj.description;
