@@ -1521,6 +1521,10 @@ function renderRoutes() {
       tmpImg = document.createElement("img");
       tmpImg.src = path.image;
       tmpImg.width = 10 * path.size;
+      if (path.border) {
+        tmpImg.style.borderRadius = path.border.borderValue;
+        tmpImg.style.border = `5px solid ${path.border.borderColor}`;
+      }
       bulkMarker = new google.maps.marker.AdvancedMarkerElement({
         position: cco,
         map: map,
