@@ -28,6 +28,7 @@ const {
 
   settingsUpdate,
   updateMapDate,
+  updateMapMetaData,
   presetHandler,
   renderPreset,
   importTutorialPicture,
@@ -126,6 +127,7 @@ router.get("/map", fetchMaps);
 router.post("/map", newMap);
 
 router.post("/map/update/launch", updateMapDate);
+router.post("/map/update/meta", updateMapMetaData);
 
 router.post("/map/duplicate", duplicateMap);
 router.post("/map/delete", deleteMap);

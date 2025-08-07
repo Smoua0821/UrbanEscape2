@@ -474,6 +474,48 @@ function generateBorderRadius() {
 }
 
 $(document).ready(() => {
+  $(".change_map_details").click(function () {
+    const $btn = $(this);
+    $btn
+      .attr("disabled", true)
+      .html("<span class='fa fa-spinner fa-spin'></span>");
+
+    const title = $("#cur_map_title").val();
+    const rewardLink = $("#cur_map_url_reward").val();
+    const thisMap = maps?.maps?.find((d) => d.id === mapId);
+
+    if (
+      !thisMap ||
+      (title === thisMap.name && rewardLink === thisMap.gameWinningUrl)
+    ) {
+      console.log("here");
+      $btn.attr("disabled", false).html("<span class='fa fa-save'></span>");
+      return;
+    }
+
+    fetch("/admin/map/update/meta", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ mapId, name: title, gameWinningUrl: rewardLink }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === "success") {
+          notyf.success("Updated Successfully");
+        } else {
+          notyf.error(data.message || "Update failed.");
+        }
+      })
+      .catch((e) => {
+        notyf.error(e.message || "Something went wrong!");
+      })
+      .finally(() => {
+        $btn.attr("disabled", false).html("<span class='fa fa-save'></span>");
+      });
+  });
+
   $(".deadCaptureCleanUp").click(function () {
     $(this).attr("disabled", true);
     $(this).text("Cleaning.....");
@@ -1204,6 +1246,11 @@ function renderRoutes() {
   let presetCenterMarker = new google.maps.marker.AdvancedMarkerElement({});
   let centerFixed = false;
   let centerRelativePos = {};
+  const thisMap = maps?.maps?.find((d) => (d.id = mapId));
+  if (thisMap) {
+    $("#cur_map_title").val(thisMap.name || "");
+    $("#cur_map_url_reward").val(thisMap.gameWinningUrl || "");
+  }
   function getDistanceAndAngle(lat2, lon2) {
     const { lat: lat1, lng: lon1 } = centerRelativePos;
     const R = 6371000;
@@ -1415,6 +1462,7 @@ function renderRoutes() {
   }
   $.get(`/api/looproute/${mapId}`, (dataa) => {
     const data = dataa?.route;
+    console.log(dataa);
     $(".game-mode-controller").show();
     let gameStngs = dataa?.mapGameSetting;
     if (!gameStngs || !gameStngs.coords) {
