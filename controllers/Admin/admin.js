@@ -840,6 +840,19 @@ const updateMapDate = async (req, res) => {
   }
 };
 
+const updateMapMetaData = async (req, res) => {
+  const { mapId, name, gameWinningUrl } = req.body;
+  if (!mapId || (!name && !gameWinningUrl))
+    return res.json({ status: "error", message: "Invalid Arguments" });
+  try {
+    await Map.updateOne({ id: mapId }, { name, gameWinningUrl });
+    return res.json({ status: "success", message: "Successfully Updated" });
+  } catch (error) {
+    console.log(error);
+    return res.json({ status: "error", message: "Something went wrong!" });
+  }
+};
+
 const presetHandler = async (req, res) => {
   const { mapId } = req.params;
   const { title, description, path, size, radius, speed, opacity, image } =
@@ -915,6 +928,7 @@ module.exports = {
   fetchMaps,
   newMap,
   updateMapDate,
+  updateMapMetaData,
   deleteMap,
   newMapMission,
   MapMissions,
